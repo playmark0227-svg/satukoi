@@ -26,7 +26,7 @@ export function BrandHeader({
         >
           <IconBell className="h-6 w-6" />
           {unread > 0 && (
-            <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface" />
+            <span className="animate-pulse-ring absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface" />
           )}
         </Link>
       )}

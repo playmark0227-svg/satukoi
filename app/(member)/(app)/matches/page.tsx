@@ -60,7 +60,8 @@ export default async function MatchesPage() {
       <div className="space-y-3 px-4 pb-6 pt-1">
         <a
           href="#"
-          className="flex items-start gap-3 rounded-3xl border border-warning/30 bg-warning-soft p-4"
+          style={{ animationDelay: "80ms" }}
+          className="animate-fade-up flex items-start gap-3 rounded-3xl border border-warning/30 bg-warning-soft p-4 transition active:scale-[0.99]"
         >
           <span
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white"
@@ -82,7 +83,8 @@ export default async function MatchesPage() {
 
         <a
           href="#"
-          className="flex items-start gap-3 rounded-3xl border border-success/30 bg-success-soft p-4"
+          style={{ animationDelay: "160ms" }}
+          className="animate-fade-up flex items-start gap-3 rounded-3xl border border-success/30 bg-success-soft p-4 transition active:scale-[0.99]"
         >
           <span
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white"

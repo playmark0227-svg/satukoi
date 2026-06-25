@@ -48,11 +48,12 @@ function TabButton({
   );
 }
 
-function MatchRow({ it }: { it: MatchItem }) {
+function MatchRow({ it, i }: { it: MatchItem; i: number }) {
   return (
     <Link
       href={`/matches/${it.id}`}
-      className="flex items-center gap-3.5 rounded-2xl px-1 py-2.5 transition active:bg-canvas"
+      style={{ animationDelay: `${i * 70}ms` }}
+      className="animate-fade-up flex items-center gap-3.5 rounded-2xl px-1 py-2.5 transition active:bg-canvas"
     >
       <Avatar
         url={it.photoUrl}
@@ -105,13 +106,13 @@ export function MatchTabs({
         />
       </div>
 
-      <div className="space-y-1 px-4 py-3">
+      <div key={tab} className="space-y-1 px-4 py-3">
         {list.length === 0 ? (
-          <p className="py-10 text-center text-sm text-ink-faint">
+          <p className="animate-fade-in py-10 text-center text-sm text-ink-faint">
             該当するやりとりはありません
           </p>
         ) : (
-          list.map((it) => <MatchRow key={it.id} it={it} />)
+          list.map((it, i) => <MatchRow key={it.id} it={it} i={i} />)
         )}
       </div>
     </div>

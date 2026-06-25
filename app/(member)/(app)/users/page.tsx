@@ -82,7 +82,7 @@ export default async function UsersPage({
 
       <div className="bg-home-wash space-y-5 px-4 py-5">
         {/* プロモバナー */}
-        <div className="flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
+        <div className="animate-fade-up flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white shadow-[var(--shadow-float)]">
             <IconSparkle className="h-5 w-5" />
           </span>
@@ -102,11 +102,12 @@ export default async function UsersPage({
           />
         ) : (
           <div className="grid grid-cols-2 gap-3.5">
-            {users.map((u) => (
+            {users.map((u, i) => (
               <Link
                 key={u.id}
                 href={`/users/${u.id}`}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-3xl bg-line shadow-[var(--shadow-card)] ring-1 ring-black/5 transition-transform active:scale-[0.98]"
+                style={{ animationDelay: `${i * 60}ms` }}
+                className="group animate-fade-up relative block aspect-[3/4] overflow-hidden rounded-3xl bg-line shadow-[var(--shadow-card)] ring-1 ring-black/5 transition-transform duration-200 active:scale-[0.98] sm:hover:-translate-y-1 sm:hover:shadow-[var(--shadow-pop)]"
               >
                 <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 

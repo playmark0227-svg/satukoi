@@ -14,7 +14,7 @@ export function BrandMark({ className }: { className?: string }) {
           "linear-gradient(135deg, var(--color-accent-violet), var(--color-primary))",
       }}
     >
-      <IconSparkle className="h-1/2 w-1/2" />
+      <IconSparkle className="h-1/2 w-1/2 animate-twinkle" />
     </span>
   );
 }

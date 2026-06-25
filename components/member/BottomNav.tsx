@@ -27,7 +27,13 @@ export function BottomNav() {
               active ? "text-primary" : "text-ink-faint"
             )}
           >
-            <Icon className="h-[22px] w-[22px]" filled={active} />
+            <Icon
+              className={cn(
+                "h-[22px] w-[22px] transition-transform duration-200",
+                active && "-translate-y-0.5 scale-110"
+              )}
+              filled={active}
+            />
             {label}
             <span
               className={cn(

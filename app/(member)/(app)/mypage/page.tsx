@@ -6,6 +6,7 @@ import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { ButtonLink } from "@/components/ui/Button";
+import { CountUp } from "@/components/ui/CountUp";
 import {
   IconPencil,
   IconHeart,
@@ -17,7 +18,7 @@ import {
 function Stat({ n, label, color }: { n: number; label: string; color: string }) {
   return (
     <div className="flex flex-col items-center">
-      <span className={`text-2xl font-black ${color}`}>{n}</span>
+      <CountUp value={n} className={`text-2xl font-black ${color}`} />
       <span className="mt-0.5 text-xs text-ink-soft">{label}</span>
     </div>
   );
@@ -62,7 +63,7 @@ export default async function MyPage() {
 
       <div className="space-y-5 px-4 py-5">
         {/* プロフィール */}
-        <div>
+        <div className="animate-fade-up">
           <div className="flex items-center gap-4">
             <Avatar
               url={me.photos[0]?.url}
@@ -83,14 +84,20 @@ export default async function MyPage() {
         </div>
 
         {/* スタッツ */}
-        <div className="grid grid-cols-3 divide-x divide-line rounded-2xl border border-line/70 bg-surface py-4 shadow-[var(--shadow-card)]">
+        <div
+          style={{ animationDelay: "90ms" }}
+          className="animate-fade-up grid grid-cols-3 divide-x divide-line rounded-2xl border border-line/70 bg-surface py-4 shadow-[var(--shadow-card)]"
+        >
           <Stat n={matchCount} label="マッチング" color="text-primary" />
           <Stat n={sentCount} label="申し込み" color="text-info" />
           <Stat n={receivedCount} label="申し受け" color="text-violet-600" />
         </div>
 
         {/* 導線リスト */}
-        <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line/70 bg-surface shadow-[var(--shadow-card)]">
+        <div
+          style={{ animationDelay: "180ms" }}
+          className="animate-fade-up divide-y divide-line overflow-hidden rounded-2xl border border-line/70 bg-surface shadow-[var(--shadow-card)]"
+        >
           <Row
             href="/matches"
             icon={<IconHeart className="h-5 w-5" />}
@@ -114,7 +121,8 @@ export default async function MyPage() {
         {/* プレミアム（サロン）バナー */}
         <Link
           href="#"
-          className="block rounded-3xl border border-primary/25 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]"
+          style={{ animationDelay: "270ms" }}
+          className="animate-fade-up block rounded-3xl border border-primary/25 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]"
         >
           <div className="flex items-start gap-3">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-[var(--shadow-float)]">
