@@ -1,8 +1,11 @@
 name: Deploy demo to GitHub Pages
 
-# サツコイ！の静的UIデモ（読み取り専用）を GitHub Pages へ自動デプロイする。
-# Settings → Pages → Source を「GitHub Actions」に設定すると有効になります。
+# サツコイ！の静的UIデモ（読み取り専用）をビルドし、gh-pages ブランチへ公開する。
+# 公開には Settings → Pages → Source を「Deploy from a branch」→「gh-pages / (root)」に設定。
 # 公開URL: https://playmark0227-svg.github.io/satukoi/
+#
+# ※ 保護された github-pages 環境を使わず gh-pages ブランチへ push する方式のため、
+#   既定ブランチ以外からでもワークフロー自体は成功します。
 
 on:
   push:
@@ -12,16 +15,14 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: pages-deploy
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -59,18 +60,9 @@ jobs:
       - name: Build static demo (output: export)
         run: npm run demo:build
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: ./out
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages

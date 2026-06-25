@@ -170,7 +170,11 @@ npm run demo:build      # 静的エクスポート（out/ に出力）
 npx serve out           # ローカル確認（任意）
 ```
 
-設定はリポジトリ設定 → Pages の Source を「GitHub Actions」にすると有効になります。
+公開手順（初回のみ）:
+1. push すると GitHub Actions が `out/` をビルドし `gh-pages` ブランチへ公開します。
+2. リポジトリ設定 → Pages → Source を「Deploy from a branch」→「gh-pages / (root)」に設定。
+3. 数分後、上記URLで閲覧できます。
+
 詳細は `.github/workflows/deploy-pages.yml` を参照。
 
 ---
