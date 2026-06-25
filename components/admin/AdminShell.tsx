@@ -52,12 +52,18 @@ export function AdminShell({
             );
           })}
         </nav>
-        <form action="/admin/logout" method="post" className="border-t border-line p-3">
-          <p className="px-1 pb-2 text-xs text-ink-faint">{adminName}</p>
-          <button className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink-soft hover:bg-canvas">
-            ログアウト
-          </button>
-        </form>
+        {process.env.NEXT_PUBLIC_DEMO === "1" ? (
+          <div className="border-t border-line p-3">
+            <p className="px-1 text-xs text-ink-faint">{adminName}</p>
+          </div>
+        ) : (
+          <form action="/admin/logout" method="post" className="border-t border-line p-3">
+            <p className="px-1 pb-2 text-xs text-ink-faint">{adminName}</p>
+            <button className="w-full rounded-lg px-3 py-2 text-left text-sm text-ink-soft hover:bg-canvas">
+              ログアウト
+            </button>
+          </form>
+        )}
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">

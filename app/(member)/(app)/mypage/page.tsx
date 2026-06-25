@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireMember } from "@/lib/auth";
+import { IS_DEMO } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
@@ -113,29 +114,31 @@ export default async function MyPage() {
         {/* 広告 */}
         <AdBanner position="MYPAGE" />
 
-        {/* ログアウト・退会 */}
-        <div className="space-y-2 pt-2">
-          <form action="/logout" method="post">
-            <Button type="submit" variant="outline" size="lg">
-              ログアウト
-            </Button>
-          </form>
-
-          <details className="rounded-2xl border border-line bg-surface">
-            <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-ink-soft">
-              退会について
-            </summary>
-            <div className="space-y-3 border-t border-line px-4 py-3">
-              <p className="text-xs leading-relaxed text-ink-soft">
-                退会すると、プロフィール・マッチング情報はご利用いただけなくなります。
-                進行中のマッチがある場合は、お手続き前にお問い合わせください。
-              </p>
-              <Button type="button" variant="danger" size="sm" disabled>
-                退会手続きへ進む（準備中）
+        {/* ログアウト・退会（デモでは非表示） */}
+        {!IS_DEMO && (
+          <div className="space-y-2 pt-2">
+            <form action="/logout" method="post">
+              <Button type="submit" variant="outline" size="lg">
+                ログアウト
               </Button>
-            </div>
-          </details>
-        </div>
+            </form>
+
+            <details className="rounded-2xl border border-line bg-surface">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-ink-soft">
+                退会について
+              </summary>
+              <div className="space-y-3 border-t border-line px-4 py-3">
+                <p className="text-xs leading-relaxed text-ink-soft">
+                  退会すると、プロフィール・マッチング情報はご利用いただけなくなります。
+                  進行中のマッチがある場合は、お手続き前にお問い合わせください。
+                </p>
+                <Button type="button" variant="danger" size="sm" disabled>
+                  退会手続きへ進む（準備中）
+                </Button>
+              </div>
+            </details>
+          </div>
+        )}
       </div>
     </div>
   );
