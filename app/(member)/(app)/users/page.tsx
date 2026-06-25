@@ -80,13 +80,15 @@ export default async function UsersPage({
         area={sp.area ?? ""}
       />
 
-      <div className="space-y-4 px-4 py-4">
+      <div className="bg-home-wash space-y-5 px-4 py-5">
         {/* プロモバナー */}
-        <div className="flex gap-3 rounded-2xl border border-primary/15 bg-primary-tint p-4">
-          <IconSparkle className="mt-0.5 h-6 w-6 shrink-0 text-primary" />
+        <div className="flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white shadow-[var(--shadow-float)]">
+            <IconSparkle className="h-5 w-5" />
+          </span>
           <div>
             <p className="font-bold text-primary-strong">新しい出会いが待っています</p>
-            <p className="mt-1 text-sm leading-relaxed text-primary-strong/80">
+            <p className="mt-1 text-sm leading-relaxed text-primary-strong/75">
               気になる方を見つけたら、プロフィールをチェックしてデート申し込みしてみましょう！
             </p>
           </div>
@@ -99,19 +101,19 @@ export default async function UsersPage({
             description="絞り込み条件を変えてもう一度お試しください。"
           />
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3.5">
             {users.map((u) => (
               <Link
                 key={u.id}
                 href={`/users/${u.id}`}
-                className="relative block aspect-[3/4] overflow-hidden rounded-2xl bg-line shadow-[var(--shadow-card)]"
+                className="group relative block aspect-[3/4] overflow-hidden rounded-3xl bg-line shadow-[var(--shadow-card)] ring-1 ring-black/5 transition-transform active:scale-[0.98]"
               >
                 <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 
                 {/* 下部グラデーション＋情報オーバーレイ */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-3 pb-3 pt-10">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-3.5 pb-3.5 pt-12">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-base font-bold text-white drop-shadow">
+                    <span className="truncate text-lg font-bold text-white drop-shadow-sm">
                       {u.nickname}
                     </span>
                     {u.incomeCertVerified && <BadgeVerified />}

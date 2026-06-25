@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import type { AdPosition } from "@prisma/client";
+import { AdImage } from "@/components/member/AdImage";
 
 /**
  * 広告バナー（サーバー部品）。
@@ -21,16 +22,14 @@ export async function AdBanner({ position }: { position: AdPosition }) {
           href={ad.linkUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block overflow-hidden rounded-2xl border border-line bg-surface"
+          className="relative block overflow-hidden rounded-2xl border border-line/70 bg-surface shadow-[var(--shadow-card)]"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ad.imageUrl}
-            alt={ad.title}
-            className="h-auto w-full object-cover"
-          />
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-black/45 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+            広告
+          </span>
+          <AdImage url={ad.imageUrl} title={ad.title} />
           <span className="block px-3 py-1.5 text-[11px] text-ink-faint">
-            広告・{ad.title}
+            {ad.title}
           </span>
         </a>
       ))}
