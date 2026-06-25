@@ -1,142 +1,138 @@
 import Link from "next/link";
 import { requireMember } from "@/lib/auth";
-import { IS_DEMO } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
-import { AppHeader } from "@/components/member/AppHeader";
-import { AdBanner } from "@/components/member/AdBanner";
+import { BrandHeader } from "@/components/member/BrandHeader";
 import { Avatar } from "@/components/ui/Avatar";
-import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { MemberStatusBadge } from "@/components/ui/StatusBadge";
+import { ButtonLink } from "@/components/ui/Button";
+import {
+  IconPencil,
+  IconHeart,
+  IconSend,
+  IconChat,
+  IconCrown,
+} from "@/components/member/icons";
 
-const MENU = [
-  { href: "/mypage/edit", label: "プロフィール編集", icon: "✎" },
-  { href: "/matches", label: "マッチング履歴", icon: "♡" },
-  { href: "/applications", label: "送った／受信した申込", icon: "✉" },
-];
-
-export default async function MyPage() {
-  const me = await requireMember();
-
-  const referralCode = await prisma.referralCode.findUnique({
-    where: { memberId: me.id },
-  });
-
+function Stat({ n, label, color }: { n: number; label: string; color: string }) {
   return (
-    <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="マイページ" />
-
-      <div className="space-y-4 px-4 py-4">
-        {/* プロフィール概要 */}
-        <Card>
-          <CardBody className="flex items-center gap-3">
-            <Avatar
-              url={me.photos[0]?.url}
-              name={me.nickname}
-              rounded="xl"
-              className="h-16 w-16 shrink-0 text-2xl"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h2 className="truncate text-lg font-black text-ink">
-                  {me.nickname}
-                </h2>
-                <Badge tone="primary">{calcAge(me.birthDate)}歳</Badge>
-              </div>
-              <p className="mt-0.5 text-sm text-ink-soft">
-                {RESIDENCE_AREA_LABELS[me.residenceArea]}
-              </p>
-              <div className="mt-1.5">
-                <MemberStatusBadge status={me.status} />
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* 紹介コード */}
-        <div>
-          <SectionTitle>ご紹介</SectionTitle>
-          <Card>
-            <CardBody className="space-y-3">
-              <div>
-                <p className="text-xs text-ink-soft">あなたの紹介コード</p>
-                <p className="mt-0.5 font-mono text-xl font-black tracking-wider text-primary-strong">
-                  {referralCode?.code ?? "ー"}
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-ink-faint">
-                  お知り合いのご登録時にこのコードをご入力いただくと、
-                  お二人にデート代無料の特典が付きます。
-                </p>
-              </div>
-              <div className="flex items-center justify-between rounded-xl bg-primary-soft px-3 py-2">
-                <span className="text-sm font-bold text-primary-strong">
-                  紹介特典（デート代無料）残数
-                </span>
-                <span className="text-lg font-black text-primary-strong">
-                  {me.referralBonusRemaining}回
-                </span>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
-
-        {/* メニュー導線 */}
-        <div>
-          <SectionTitle>メニュー</SectionTitle>
-          <Card>
-            <nav className="divide-y divide-line">
-              {MENU.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 px-4 py-3.5 hover:bg-canvas"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-soft text-sm text-primary">
-                    {item.icon}
-                  </span>
-                  <span className="flex-1 text-sm font-medium text-ink">
-                    {item.label}
-                  </span>
-                  <span className="text-ink-faint">›</span>
-                </Link>
-              ))}
-            </nav>
-          </Card>
-        </div>
-
-        {/* 広告 */}
-        <AdBanner position="MYPAGE" />
-
-        {/* ログアウト・退会（デモでは非表示） */}
-        {!IS_DEMO && (
-          <div className="space-y-2 pt-2">
-            <form action="/logout" method="post">
-              <Button type="submit" variant="outline" size="lg">
-                ログアウト
-              </Button>
-            </form>
-
-            <details className="rounded-2xl border border-line bg-surface">
-              <summary className="cursor-pointer px-4 py-3 text-sm font-bold text-ink-soft">
-                退会について
-              </summary>
-              <div className="space-y-3 border-t border-line px-4 py-3">
-                <p className="text-xs leading-relaxed text-ink-soft">
-                  退会すると、プロフィール・マッチング情報はご利用いただけなくなります。
-                  進行中のマッチがある場合は、お手続き前にお問い合わせください。
-                </p>
-                <Button type="button" variant="danger" size="sm" disabled>
-                  退会手続きへ進む（準備中）
-                </Button>
-              </div>
-            </details>
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col items-center">
+      <span className={`text-2xl font-black ${color}`}>{n}</span>
+      <span className="mt-0.5 text-xs text-ink-soft">{label}</span>
     </div>
   );
 }
 
+function Row({
+  href,
+  icon,
+  iconClass,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  iconClass: string;
+  label: string;
+}) {
+  return (
+    <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-canvas">
+      <span className={`flex h-9 w-9 items-center justify-center rounded-full ${iconClass}`}>
+        {icon}
+      </span>
+      <span className="flex-1 text-sm font-medium text-ink">{label}</span>
+      <span className="text-ink-faint">›</span>
+    </Link>
+  );
+}
+
+export default async function MyPage() {
+  const me = await requireMember();
+
+  const [matchCount, sentCount, receivedCount] = await Promise.all([
+    prisma.match.count({
+      where: { OR: [{ applicantId: me.id }, { receiverId: me.id }] },
+    }),
+    prisma.dateApplication.count({ where: { applicantId: me.id } }),
+    prisma.dateApplication.count({ where: { receiverId: me.id } }),
+  ]);
+
+  return (
+    <div className="flex flex-1 flex-col pb-8">
+      <BrandHeader />
+
+      <div className="space-y-5 px-4 py-5">
+        {/* プロフィール */}
+        <div>
+          <div className="flex items-center gap-4">
+            <Avatar
+              url={me.photos[0]?.url}
+              name={me.nickname}
+              className="h-20 w-20 shrink-0 text-2xl"
+            />
+            <div className="min-w-0">
+              <p className="truncate text-2xl font-black text-ink">{me.nickname}</p>
+              <p className="mt-0.5 text-sm text-ink-soft">
+                {calcAge(me.birthDate)}歳 / {RESIDENCE_AREA_LABELS[me.residenceArea]}
+              </p>
+            </div>
+          </div>
+          <ButtonLink href="/mypage/edit" size="lg" className="mt-4">
+            <IconPencil className="h-5 w-5" />
+            プロフィールを編集
+          </ButtonLink>
+        </div>
+
+        {/* スタッツ */}
+        <div className="grid grid-cols-3 divide-x divide-line rounded-2xl border border-line/70 bg-surface py-4 shadow-[var(--shadow-card)]">
+          <Stat n={matchCount} label="マッチング" color="text-primary" />
+          <Stat n={sentCount} label="申し込み" color="text-info" />
+          <Stat n={receivedCount} label="申し受け" color="text-violet-600" />
+        </div>
+
+        {/* 導線リスト */}
+        <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line/70 bg-surface shadow-[var(--shadow-card)]">
+          <Row
+            href="/matches"
+            icon={<IconHeart className="h-5 w-5" />}
+            iconClass="bg-primary-soft text-primary"
+            label="マッチング履歴"
+          />
+          <Row
+            href="/applications?tab=sent"
+            icon={<IconSend className="h-5 w-5" />}
+            iconClass="bg-info-soft text-info"
+            label="申し込み"
+          />
+          <Row
+            href="/applications?tab=received"
+            icon={<IconChat className="h-5 w-5" />}
+            iconClass="bg-violet-100 text-violet-600"
+            label="申し受け"
+          />
+        </div>
+
+        {/* プレミアム（サロン）バナー */}
+        <Link
+          href="#"
+          className="block rounded-3xl border border-primary/25 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-[var(--shadow-float)]">
+              <IconCrown className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-bold text-violet-700">
+                ♛ プレミアム
+              </span>
+              <p className="mt-1 font-bold text-ink">婚活サロン会員募集</p>
+              <p className="mt-0.5 text-sm leading-relaxed text-ink-soft">
+                月9,900円〜でデート代無料・全国10万人以上とマッチング・専属カウンセラー
+              </p>
+              <p className="mt-1.5 text-sm font-bold text-violet-700">詳細を見る →</p>
+            </div>
+          </div>
+        </Link>
+      </div>
+    </div>
+  );
+}

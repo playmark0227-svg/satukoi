@@ -73,7 +73,7 @@ export default async function UsersPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <BrandHeader unread={unread} />
+      <BrandHeader unread={unread} bell />
       <UserFilters
         ageMin={sp.ageMin ?? ""}
         ageMax={sp.ageMax ?? ""}
