@@ -1,0 +1,794 @@
+// ════════════════════════════════════════════════════════════════════
+//  サツコイ！（仮）  データモデル
+//  「チャットなし、ちゃんと会える！」札幌恋活マッチングサービス
+//
+//  仕様書の各セクションに対応するモデルをコメントで明示しています。
+//  Prisma 7（Rust-free / driver adapter）構成。
+// ════════════════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7: 接続 URL は prisma.config.ts（マイグレーション用）と
+// PrismaClient の adapter（実行時）で指定する。schema 側には書かない。
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+//  列挙型（プロフィール選択肢・ステータス）
+// ─────────────────────────────────────────────
+
+enum Sex {
+  MALE
+  FEMALE
+}
+
+/// 居住地（可能エリア）。札幌及び札幌近郊に限定。
+enum ResidenceArea {
+  SAPPORO // 札幌市
+  EBETSU // 江別市
+  KITAHIROSHIMA // 北広島市
+  ENIWA // 恵庭市
+  TOBETSU // 当別町
+  NANPORO // 南幌町
+  OTARU // 小樽市
+  ISHIKARI // 石狩市
+  IWAMIZAWA // 岩見沢市
+  CHITOSE // 千歳市
+  SHINSHINOTSU // 新篠津村
+  NAGANUMA // 長沼町
+}
+
+/// 在住 / 在勤の区分（在住もしくは在勤限定）
+enum EligibilityType {
+  RESIDENT // 在住
+  WORKER // 在勤
+}
+
+/// 年収帯（所得証明提出時のみ公開）
+enum IncomeBracket {
+  UNDER_399 // 〜399万
+  B400_599 // 400〜599
+  B600_799 // 600〜799
+  B800_999 // 800〜999
+  OVER_1000 // 1000万〜
+}
+
+/// 休日
+enum HolidayType {
+  WEEKENDS_HOLIDAYS // 土日祝
+  SHIFT // シフト
+  OTHER_FIXED // その他固定曜日（fixedHolidays に曜日を保持）
+}
+
+enum Weekday {
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+  SUN
+}
+
+/// 体型
+enum BodyType {
+  SLIM // スリム
+  AVERAGE // 普通
+  CHUBBY // ぽっちゃり
+  MUSCULAR // ガッチリ
+  PLUMP // ふっくら
+}
+
+/// タバコ
+enum SmokingHabit {
+  SMOKER // 吸う
+  NON_SMOKER // 吸わない
+}
+
+/// お酒
+enum DrinkingHabit {
+  DRINKER // 飲む
+  SOCIAL // 付き合い程度
+  NON_DRINKER // 飲まない
+}
+
+/// 将来子供は？
+enum ChildrenWish {
+  WANT // 希望する
+  EITHER // こだわらない
+  DONT_WANT // 希望しない
+}
+
+/// 会員アカウント種別（料金免除判定に使用）
+/// SALON = 結婚相談所（サロン）会員。各種料金が無料。
+enum MemberAccountType {
+  NORMAL
+  SALON
+}
+
+/// 会員ステータス（運営管理画面の会員ステータスに対応）
+enum MemberStatus {
+  DOCUMENT_REVIEW // 書類確認中（登録直後）
+  ACTIVE // 有効（運営承認後）
+  SUSPENDED // 停止（違約金未払い・通報対応など）
+  WITHDRAWN // 退会
+}
+
+// ─────────────────────────────────────────────
+//  会員（Member）— 仕様「会員登録」「プロフィール登録」
+// ─────────────────────────────────────────────
+
+model Member {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // アカウント / ステータス
+  accountType MemberAccountType @default(NORMAL)
+  status      MemberStatus      @default(DOCUMENT_REVIEW)
+  approvedAt  DateTime? // 運営承認日時
+  withdrawnAt DateTime?
+  suspendedAt DateTime?
+
+  // Stripe
+  stripeCustomerId String?
+  cardRegistered   Boolean @default(false)
+
+  // ── プロフィール（②プロフィール登録：すべて必須） ──
+  // ※ 登録後に自己編集不可：name / birthDate / sex / residenceArea /
+  //   incomeBracket / hasMarriageHistory / hasChildren
+  //   （変更は運営申請。アプリ層で編集ガード）
+  fullName          String // 名前（会員間では非公開）
+  nickname          String
+  birthDate         DateTime // 年齢は生年月日から自動算出
+  sex               Sex
+  residenceArea     ResidenceArea
+  eligibilityType   EligibilityType @default(RESIDENT)
+  occupation        String // 職業
+  incomeBracket     IncomeBracket
+  incomeCertVerified Boolean        @default(false) // 所得証明提出・確認済みなら年収公開
+  holidayType       HolidayType
+  fixedHolidays     Weekday[] // holidayType=OTHER_FIXED の場合の曜日
+  hasMarriageHistory Boolean // 婚姻歴（有無）
+  hasChildren       Boolean // 子供（有無）
+  childrenWish      ChildrenWish // 将来子供は？
+  heightCm          Int // 身長
+  bodyType          BodyType
+  smoking           SmokingHabit
+  drinking          DrinkingHabit
+  qualifications    String? // 資格
+  hobbies           String? // 趣味
+  selfIntroduction  String? // 自己紹介
+
+  // 紹介制度
+  referralBonusRemaining Int @default(0) // 紹介特典（デート代無料）残数
+
+  // 更新料の自動決済管理（登録から1年後に自動決済）
+  nextRenewalAt DateTime?
+
+  // ── リレーション ──
+  photos        Photo[]
+  documents     Document[]
+  resetTokens   PasswordResetToken[]
+  ownReferralCode ReferralCode?      @relation("memberReferralCode")
+
+  blocksMade     Block[] @relation("blocker")
+  blocksReceived Block[] @relation("blocked")
+  reportsMade     Report[] @relation("reporter")
+  reportsReceived Report[] @relation("reported")
+  inquiries       Inquiry[]
+
+  applicationsSent     DateApplication[] @relation("applicant")
+  applicationsReceived DateApplication[] @relation("receiver")
+  matchesAsApplicant   Match[]           @relation("matchApplicant")
+  matchesAsReceiver    Match[]           @relation("matchReceiver")
+  proposalsMade        ScheduleProposal[]
+  candidateSelections  ScheduleCandidate[]
+
+  payments        Payment[]
+  cancellations   Cancellation[]
+  warnings        Warning[]
+  surveyResponses SurveyResponse[]
+  notifications   Notification[]
+  adminMemos      AdminMemo[]
+
+  referralsAsReferrer Referral[] @relation("referrer")
+  referralAsReferred  Referral?  @relation("referred")
+
+  @@index([status])
+  @@index([sex, residenceArea])
+  @@index([sex, birthDate])
+}
+
+/// 顔写真：最大5枚（2枚必須）。1枚目が一覧表示に使用される。
+model Photo {
+  id        String   @id @default(cuid())
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String
+  url       String
+  order     Int // 表示順（0 = 1枚目）
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, order])
+  @@index([memberId])
+}
+
+enum DocumentType {
+  ID_DOCUMENT // 顔写真付き身分証明書（必須）
+  SINGLE_CERT // 独身証明書（必須）
+  INCOME_CERT // 所得証明（任意・前年分を毎年3/15まで）
+}
+
+enum DocumentCheckStatus {
+  PENDING // 未確認
+  OK // 確認OK
+  NG // 差戻し
+}
+
+/// ③ 書類アップロード（運営で手動確認）
+model Document {
+  id          String              @id @default(cuid())
+  member      Member              @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId    String
+  type        DocumentType
+  url         String
+  checkStatus DocumentCheckStatus @default(PENDING)
+  checkedAt   DateTime?
+  note        String? // 差戻し理由など
+  createdAt   DateTime            @default(now())
+
+  @@index([memberId])
+  @@index([checkStatus])
+}
+
+/// PW忘れ：再設定トークン
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  member    Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([memberId])
+}
+
+// ─────────────────────────────────────────────
+//  ブロック / 通報 / お問い合わせ
+// ─────────────────────────────────────────────
+
+/// ブロック（自分と相手の双方に今後非表示）
+model Block {
+  id        String   @id @default(cuid())
+  blocker   Member   @relation("blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blockerId String
+  blocked   Member   @relation("blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  blockedId String
+  createdAt DateTime @default(now())
+
+  @@unique([blockerId, blockedId])
+  @@index([blockedId])
+}
+
+enum ReportType {
+  HARASSMENT // 迷惑行為
+  INAPPROPRIATE_CONTENT // 不適切なプロフィール
+  FAKE_PROFILE // なりすまし
+  NO_SHOW // 無断キャンセル/ドタキャン
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+/// 通報（⑥通報・お問い合わせ管理）
+model Report {
+  id         String       @id @default(cuid())
+  reporter   Member       @relation("reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reporterId String
+  reported   Member       @relation("reported", fields: [reportedId], references: [id], onDelete: Cascade)
+  reportedId String
+  type       ReportType
+  content    String
+  status     ReportStatus @default(OPEN)
+  handledAt  DateTime?
+  createdAt  DateTime     @default(now())
+
+  @@index([status])
+  @@index([reportedId])
+}
+
+enum InquiryStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+/// お問い合わせ
+model Inquiry {
+  id        String        @id @default(cuid())
+  member    Member?       @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  memberId  String?
+  email     String?
+  subject   String
+  body      String
+  status    InquiryStatus @default(OPEN)
+  handledAt DateTime?
+  createdAt DateTime      @default(now())
+
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+//  デート申込み / マッチ / 日程調整フロー
+// ─────────────────────────────────────────────
+
+enum ApplicationStatus {
+  PENDING // 申込済（申受待ち）
+  ACCEPTED // 申受（→マッチ成立）
+  DECLINED // 見送り
+  CANCELLED // 申込側が取消
+  EXPIRED // 期限切れ
+}
+
+/// デート申込み／申受。ACCEPTED で Match が成立する。
+model DateApplication {
+  id          String            @id @default(cuid())
+  applicant   Member            @relation("applicant", fields: [applicantId], references: [id], onDelete: Cascade)
+  applicantId String
+  receiver    Member            @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId  String
+  status      ApplicationStatus @default(PENDING)
+  message     String?
+  respondedAt DateTime?
+  createdAt   DateTime          @default(now())
+
+  match Match?
+
+  @@index([applicantId])
+  @@index([receiverId])
+  @@index([status])
+}
+
+/// マッチ／デートのフェーズ（運営管理：状態遷移）
+/// 会員向け表示は SCHEDULING→「日程調整中」/ CONFIRMED→「日程確定」の2種類のみ。
+enum MatchPhase {
+  SCHEDULING // 日程調整中
+  CONFIRMED // 日程確定
+  COMPLETED // デート実施済
+  CANCELLED // キャンセル（理由は Cancellation 参照）
+}
+
+model Match {
+  id          String     @id @default(cuid())
+  // 申込会員 / 申受会員
+  applicant   Member     @relation("matchApplicant", fields: [applicantId], references: [id], onDelete: Cascade)
+  applicantId String
+  receiver    Member     @relation("matchReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId  String
+  phase       MatchPhase @default(SCHEDULING)
+
+  application   DateApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  applicationId String?          @unique
+
+  matchedAt   DateTime  @default(now()) // マッチ成立日（30日/7日の起算点）
+  // 最後のアクション日時（自動キャンセル判定：48時間ルール等）
+  lastActionAt DateTime @default(now())
+  closedAt    DateTime?
+
+  proposals       ScheduleProposal[]
+  dateEvent       DateEvent?
+  payments        Payment[]
+  cancellations   Cancellation[]
+  surveyResponses SurveyResponse[]
+  notifications   Notification[]
+  adminMemos      AdminMemo[]
+
+  @@index([applicantId])
+  @@index([receiverId])
+  @@index([phase])
+  @@index([lastActionAt])
+}
+
+/// 日程候補の提示（申受側が3件以上、回数制限なし）
+model ScheduleProposal {
+  id           String   @id @default(cuid())
+  match        Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId      String
+  proposedBy   Member   @relation(fields: [proposedById], references: [id], onDelete: Cascade)
+  proposedById String
+  round        Int // 何回目の提示か（履歴は会員画面では非表示）
+  createdAt    DateTime @default(now())
+
+  candidates ScheduleCandidate[]
+
+  @@index([matchId])
+}
+
+/// 日程候補（日付・開始/終了時刻）
+model ScheduleCandidate {
+  id           String           @id @default(cuid())
+  proposal     ScheduleProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId   String
+  startAt      DateTime // 日付＋開始時刻
+  endAt        DateTime // 終了時刻
+  isSelected   Boolean          @default(false)
+  selectedBy   Member?          @relation(fields: [selectedById], references: [id], onDelete: SetNull)
+  selectedById String?
+  selectedAt   DateTime?
+
+  @@index([proposalId])
+}
+
+enum DateEventStatus {
+  SCHEDULED // 日程確定・実施前
+  COMPLETED // 実施済
+  CANCELLED // キャンセル
+  RESCHEDULING // 日程変更希望により調整中へ差戻し
+}
+
+/// 確定デート＋店舗情報（④店舗確定・デート実施）
+model DateEvent {
+  id      String          @id @default(cuid())
+  match   Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId String          @unique
+  startAt DateTime
+  endAt   DateTime
+  status  DateEventStatus @default(SCHEDULED)
+
+  // 店舗（運営が事前登録5店舗から選択）
+  store            Store?    @relation(fields: [storeId], references: [id], onDelete: SetNull)
+  storeId          String?
+  storeConfirmedAt DateTime?
+  reservationName  String? // 予約名（サービス名）
+  notesTemplate    String? // 注意事項（テンプレ）
+
+  confirmedAt DateTime @default(now())
+
+  @@index([startAt])
+  @@index([status])
+}
+
+/// 店舗（5店舗まで事前登録、運営が選択、情報は編集可能）
+model Store {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  area      String? // 札幌中心部など
+  phone     String?
+  notes     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  dateEvents DateEvent[]
+}
+
+// ─────────────────────────────────────────────
+//  決済（Stripe）
+// ─────────────────────────────────────────────
+
+enum PaymentPurpose {
+  REGISTRATION // 登録料 11,000円（サロン会員無料）
+  RENEWAL // 更新料 11,000円（登録1年後に自動決済）
+  DATE_FEE // デート代 5,500円（日程確定時、サロン会員/紹介特典は無料）
+  PENALTY_5500 // 違約金 5,500円（24h〜2h前キャンセル）
+  PENALTY_11000 // 違約金 11,000円（2h前〜無断）
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Payment {
+  id                    String         @id @default(cuid())
+  member                Member         @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId              String
+  match                 Match?         @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  matchId               String?
+  purpose               PaymentPurpose
+  amount                Int // JPY
+  status                PaymentStatus  @default(PENDING)
+  stripePaymentIntentId String?
+  refundedAmount        Int            @default(0)
+  // 無料適用の根拠（サロン会員・紹介特典など）
+  waivedReason          String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@index([memberId])
+  @@index([matchId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+//  キャンセル / 警告（ペナルティ）
+// ─────────────────────────────────────────────
+
+/// キャンセル区分（補足：3種類のみで管理）
+enum CancellationCategory {
+  BEFORE_24H // ① 日程確定後〜開始24時間前まで（返金なし/相手全額返金/警告なし）
+  H24_TO_2H // ② 24時間前〜当日2時間前（違約金5,500/警告1点）
+  WITHIN_2H_OR_NOSHOW // ③ 2時間前〜無断（20分以上遅延含む。違約金11,000/警告2点/相手次回無料）
+}
+
+model Cancellation {
+  id       String               @id @default(cuid())
+  match    Match                @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId  String
+  by       Member               @relation(fields: [byMemberId], references: [id], onDelete: Cascade)
+  byMemberId String
+  category CancellationCategory
+  reason   String
+
+  // 自動制御される結果（運営最終判断で上書き可）
+  refundIssuedToCounterpart    Boolean @default(true) // 相手側へ全額返金
+  penaltyAmount                Int     @default(0) // キャンセル者の違約金
+  warningPoints                Int     @default(0) // キャンセル者への警告点
+  freeDateGrantedToCounterpart Boolean @default(false) // 相手へ次回デート1回無料
+  mutualHide                   Boolean @default(false) // 以降お互い非表示（③のみ）
+
+  createdAt DateTime @default(now())
+
+  warnings Warning[]
+
+  @@index([matchId])
+  @@index([byMemberId])
+  @@index([category])
+}
+
+/// 警告制度（付与日から1年間有効、1年以内に3点以上で強制退会）
+model Warning {
+  id             String        @id @default(cuid())
+  member         Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId       String
+  points         Int // 1 または 2
+  reason         String
+  cancellation   Cancellation? @relation(fields: [cancellationId], references: [id], onDelete: SetNull)
+  cancellationId String?
+  issuedAt       DateTime      @default(now())
+  expiresAt      DateTime // issuedAt + 1年
+
+  @@index([memberId])
+  @@index([expiresAt])
+}
+
+// ─────────────────────────────────────────────
+//  紹介制度
+// ─────────────────────────────────────────────
+
+enum ReferralSourceType {
+  MEMBER // 既存会員
+  STORE // 紹介先店舗（謝礼は直接）
+}
+
+/// 紹介コード（会員 or 店舗に付与）
+model ReferralCode {
+  id         String             @id @default(cuid())
+  code       String             @unique
+  sourceType ReferralSourceType
+  // 会員発行コードの場合の所有会員
+  member     Member?            @relation("memberReferralCode", fields: [memberId], references: [id], onDelete: Cascade)
+  memberId   String?            @unique
+  // 店舗発行コードの場合のラベル
+  storeLabel String?
+  isActive   Boolean            @default(true)
+  createdAt  DateTime           @default(now())
+
+  referrals Referral[]
+}
+
+enum ReferralStatus {
+  PENDING // 登録済（決済前）
+  ESTABLISHED // 登録料決済完了で紹介成立
+}
+
+/// 紹介の成立記録
+model Referral {
+  id           String         @id @default(cuid())
+  code         ReferralCode   @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId       String
+  // 紹介者（会員紹介の場合）
+  referrer     Member?        @relation("referrer", fields: [referrerId], references: [id], onDelete: SetNull)
+  referrerId   String?
+  // 被紹介者（新規会員）
+  referred     Member         @relation("referred", fields: [referredId], references: [id], onDelete: Cascade)
+  referredId   String         @unique
+  status       ReferralStatus @default(PENDING)
+  establishedAt DateTime?
+  // 特典付与済フラグ（デート代無料1回分）
+  referrerBonusGranted Boolean @default(false)
+  referredBonusGranted Boolean @default(false)
+  createdAt    DateTime       @default(now())
+
+  @@index([codeId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────
+//  デート後アンケート（運営改善用）
+// ─────────────────────────────────────────────
+
+enum SurveyImplementation {
+  AS_PLANNED // はい（約60分）
+  ENDED_EARLY // 早めに終了した
+  OVER_60 // 60分以上かかった
+}
+
+enum SurveySatisfaction {
+  VERY_SATISFIED // とても満足
+  SATISFIED // 満足
+  NEUTRAL // 普通
+  SOMEWHAT_DISSATISFIED // やや不満
+  DISSATISFIED // 不満
+}
+
+enum SurveyIntent {
+  WANT_AGAIN // もう一度会いたい
+  NO_MATCH // 今回はご縁がなかった
+}
+
+model SurveyResponse {
+  id       String @id @default(cuid())
+  match    Match  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId  String
+  member   Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId String
+
+  q1Implementation SurveyImplementation // Q1 実施状況
+  q2Satisfaction   SurveySatisfaction // Q2 満足度
+  q3Impression     String // Q3 お相手への感想（200字・相手に非公開）
+  q4Intent         SurveyIntent // Q4 次のご希望
+  q5Other          String? // Q5 その他ご意見（任意・200字）
+
+  // 送信タイミング管理（開始2時間後に自動送信／24時間以内回答）
+  sentAt      DateTime?
+  dueAt       DateTime?
+  submittedAt DateTime?
+
+  @@unique([matchId, memberId])
+  @@index([matchId])
+}
+
+// ─────────────────────────────────────────────
+//  通知（メール／アプリ内）
+// ─────────────────────────────────────────────
+
+enum NotificationType {
+  APPLICATION_RECEIVED // 申受
+  MATCHED // マッチング
+  CANDIDATE_RECEIVED // デート日程候補受信
+  DATE_CONFIRMED // デート日程確定
+  DAY_OF_CONTACT // 当日連絡
+  DATE_CANCELLED // デートキャンセル
+  RESCHEDULE_REQUEST // 日程変更希望
+  ADMIN_ANNOUNCEMENT // 運営からのお知らせ
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  member      Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId    String
+  type        NotificationType
+  title       String
+  body        String
+  match       Match?           @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  matchId     String?
+  readAt      DateTime?
+  emailSentAt DateTime? // メール送信済時刻（メール／アプリ内の両方通知）
+  createdAt   DateTime         @default(now())
+
+  @@index([memberId, readAt])
+  @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────
+//  お知らせ / 広告（⑦お知らせ・広告管理）
+// ─────────────────────────────────────────────
+
+enum AnnouncementTarget {
+  ALL // 全員
+  MALE // 男性
+  FEMALE // 女性
+}
+
+model Announcement {
+  id          String             @id @default(cuid())
+  title       String
+  body        String
+  target      AnnouncementTarget @default(ALL)
+  isPublished Boolean            @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([isPublished, target])
+}
+
+enum AdType {
+  OWN // 自社広告
+  SPONSOR // 他社スポンサー
+}
+
+enum AdPosition {
+  TOP_BOTTOM // トップページ下部
+  MYPAGE // マイページ
+}
+
+model Ad {
+  id        String     @id @default(cuid())
+  title     String
+  imageUrl  String
+  linkUrl   String
+  type      AdType     @default(OWN)
+  position  AdPosition @default(TOP_BOTTOM)
+  isEnabled Boolean    @default(true)
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([isEnabled, position])
+}
+
+// ─────────────────────────────────────────────
+//  運営（管理画面）
+// ─────────────────────────────────────────────
+
+enum AdminRole {
+  OWNER // 運営者（1人想定）
+  STAFF
+}
+
+model AdminUser {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         AdminRole   @default(OWNER)
+  createdAt    DateTime    @default(now())
+  memos        AdminMemo[]
+}
+
+/// 運営メモ（会員 or マッチに紐づく）
+model AdminMemo {
+  id        String     @id @default(cuid())
+  author    AdminUser? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId  String?
+  member    Member?    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String?
+  match     Match?     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId   String?
+  body      String
+  createdAt DateTime   @default(now())
+
+  @@index([memberId])
+  @@index([matchId])
+}
+
+/// 監査ログ（運営判断・自動処理の記録）
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorType  String // ADMIN / SYSTEM / MEMBER
+  actorId    String?
+  action     String // 例：MEMBER_APPROVED, PENALTY_ISSUED, REFUND_ISSUED
+  targetType String? // 例：Member, Match, Payment
+  targetId   String?
+  detail     Json?
+  createdAt  DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([createdAt])
+}
