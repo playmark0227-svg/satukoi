@@ -20,7 +20,6 @@ import {
   resolveInquiry,
 } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const REPORT_STATUS_TONE = {
   OPEN: "danger",

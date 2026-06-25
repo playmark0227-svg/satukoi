@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@/lib/db";
+import { IS_DEMO, getDemoMember, getDemoAdmin } from "@/lib/demo";
 
 const MEMBER_COOKIE = "satukoi_session";
 const ADMIN_COOKIE = "satukoi_admin";
@@ -65,10 +66,13 @@ export function destroyMemberSession() {
 }
 
 export async function getCurrentMemberId() {
+  // デモ：公開ページ（ランディング/ログイン）はそのまま表示させたいので null。
+  if (IS_DEMO) return null;
   return read("member");
 }
 
 export async function getCurrentMember() {
+  if (IS_DEMO) return getDemoMember();
   const id = await read("member");
   if (!id) return null;
   return prisma.member.findUnique({
@@ -95,12 +99,15 @@ export function destroyAdminSession() {
 }
 
 export async function getCurrentAdmin() {
+  // デモ：運営ログインページを表示させたいので null。
+  if (IS_DEMO) return null;
   const id = await read("admin");
   if (!id) return null;
   return prisma.adminUser.findUnique({ where: { id } });
 }
 
 export async function requireAdmin() {
+  if (IS_DEMO) return getDemoAdmin();
   const admin = await getCurrentAdmin();
   if (!admin) redirect("/admin/login");
   return admin;

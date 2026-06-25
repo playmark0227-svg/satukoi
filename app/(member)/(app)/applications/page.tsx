@@ -177,4 +177,3 @@ function TabLink({
   );
 }
 
-export const dynamic = "force-dynamic";

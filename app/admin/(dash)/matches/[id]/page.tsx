@@ -36,7 +36,6 @@ import {
   adminCancel,
 } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const PHASE_ORDER: MatchPhase[] = [
   "SCHEDULING",
@@ -51,6 +50,13 @@ type TimelineItem = {
   detail?: React.ReactNode;
   tone: "neutral" | "primary" | "success" | "info" | "warning" | "danger";
 };
+
+// 静的エクスポート（デモ）用：全マッチを事前生成
+export async function generateStaticParams() {
+  if (process.env.DEMO_EXPORT !== "1") return [];
+  const rows = await prisma.match.findMany({ select: { id: true } });
+  return rows.map((r) => ({ id: r.id }));
+}
 
 export default async function AdminMatchDetailPage({
   params,

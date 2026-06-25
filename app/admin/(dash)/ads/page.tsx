@@ -9,7 +9,6 @@ import { AD_TYPE_LABELS, AD_POSITION_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
 import { createAd, toggleAd } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const TYPE_VALUES = Object.keys(
   AD_TYPE_LABELS

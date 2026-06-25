@@ -214,4 +214,3 @@ export default async function ProfileEditPage() {
   );
 }
 
-export const dynamic = "force-dynamic";

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { requireMember } from "@/lib/auth";
+import { IS_DEMO, getDemoMember } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { calcAge, formatSlot, formatDateTime } from "@/lib/format";
 import {
@@ -24,6 +25,17 @@ import {
   cancelDate,
   dayOfContact,
 } from "./actions";
+
+// 静的エクスポート（デモ）用：デモ会員が参加するマッチのみ事前生成
+export async function generateStaticParams() {
+  if (!IS_DEMO) return [];
+  const me = await getDemoMember();
+  const rows = await prisma.match.findMany({
+    where: { OR: [{ applicantId: me.id }, { receiverId: me.id }] },
+    select: { id: true },
+  });
+  return rows.map((r) => ({ id: r.id }));
+}
 
 export default async function MatchDetailPage({
   params,
@@ -400,4 +412,3 @@ function ConfirmedView({
   );
 }
 
-export const dynamic = "force-dynamic";

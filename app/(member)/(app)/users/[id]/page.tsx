@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { requireMember } from "@/lib/auth";
+import { IS_DEMO, getDemoMember } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import {
@@ -32,6 +33,18 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
       <span className="text-right text-sm font-medium text-ink">{value}</span>
     </div>
   );
+}
+
+// 静的エクスポート（デモ）用：デモ会員が閲覧できる異性会員のみ事前生成
+export async function generateStaticParams() {
+  if (!IS_DEMO) return [];
+  const me = await getDemoMember();
+  const opp = me.sex === "MALE" ? "FEMALE" : "MALE";
+  const rows = await prisma.member.findMany({
+    where: { status: "ACTIVE", sex: opp, NOT: { id: me.id } },
+    select: { id: true },
+  });
+  return rows.map((r) => ({ id: r.id }));
 }
 
 export default async function UserDetailPage({
@@ -247,4 +260,3 @@ export default async function UserDetailPage({
   );
 }
 
-export const dynamic = "force-dynamic";

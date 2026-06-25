@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { requireMember } from "@/lib/auth";
+import { IS_DEMO, getDemoMember } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import {
   SURVEY_Q1_LABELS,
@@ -43,6 +44,20 @@ function RadioGroup({
       ))}
     </div>
   );
+}
+
+// 静的エクスポート（デモ）用：デモ会員の実施済みマッチのみ事前生成
+export async function generateStaticParams() {
+  if (!IS_DEMO) return [];
+  const me = await getDemoMember();
+  const rows = await prisma.match.findMany({
+    where: {
+      phase: "COMPLETED",
+      OR: [{ applicantId: me.id }, { receiverId: me.id }],
+    },
+    select: { id: true },
+  });
+  return rows.map((r) => ({ matchId: r.id }));
 }
 
 export default async function SurveyPage({
@@ -151,4 +166,3 @@ export default async function SurveyPage({
   );
 }
 
-export const dynamic = "force-dynamic";

@@ -123,4 +123,3 @@ export default async function NotificationsPage() {
   );
 }
 
-export const dynamic = "force-dynamic";

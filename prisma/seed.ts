@@ -253,7 +253,7 @@ async function main() {
   // ── マッチ②：日程確定（店舗確定・両者決済済） ──
   const app2 = await prisma.dateApplication.create({
     data: {
-      applicantId: males[2].id,
+      applicantId: males[1].id,
       receiverId: females[1].id,
       status: "ACCEPTED",
       respondedAt: daysFromNow(-6),
@@ -261,7 +261,7 @@ async function main() {
   });
   const match2 = await prisma.match.create({
     data: {
-      applicantId: males[2].id,
+      applicantId: males[1].id,
       receiverId: females[1].id,
       applicationId: app2.id,
       phase: "CONFIRMED",
@@ -278,7 +278,7 @@ async function main() {
       startAt: daysFromNow(3),
       endAt: hoursFromNow(24 * 3 + 1),
       isSelected: true,
-      selectedById: males[2].id,
+      selectedById: males[1].id,
       selectedAt: daysFromNow(-2),
     },
   });
@@ -295,7 +295,7 @@ async function main() {
         "サツコイ！（仮）で予約しています。\nお席での待ち合わせでお願い致します。\nデート時間は60分を目安にお願い致します。\nデート代金は割り勘がルールです。",
     },
   });
-  for (const m of [males[2], females[1]]) {
+  for (const m of [males[1], females[1]]) {
     await prisma.payment.create({
       data: {
         memberId: m.id,
@@ -321,8 +321,8 @@ async function main() {
   // ── マッチ③：デート実施済（アンケート回答済） ──
   const match3 = await prisma.match.create({
     data: {
-      applicantId: males[3].id,
-      receiverId: females[2].id,
+      applicantId: males[1].id,
+      receiverId: females[1].id,
       phase: "COMPLETED",
       matchedAt: daysFromNow(-20),
       lastActionAt: daysFromNow(-10),
@@ -342,7 +342,7 @@ async function main() {
   await prisma.surveyResponse.create({
     data: {
       matchId: match3.id,
-      memberId: males[3].id,
+      memberId: males[1].id,
       q1Implementation: "AS_PLANNED",
       q2Satisfaction: "SATISFIED",
       q3Impression: "とても話しやすい方でした。",
@@ -356,7 +356,7 @@ async function main() {
   // 通報・お問い合わせ
   await prisma.report.create({
     data: {
-      reporterId: females[3].id,
+      reporterId: females[1].id,
       reportedId: males[4].id,
       type: "INAPPROPRIATE_CONTENT",
       content: "プロフィール写真が本人と異なる可能性があります。",

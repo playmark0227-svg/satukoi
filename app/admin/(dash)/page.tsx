@@ -4,7 +4,6 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { formatDateTime } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
 
 function startOfThisMonth() {
   const now = new Date();

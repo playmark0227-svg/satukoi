@@ -9,7 +9,6 @@ import { ANNOUNCEMENT_TARGET_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
 import { createAnnouncement, togglePublish } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const TARGET_VALUES = Object.keys(
   ANNOUNCEMENT_TARGET_LABELS

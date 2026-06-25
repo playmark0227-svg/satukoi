@@ -15,7 +15,6 @@ import {
 import { formatYen, formatDateTime, formatDate } from "@/lib/format";
 import { addWarning, suspend, forceWithdraw } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const CATEGORY_TONE = {
   BEFORE_24H: "neutral",

@@ -9,7 +9,6 @@ import { shouldAutoDissolve } from "@/lib/scheduling";
 import { MATCH_PHASE_LABELS } from "@/lib/constants";
 import type { MatchPhase } from "@prisma/client";
 
-export const dynamic = "force-dynamic";
 
 const PHASE_ORDER: MatchPhase[] = [
   "SCHEDULING",

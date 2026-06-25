@@ -141,4 +141,3 @@ export default async function MyPage() {
   );
 }
 
-export const dynamic = "force-dynamic";

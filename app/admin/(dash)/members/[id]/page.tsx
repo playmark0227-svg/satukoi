@@ -40,7 +40,6 @@ import {
   setDocCheck,
 } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 type MemberStatus = keyof typeof MEMBER_STATUS_LABELS;
 const STATUS_VALUES = Object.keys(MEMBER_STATUS_LABELS) as MemberStatus[];
@@ -53,6 +52,13 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
       <span className="text-right text-sm font-medium text-ink">{value}</span>
     </div>
   );
+}
+
+// 静的エクスポート（デモ）用：全会員を事前生成
+export async function generateStaticParams() {
+  if (process.env.DEMO_EXPORT !== "1") return [];
+  const rows = await prisma.member.findMany({ select: { id: true } });
+  return rows.map((r) => ({ id: r.id }));
 }
 
 export default async function AdminMemberDetailPage({

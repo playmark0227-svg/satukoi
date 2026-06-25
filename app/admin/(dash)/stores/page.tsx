@@ -7,7 +7,6 @@ import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { createStore, updateStore, toggleStoreActive } from "./actions";
 
-export const dynamic = "force-dynamic";
 
 const MAX_STORES = 5;
 

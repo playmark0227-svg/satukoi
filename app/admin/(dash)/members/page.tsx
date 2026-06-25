@@ -15,7 +15,6 @@ import {
 } from "@/lib/constants";
 import { calcAge, formatDate } from "@/lib/format";
 
-export const dynamic = "force-dynamic";
 
 type MemberStatus = keyof typeof MEMBER_STATUS_LABELS;
 

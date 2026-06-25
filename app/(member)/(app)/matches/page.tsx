@@ -92,4 +92,3 @@ export default async function MatchesPage() {
   );
 }
 
-export const dynamic = "force-dynamic";

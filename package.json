@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "demo:build": "DEMO_EXPORT=1 next build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
