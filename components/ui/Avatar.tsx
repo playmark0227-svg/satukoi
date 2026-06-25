@@ -1,8 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "@/lib/cn";
 
 /**
- * 顔写真サムネイル。url が無い場合はニックネーム頭文字のプレースホルダ。
- * 本スキャフォルドではアップロード画像は未配信のため、url 指定時のみ表示。
+ * 顔写真サムネイル。url が無い／読み込み失敗時はニックネーム頭文字のプレースホルダ。
  */
 export function Avatar({
   url,
@@ -15,7 +17,10 @@ export function Avatar({
   className?: string;
   rounded?: "full" | "xl";
 }) {
+  const [error, setError] = useState(false);
   const radius = rounded === "full" ? "rounded-full" : "rounded-2xl";
+  const showImg = url && !error;
+
   return (
     <div
       className={cn(
@@ -24,11 +29,16 @@ export function Avatar({
         className
       )}
     >
-      {url ? (
+      {showImg ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={name ?? ""} className="h-full w-full object-cover" />
+        <img
+          src={url}
+          alt={name ?? ""}
+          onError={() => setError(true)}
+          className="h-full w-full object-cover"
+        />
       ) : (
-        <span className="text-lg">{name?.[0] ?? "♡"}</span>
+        <span>{name?.[0] ?? "♡"}</span>
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UserFilters } from "@/components/member/browse/UserFilters";
+import { UserPhoto } from "@/components/member/UserPhoto";
 import { IconSparkle, BadgeVerified, BadgeCrown } from "@/components/member/icons";
 import type { Prisma, ResidenceArea } from "@prisma/client";
 
@@ -105,18 +106,7 @@ export default async function UsersPage({
                 href={`/users/${u.id}`}
                 className="relative block aspect-[3/4] overflow-hidden rounded-2xl bg-line shadow-[var(--shadow-card)]"
               >
-                {u.photos[0]?.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={u.photos[0].url}
-                    alt={u.nickname}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-primary-soft text-4xl font-black text-primary">
-                    {u.nickname[0]}
-                  </div>
-                )}
+                <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 
                 {/* 下部グラデーション＋情報オーバーレイ */}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-3 pb-3 pt-10">
