@@ -3,16 +3,14 @@ import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
-import { AppHeader } from "@/components/member/AppHeader";
-import { Avatar } from "@/components/ui/Avatar";
-import { Card } from "@/components/ui/Card";
+import { BrandHeader } from "@/components/member/BrandHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ButtonLink } from "@/components/ui/Button";
 import { UserFilters } from "@/components/member/browse/UserFilters";
+import { IconSparkle, BadgeVerified, BadgeCrown } from "@/components/member/icons";
 import type { Prisma, ResidenceArea } from "@prisma/client";
 
 /**
- * さがす：異性のみ・有効会員・自分以外・ブロック関係（双方）を除外して一覧表示。
+ * さがす（ホーム）：異性のみ・有効会員・自分以外・ブロック関係（双方）を除外して一覧表示。
  * searchParams: ageMin / ageMax / area で絞り込み。
  */
 export default async function UsersPage({
@@ -22,6 +20,10 @@ export default async function UsersPage({
 }) {
   const me = await requireMember();
   const sp = await searchParams;
+
+  const unread = await prisma.notification.count({
+    where: { memberId: me.id, readAt: null },
+  });
 
   const oppositeSex = me.sex === "MALE" ? "FEMALE" : "MALE";
 
@@ -39,17 +41,16 @@ export default async function UsersPage({
   // ── 年齢レンジ → 生年月日レンジへ変換 ──
   const ageMin = sp.ageMin ? Number(sp.ageMin) : undefined;
   const ageMax = sp.ageMax ? Number(sp.ageMax) : undefined;
-  const area = sp.area && sp.area in RESIDENCE_AREA_LABELS ? (sp.area as ResidenceArea) : undefined;
+  const area =
+    sp.area && sp.area in RESIDENCE_AREA_LABELS ? (sp.area as ResidenceArea) : undefined;
 
   const birthDate: Prisma.DateTimeFilter = {};
   if (ageMin !== undefined && !Number.isNaN(ageMin)) {
-    // ageMin 歳以上 = (今日 - ageMin 年) 以前生まれ
     const d = new Date();
     d.setFullYear(d.getFullYear() - ageMin);
     birthDate.lte = d;
   }
   if (ageMax !== undefined && !Number.isNaN(ageMax)) {
-    // ageMax 歳以下 = (今日 - (ageMax + 1) 年) より後に生まれ
     const d = new Date();
     d.setFullYear(d.getFullYear() - (ageMax + 1));
     birthDate.gt = d;
@@ -71,40 +72,65 @@ export default async function UsersPage({
 
   return (
     <div className="flex flex-1 flex-col">
-      <AppHeader title="さがす" />
-      <div className="px-4 py-4">
-        <UserFilters
-          ageMin={sp.ageMin ?? ""}
-          ageMax={sp.ageMax ?? ""}
-          area={sp.area ?? ""}
-        />
+      <BrandHeader unread={unread} />
+      <UserFilters
+        ageMin={sp.ageMin ?? ""}
+        ageMax={sp.ageMax ?? ""}
+        area={sp.area ?? ""}
+      />
 
+      <div className="space-y-4 px-4 py-4">
+        {/* プロモバナー */}
+        <div className="flex gap-3 rounded-2xl border border-primary/15 bg-primary-tint p-4">
+          <IconSparkle className="mt-0.5 h-6 w-6 shrink-0 text-primary" />
+          <div>
+            <p className="font-bold text-primary-strong">新しい出会いが待っています</p>
+            <p className="mt-1 text-sm leading-relaxed text-primary-strong/80">
+              気になる方を見つけたら、プロフィールをチェックしてデート申し込みしてみましょう！
+            </p>
+          </div>
+        </div>
+
+        {/* ユーザーグリッド */}
         {users.length === 0 ? (
           <EmptyState
             title="該当するお相手がいません"
             description="絞り込み条件を変えてもう一度お試しください。"
           />
         ) : (
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {users.map((u) => (
-              <Link key={u.id} href={`/users/${u.id}`} className="block">
-                <Card className="overflow-hidden">
-                  <Avatar
-                    url={u.photos[0]?.url}
-                    name={u.nickname}
-                    rounded="xl"
-                    className="aspect-square w-full text-3xl"
+              <Link
+                key={u.id}
+                href={`/users/${u.id}`}
+                className="relative block aspect-[3/4] overflow-hidden rounded-2xl bg-line shadow-[var(--shadow-card)]"
+              >
+                {u.photos[0]?.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={u.photos[0].url}
+                    alt={u.nickname}
+                    className="h-full w-full object-cover"
                   />
-                  <div className="px-3 py-2.5">
-                    <p className="truncate text-sm font-bold text-ink">
-                      {u.nickname}
-                    </p>
-                    <p className="mt-0.5 text-xs text-ink-soft">
-                      {calcAge(u.birthDate)}歳・
-                      {RESIDENCE_AREA_LABELS[u.residenceArea]}
-                    </p>
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-primary-soft text-4xl font-black text-primary">
+                    {u.nickname[0]}
                   </div>
-                </Card>
+                )}
+
+                {/* 下部グラデーション＋情報オーバーレイ */}
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent px-3 pb-3 pt-10">
+                  <div className="flex items-center gap-1.5">
+                    <span className="truncate text-base font-bold text-white drop-shadow">
+                      {u.nickname}
+                    </span>
+                    {u.incomeCertVerified && <BadgeVerified />}
+                    {u.accountType === "SALON" && <BadgeCrown />}
+                  </div>
+                  <p className="mt-0.5 text-xs font-medium text-white/90">
+                    {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
@@ -113,4 +139,3 @@ export default async function UsersPage({
     </div>
   );
 }
-

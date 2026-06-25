@@ -21,6 +21,12 @@ const yearsAgo = (n: number) => {
 const hoursFromNow = (h: number) => new Date(Date.now() + h * 3_600_000);
 const daysFromNow = (d: number) => new Date(Date.now() + d * 86_400_000);
 
+// デモ用のポートレート画像（性別ごと・安定URL）。実運用ではアップロード画像に差し替え。
+const portrait = (sex: "MALE" | "FEMALE", i: number) =>
+  `https://randomuser.me/api/portraits/${sex === "FEMALE" ? "women" : "men"}/${
+    (i * 9 + 11) % 99
+  }.jpg`;
+
 async function clean() {
   // 子→親の順で全削除（再実行可能に）
   await prisma.auditLog.deleteMany();
@@ -119,6 +125,9 @@ async function createMember(args: {
         "はじめまして。札幌在住です。休日はカフェ巡りが好きです。よろしくお願いします。",
       referralBonusRemaining: i === 1 ? 1 : 0,
       nextRenewalAt: daysFromNow(335),
+      photos: {
+        create: [{ url: portrait(sex, i), order: 0 }],
+      },
       documents: {
         create: [
           { type: "ID_DOCUMENT", url: "pending-upload", checkStatus: "OK", checkedAt: daysFromNow(-29) },

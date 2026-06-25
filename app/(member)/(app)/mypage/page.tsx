@@ -16,10 +16,6 @@ const MENU = [
   { href: "/mypage/edit", label: "プロフィール編集", icon: "✎" },
   { href: "/matches", label: "マッチング履歴", icon: "♡" },
   { href: "/applications", label: "送った／受信した申込", icon: "✉" },
-  { href: "/info/terms", label: "利用規約", icon: "📄" },
-  { href: "/info/privacy", label: "プライバシーポリシー", icon: "🔒" },
-  { href: "/info/company", label: "運営会社", icon: "🏢" },
-  { href: "/contact", label: "お問い合わせ", icon: "✉" },
 ];
 
 export default async function MyPage() {

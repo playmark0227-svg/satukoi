@@ -4,11 +4,12 @@
    サツコイ！（仮） デザイントークン（Tailwind v4 @theme）
    ───────────────────────────────────────────── */
 @theme {
-  /* ブランドカラー：コーラルピンク × 落ち着いたインク */
-  --color-primary: #f8617e;
-  --color-primary-strong: #e6486a;
-  --color-primary-soft: #ffeef2;
-  --color-primary-tint: #fff6f8;
+  /* ブランドカラー：ビビッドなピンクマゼンタ × 落ち着いたインク */
+  --color-primary: #ec4899;
+  --color-primary-strong: #db2777;
+  --color-primary-soft: #fce7f3;
+  --color-primary-tint: #fdf2f8;
+  --color-accent-violet: #9333ea;
 
   --color-ink: #2b2d42;
   --color-ink-soft: #6b7088;

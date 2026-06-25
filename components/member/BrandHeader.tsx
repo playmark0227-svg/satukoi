@@ -1,0 +1,27 @@
+import Link from "next/link";
+import { BrandMark } from "./BrandMark";
+import { IconBell } from "./icons";
+
+/** ホーム等のタブ画面で使うブランドヘッダー（ロゴ＋サービス名＋お知らせベル）。 */
+export function BrandHeader({ unread = 0 }: { unread?: number }) {
+  return (
+    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-surface/95 px-4 backdrop-blur">
+      <div className="flex items-center gap-2.5">
+        <BrandMark className="h-9 w-9" />
+        <span className="text-xl font-black tracking-tight text-primary">
+          サツコイ！
+        </span>
+      </div>
+      <Link
+        href="/notifications"
+        aria-label="お知らせ"
+        className="relative flex h-10 w-10 items-center justify-center rounded-full text-ink-soft hover:bg-line/60"
+      >
+        <IconBell className="h-6 w-6" />
+        {unread > 0 && (
+          <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface" />
+        )}
+      </Link>
+    </header>
+  );
+}
