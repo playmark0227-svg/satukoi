@@ -31,18 +31,18 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-bold transition-colors",
-        active ? "text-primary-strong" : "text-ink-faint"
+        "relative flex flex-1 items-center justify-center gap-2 py-3.5 text-sm transition-colors",
+        active ? "text-display text-primary-strong" : "font-medium text-ink-faint"
       )}
     >
       {label}
       {count ? (
-        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
+        <span className="num-tnum inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-surface">
           {count}
         </span>
       ) : null}
       {active && (
-        <span className="absolute inset-x-6 -bottom-px h-0.5 rounded-full bg-primary" />
+        <span className="absolute inset-x-6 -bottom-px h-[2px] bg-gold" />
       )}
     </button>
   );
@@ -61,8 +61,8 @@ function MatchRow({ it, i }: { it: MatchItem; i: number }) {
         className="h-16 w-16 shrink-0 text-xl"
       />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-lg font-bold text-ink">{it.nickname}</p>
-        <p className="text-sm text-ink-soft">
+        <p className="text-display truncate text-lg font-medium text-ink">{it.nickname}</p>
+        <p className="num-tnum text-sm text-ink-soft">
           {it.age}歳 / {it.area}
         </p>
         <p

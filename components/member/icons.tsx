@@ -61,10 +61,14 @@ export function IconMenu({ className }: P & { filled?: boolean }) {
   );
 }
 
-/** 本人確認済バッジ（緑の盾＋チェック） */
+/** 本人確認済バッジ（ゴールドの箔チェック） */
 export function BadgeVerified({ className }: P) {
   return (
-    <span className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-success text-white " + (className ?? "")} title="本人確認済">
+    <span
+      className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface text-gold " + (className ?? "")}
+      style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
+      title="本人確認済"
+    >
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden>
         <path d="M4 12l5 5L20 6" />
       </svg>
@@ -167,10 +171,14 @@ export function IconScissors({ className }: P) {
   );
 }
 
-/** サロン会員バッジ（王冠） */
+/** サロン会員バッジ（ゴールドの王冠） */
 export function BadgeCrown({ className }: P) {
   return (
-    <span className={"inline-flex h-5 w-5 items-center justify-center rounded-full text-white " + (className ?? "")} style={{ background: "var(--color-accent-violet)" }} title="サロン会員">
+    <span
+      className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-surface text-gold " + (className ?? "")}
+      style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
+      title="サロン会員"
+    >
       <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden>
         <path d="M3 7l4 4 5-6 5 6 4-4v11H3V7z" />
       </svg>

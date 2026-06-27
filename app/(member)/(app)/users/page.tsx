@@ -80,16 +80,20 @@ export default async function UsersPage({
         area={sp.area ?? ""}
       />
 
-      <div className="bg-home-wash space-y-5 px-4 py-5">
+      <div className="space-y-5 px-4 py-5">
         {/* プロモバナー */}
-        <div className="animate-fade-up flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-gradient text-white shadow-[var(--shadow-float)]">
+        <div className="animate-fade-up relative flex items-start gap-3 overflow-hidden rounded-2xl border border-gold-soft bg-surface p-5">
+          <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
+            style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
+          >
             <IconSparkle className="h-5 w-5" />
           </span>
           <div>
-            <p className="font-bold text-primary-strong">新しい出会いが待っています</p>
-            <p className="mt-1 text-sm leading-relaxed text-primary-strong/75">
-              気になる方を見つけたら、プロフィールをチェックしてデート申し込みしてみましょう！
+            <p className="text-display text-base text-ink">新しい出会いが待っています</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+              気になる方を見つけたら、プロフィールをチェックしてデート申し込みしてみましょう。
             </p>
           </div>
         </div>
@@ -107,20 +111,20 @@ export default async function UsersPage({
                 key={u.id}
                 href={`/users/${u.id}`}
                 style={{ animationDelay: `${i * 60}ms` }}
-                className="group animate-fade-up relative block aspect-[3/4] overflow-hidden rounded-3xl bg-line shadow-[var(--shadow-card)] ring-1 ring-black/5 transition-transform duration-200 active:scale-[0.98] sm:hover:-translate-y-1 sm:hover:shadow-[var(--shadow-pop)]"
+                className="group animate-fade-up relative block aspect-[3/4] overflow-hidden rounded-2xl bg-surface-alt ring-1 ring-inset ring-gold-soft transition-transform duration-200 active:scale-[0.98] sm:hover:-translate-y-1"
               >
                 <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 
                 {/* 下部グラデーション＋情報オーバーレイ */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-3.5 pb-3.5 pt-12">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(40,30,28,0.78)] via-[rgba(40,30,28,0.18)] to-transparent px-3.5 pb-3.5 pt-12">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-lg font-bold text-white drop-shadow-sm">
+                    <span className="text-display truncate text-lg font-medium text-white">
                       {u.nickname}
                     </span>
                     {u.incomeCertVerified && <BadgeVerified />}
                     {u.accountType === "SALON" && <BadgeCrown />}
                   </div>
-                  <p className="mt-0.5 text-xs font-medium text-white/90">
+                  <p className="num-tnum mt-0.5 text-xs font-medium text-white/90">
                     {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
                   </p>
                 </div>

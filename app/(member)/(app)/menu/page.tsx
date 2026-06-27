@@ -20,12 +20,14 @@ type Tone = "neutral" | "primary" | "info";
 function SectionHeader({ label, tone }: { label: string; tone: Tone }) {
   const cls =
     tone === "primary"
-      ? "bg-primary-tint text-primary-strong"
+      ? "text-primary"
       : tone === "info"
-        ? "bg-info-soft text-info"
-        : "bg-canvas text-ink-soft";
+        ? "text-gold"
+        : "text-ink-soft";
   return (
-    <p className={`px-4 py-2 text-xs font-bold ${cls}`}>{label}</p>
+    <p className={`text-display bg-surface-alt px-4 py-2.5 text-xs font-medium tracking-wide ${cls}`}>
+      {label}
+    </p>
   );
 }
 
@@ -56,8 +58,8 @@ function MenuRow({
 
 export default async function MenuPage() {
   await requireMember();
-  const ink = "h-[22px] w-[22px] text-ink";
-  const blue = "h-[22px] w-[22px] text-info";
+  const ink = "h-[22px] w-[22px] text-ink-soft";
+  const blue = "h-[22px] w-[22px] text-gold";
 
   return (
     <div className="flex flex-1 flex-col pb-8">

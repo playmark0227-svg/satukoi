@@ -61,46 +61,40 @@ export default async function MatchesPage() {
         <a
           href="#"
           style={{ animationDelay: "80ms" }}
-          className="animate-fade-up flex items-start gap-3 rounded-3xl border border-warning/30 bg-warning-soft p-4 transition active:scale-[0.99]"
+          className="animate-fade-up flex items-start gap-3 rounded-2xl border border-line bg-surface p-5 transition active:scale-[0.99]"
         >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white"
-            style={{ background: "linear-gradient(135deg,#fb923c,#f97316)" }}
-          >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-warning text-surface">
             <IconCoffee className="h-6 w-6" />
           </span>
           <div className="min-w-0">
-            <span className="inline-block rounded-full bg-warning px-2.5 py-0.5 text-[11px] font-bold text-white">
+            <span className="inline-block rounded-[6px] border border-warning/40 bg-warning-soft px-2 py-0.5 text-[11px] font-medium text-warning">
               提携カフェ
             </span>
-            <p className="mt-1 font-bold text-ink">札幌おすすめカフェ</p>
-            <p className="mt-0.5 text-sm leading-relaxed text-ink-soft">
+            <p className="text-display mt-1 text-base text-ink">札幌おすすめカフェ</p>
+            <p className="mt-1 text-sm leading-relaxed text-ink-soft">
               サツコイ！提携カフェなら安心・快適なデートが楽しめます
             </p>
-            <p className="mt-1.5 text-sm font-bold text-warning">提携カフェ一覧 →</p>
+            <p className="mt-2 text-sm font-semibold text-warning">提携カフェ一覧 →</p>
           </div>
         </a>
 
         <a
           href="#"
           style={{ animationDelay: "160ms" }}
-          className="animate-fade-up flex items-start gap-3 rounded-3xl border border-success/30 bg-success-soft p-4 transition active:scale-[0.99]"
+          className="animate-fade-up flex items-start gap-3 rounded-2xl border border-line bg-surface p-5 transition active:scale-[0.99]"
         >
-          <span
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white"
-            style={{ background: "linear-gradient(135deg,#34d399,#10b981)" }}
-          >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success text-surface">
             <IconScissors className="h-6 w-6" />
           </span>
           <div className="min-w-0">
-            <span className="inline-block rounded-full bg-success px-2.5 py-0.5 text-[11px] font-bold text-white">
+            <span className="inline-block rounded-[6px] border border-success/40 bg-success-soft px-2 py-0.5 text-[11px] font-medium text-success">
               提携サロン
             </span>
-            <p className="mt-1 font-bold text-ink">ビューティーサロンLUXE札幌</p>
-            <p className="mt-0.5 text-sm leading-relaxed text-ink-soft">
+            <p className="text-display mt-1 text-base text-ink">ビューティーサロンLUXE札幌</p>
+            <p className="mt-1 text-sm leading-relaxed text-ink-soft">
               デート前のヘアセット・メイク20%OFF！サツコイ会員様限定特典
             </p>
-            <p className="mt-1.5 text-sm font-bold text-success">クーポンを見る →</p>
+            <p className="mt-2 text-sm font-semibold text-success">クーポンを見る →</p>
           </div>
         </a>
       </div>

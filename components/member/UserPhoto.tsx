@@ -17,8 +17,8 @@ export function UserPhoto({
 
   if (!url || error) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-soft to-primary-tint text-5xl font-black text-primary/70">
-        {name[0] ?? "♡"}
+      <div className="flex h-full w-full items-center justify-center bg-surface-alt">
+        <span className="text-display text-5xl text-gold">{name[0] ?? "♡"}</span>
       </div>
     );
   }
@@ -31,6 +31,7 @@ export function UserPhoto({
       loading="lazy"
       onError={() => setError(true)}
       className="h-full w-full object-cover"
+      style={{ filter: "saturate(0.96)" }}
     />
   );
 }

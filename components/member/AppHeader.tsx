@@ -11,19 +11,19 @@ export function AppHeader({
   right?: React.ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-surface/95 px-2 backdrop-blur">
+    <header className="sticky top-0 z-20 flex h-15 items-center justify-between border-b border-gold-soft bg-surface/95 px-2 backdrop-blur-sm">
       <div className="flex w-12 items-center">
         {backHref && (
           <Link
             href={backHref}
             aria-label="戻る"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-ink-soft hover:bg-line/60"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-ink-soft hover:bg-surface-alt"
           >
             ‹
           </Link>
         )}
       </div>
-      <h1 className="truncate text-base font-bold text-ink">{title}</h1>
+      <h1 className="text-display truncate text-lg font-medium text-ink">{title}</h1>
       <div className="flex w-12 items-center justify-end">{right}</div>
     </header>
   );

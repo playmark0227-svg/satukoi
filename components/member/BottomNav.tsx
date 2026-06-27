@@ -15,7 +15,7 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line/70 bg-surface/85 px-2 pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-lg">
+    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-gold-soft bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2.5 backdrop-blur-sm">
       {items.map(({ href, label, Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
@@ -23,23 +23,16 @@ export function BottomNav() {
             key={href}
             href={href}
             className={cn(
-              "flex flex-col items-center gap-1 py-1 text-[10px] font-bold transition-colors",
+              "flex flex-col items-center gap-1.5 pb-1 text-[10px] transition-colors",
               active ? "text-primary" : "text-ink-faint"
             )}
           >
-            <Icon
-              className={cn(
-                "h-[22px] w-[22px] transition-transform duration-200",
-                active && "-translate-y-0.5 scale-110"
-              )}
-              filled={active}
-            />
-            {label}
+            <Icon className="h-[22px] w-[22px]" filled={active} />
+            <span className={active ? "text-display font-medium" : "font-medium"}>
+              {label}
+            </span>
             <span
-              className={cn(
-                "h-1 w-1 rounded-full transition-colors",
-                active ? "bg-primary" : "bg-transparent"
-              )}
+              className={cn("h-[1.5px] w-2.5", active ? "bg-gold" : "bg-transparent")}
             />
           </Link>
         );

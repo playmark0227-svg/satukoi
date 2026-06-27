@@ -18,8 +18,8 @@ import {
 function Stat({ n, label, color }: { n: number; label: string; color: string }) {
   return (
     <div className="flex flex-col items-center">
-      <CountUp value={n} className={`text-2xl font-black ${color}`} />
-      <span className="mt-0.5 text-xs text-ink-soft">{label}</span>
+      <CountUp value={n} className={`text-display num-tnum text-3xl font-medium ${color}`} />
+      <span className="mt-1 text-xs text-ink-soft">{label}</span>
     </div>
   );
 }
@@ -71,8 +71,10 @@ export default async function MyPage() {
               className="h-20 w-20 shrink-0 text-2xl"
             />
             <div className="min-w-0">
-              <p className="truncate text-2xl font-black text-ink">{me.nickname}</p>
-              <p className="mt-0.5 text-sm text-ink-soft">
+              <p className="text-display truncate text-3xl font-medium text-ink">
+                {me.nickname}
+              </p>
+              <p className="num-tnum mt-1 text-sm text-ink-soft">
                 {calcAge(me.birthDate)}歳 / {RESIDENCE_AREA_LABELS[me.residenceArea]}
               </p>
             </div>
@@ -88,9 +90,9 @@ export default async function MyPage() {
           style={{ animationDelay: "90ms" }}
           className="animate-fade-up grid grid-cols-3 divide-x divide-line rounded-2xl border border-line/70 bg-surface py-4 shadow-[var(--shadow-card)]"
         >
-          <Stat n={matchCount} label="マッチング" color="text-primary" />
-          <Stat n={sentCount} label="申し込み" color="text-info" />
-          <Stat n={receivedCount} label="申し受け" color="text-violet-600" />
+          <Stat n={matchCount} label="マッチング" color="text-ink" />
+          <Stat n={sentCount} label="申し込み" color="text-ink" />
+          <Stat n={receivedCount} label="申し受け" color="text-ink" />
         </div>
 
         {/* 導線リスト */}
@@ -113,7 +115,7 @@ export default async function MyPage() {
           <Row
             href="/applications?tab=received"
             icon={<IconChat className="h-5 w-5" />}
-            iconClass="bg-violet-100 text-violet-600"
+            iconClass="bg-surface-alt text-gold"
             label="申し受け"
           />
         </div>
@@ -122,21 +124,25 @@ export default async function MyPage() {
         <Link
           href="#"
           style={{ animationDelay: "270ms" }}
-          className="animate-fade-up block rounded-3xl border border-primary/25 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]"
+          className="animate-fade-up relative block overflow-hidden rounded-2xl border border-gold-soft bg-surface p-5"
         >
+          <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
           <div className="flex items-start gap-3">
-            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand-gradient text-white shadow-[var(--shadow-float)]">
+            <span
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
+              style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
+            >
               <IconCrown className="h-6 w-6" />
             </span>
             <div className="min-w-0">
-              <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-bold text-violet-700">
-                ♛ プレミアム
+              <span className="caps-label text-[11px] font-semibold text-gold">
+                PREMIUM
               </span>
-              <p className="mt-1 font-bold text-ink">婚活サロン会員募集</p>
-              <p className="mt-0.5 text-sm leading-relaxed text-ink-soft">
+              <p className="text-display mt-1 text-base text-ink">婚活サロン会員募集</p>
+              <p className="num-tnum mt-1 text-sm leading-relaxed text-ink-soft">
                 月9,900円〜でデート代無料・全国10万人以上とマッチング・専属カウンセラー
               </p>
-              <p className="mt-1.5 text-sm font-bold text-violet-700">詳細を見る →</p>
+              <p className="mt-2 text-sm font-semibold text-primary">詳細を見る →</p>
             </div>
           </div>
         </Link>
