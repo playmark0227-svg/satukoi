@@ -102,10 +102,10 @@ export function MatchTabs({
           active={tab === "confirmed"}
           onClick={() => setTab("confirmed")}
         />
-        {/* 金のスライドインジケーター */}
+        {/* スライドインジケーター */}
         <span
           className={cn(
-            "absolute -bottom-px left-0 h-[2px] w-1/2 bg-gold transition-transform duration-300 ease-out",
+            "absolute -bottom-px left-0 h-[3px] w-1/2 rounded-full bg-primary transition-transform duration-300 ease-out",
             tab === "confirmed" && "translate-x-full"
           )}
           style={{ transformOrigin: "center" }}

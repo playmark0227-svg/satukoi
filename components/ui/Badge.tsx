@@ -6,17 +6,15 @@ export type Tone =
   | "success"
   | "warning"
   | "danger"
-  | "info"
-  | "gold";
+  | "info";
 
 const tones: Record<Tone, string> = {
-  neutral: "bg-surface border-line text-ink-soft",
-  primary: "bg-surface border-gold-soft text-primary",
-  success: "bg-success-soft border-success/40 text-success",
-  warning: "bg-warning-soft border-warning/40 text-warning",
-  danger: "bg-danger-soft border-danger/40 text-danger",
-  info: "bg-info-soft border-info/40 text-info",
-  gold: "bg-surface border-gold text-[color:var(--color-primary-strong)]",
+  neutral: "bg-surface-alt text-ink-soft",
+  primary: "bg-primary-soft text-primary-strong",
+  success: "bg-success-soft text-success",
+  warning: "bg-warning-soft text-warning",
+  danger: "bg-danger-soft text-danger",
+  info: "bg-info-soft text-info",
 };
 
 export function Badge({
@@ -31,7 +29,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-[6px] border px-2 py-0.5 text-[11px] font-medium tracking-wide",
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold",
         tones[tone],
         className
       )}

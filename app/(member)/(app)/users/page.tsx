@@ -7,7 +7,12 @@ import { BrandHeader } from "@/components/member/BrandHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UserFilters } from "@/components/member/browse/UserFilters";
 import { UserPhoto } from "@/components/member/UserPhoto";
-import { IconSparkle, BadgeVerified, BadgeCrown } from "@/components/member/icons";
+import {
+  IconSparkle,
+  IconHeart,
+  BadgeVerified,
+  BadgeCrown,
+} from "@/components/member/icons";
 import type { Prisma, ResidenceArea } from "@prisma/client";
 
 /**
@@ -82,19 +87,15 @@ export default async function UsersPage({
 
       <div className="space-y-5 px-4 py-5">
         {/* プロモバナー */}
-        <div className="animate-fade-up relative flex items-start gap-3 overflow-hidden rounded-2xl border border-gold-soft bg-surface p-5">
-          <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
-          <span
-            className="animate-float flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
-            style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
-          >
+        <div className="animate-fade-up flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
+          <span className="bg-brand-gradient animate-float flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-[var(--shadow-float)]">
             <IconSparkle className="animate-twinkle h-5 w-5" />
           </span>
           <div>
-            <p className="text-display text-base text-ink">
+            <p className="text-display text-base text-primary-strong">
               素敵な出会いが、待っています
             </p>
-            <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+            <p className="mt-1 text-sm leading-relaxed text-primary-strong/75">
               チャットのやり取りは不要。気になる方にデートを申し込むだけで、
               札幌のカフェでお会いできます。
             </p>
@@ -106,9 +107,9 @@ export default async function UsersPage({
           {["チャット不要", "本人確認済の方のみ", "カフェで60分"].map((t) => (
             <span
               key={t}
-              className="inline-flex items-center gap-1.5 rounded-[6px] border border-line bg-surface px-2.5 py-1 text-[11px] font-medium text-ink-soft"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-surface px-3 py-1 text-[11px] font-bold text-ink-soft shadow-[var(--shadow-card)]"
             >
-              <span className="text-gold">✓</span>
+              <span className="text-primary">✓</span>
               {t}
             </span>
           ))}
@@ -116,14 +117,14 @@ export default async function UsersPage({
 
         {/* セクション見出し */}
         <div className="animate-fade-up pt-1" style={{ animationDelay: "120ms" }}>
-          <p className="caps-label text-center text-[10px] font-semibold text-gold">
-            Members
+          <p className="caps-label text-center text-[10px] font-bold text-primary">
+            Pick Up
           </p>
           <h2 className="text-display mt-1 text-center text-lg text-ink">
             あなたにおすすめのお相手
           </h2>
           <div className="rule-letter mt-2.5">
-            <span>◆</span>
+            <span>♥</span>
           </div>
         </div>
 
@@ -139,14 +140,14 @@ export default async function UsersPage({
               <Link
                 key={u.id}
                 href={`/users/${u.id}`}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl bg-surface-alt ring-1 ring-inset ring-gold-soft transition-[transform,box-shadow] duration-300 active:scale-[0.98] sm:hover:-translate-y-1 sm:hover:shadow-[var(--shadow-card)]"
+                className="group relative block aspect-[3/4] overflow-hidden rounded-3xl bg-line shadow-[var(--shadow-card)] ring-1 ring-black/5 transition-[transform,box-shadow] duration-300 active:scale-[0.98] sm:hover:-translate-y-1 sm:hover:shadow-[var(--shadow-pop)]"
               >
                 <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 
                 {/* 下部グラデーション＋情報オーバーレイ */}
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(40,30,28,0.78)] via-[rgba(40,30,28,0.18)] to-transparent px-3.5 pb-3.5 pt-12">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent px-3.5 pb-3.5 pt-12">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-display truncate text-lg font-medium text-white">
+                    <span className="text-display truncate text-lg text-white drop-shadow-sm">
                       {u.nickname}
                     </span>
                     {u.incomeCertVerified && <BadgeVerified />}
@@ -156,6 +157,11 @@ export default async function UsersPage({
                     {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
                   </p>
                 </div>
+
+                {/* いいねハート */}
+                <span className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 text-primary shadow-[var(--shadow-float)] transition-transform duration-200 group-hover:scale-110 group-active:scale-90">
+                  <IconHeart className="h-5 w-5 transition-transform duration-200 group-hover:animate-heart" />
+                </span>
               </Link>
             ))}
           </div>

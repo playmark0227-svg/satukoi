@@ -5,16 +5,15 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold rounded-[14px] tracking-[0.06em] transition-all duration-200 active:scale-[0.98] active:brightness-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
+  "inline-flex items-center justify-center gap-2 font-bold rounded-full transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 
 const variants: Record<Variant, string> = {
   primary:
-    "sheen-host bg-primary text-surface ring-1 ring-inset ring-gold-soft shadow-[var(--shadow-card)] hover:bg-primary-strong hover:-translate-y-px",
-  secondary:
-    "bg-surface text-primary ring-1 ring-inset ring-gold-soft hover:bg-surface-alt",
-  ghost: "bg-transparent text-ink-soft hover:bg-surface-alt",
-  danger: "bg-danger text-surface hover:brightness-105",
-  outline: "border border-line bg-surface text-ink hover:bg-surface-alt",
+    "sheen-host bg-brand-gradient text-white shadow-[var(--shadow-float)] hover:-translate-y-px hover:brightness-105",
+  secondary: "bg-primary-soft text-primary-strong hover:bg-primary-soft/70",
+  ghost: "bg-transparent text-ink-soft hover:bg-line/60",
+  danger: "bg-danger text-white hover:brightness-105",
+  outline: "border border-line bg-surface text-ink hover:bg-canvas",
 };
 
 const sizes: Record<Size, string> = {

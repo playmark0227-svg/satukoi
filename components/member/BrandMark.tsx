@@ -1,15 +1,14 @@
 import { cn } from "@/lib/cn";
 import { IconSparkle } from "./icons";
 
-/** アイボリーの円にシャンパンゴールドの極細リングとスパークル（箔押し風）。 */
+/** パープル→ピンクのグラデーションチップ＋スパークル。 */
 export function BrandMark({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center justify-center rounded-full bg-surface-alt text-gold",
+        "bg-brand-gradient inline-flex items-center justify-center rounded-2xl text-white shadow-[var(--shadow-float)]",
         className
       )}
-      style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
     >
       <IconSparkle className="animate-twinkle h-1/2 w-1/2" />
     </span>

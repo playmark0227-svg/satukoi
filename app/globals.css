@@ -1,39 +1,34 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════
-   サツコイ！（仮） デザイントークン — “Atelier Rosé”
-   アイボリーの便箋 × シャンパンゴールドの箔押し × くすみローズ。
-   見出し/氏名/数字＝明朝、本文＝サンセリフ。静謐で上質に。
+   サツコイ！（仮） デザイントークン — マッチングアプリUI
+   ビビッドピンク×パープルのグラデーション、白いカード、
+   大きな丸み、写真主役。明るくフレンドリーで今っぽく。
    ════════════════════════════════════════════════════════════ */
 @theme {
-  /* くすみローズ（主役）＋ゴールド差し色 */
-  --color-primary: #9e5b66;
-  --color-primary-strong: #7e3f4b;
-  --color-primary-soft: #f0e3e2;
-  --color-primary-tint: #f1e9dc;
-  --color-accent: #b07c84;
+  /* ブランド：ピンク（主役）×パープル（グラデーションの相方） */
+  --color-primary: #ec4899;
+  --color-primary-strong: #db2777;
+  --color-primary-soft: #fce7f3;
+  --color-primary-tint: #fdf2f8;
+  --color-accent-violet: #a855f7;
 
-  --color-gold: #b08a4f;
-  --color-gold-soft: rgba(176, 138, 79, 0.3);
+  --color-ink: #1f2430;
+  --color-ink-soft: #6b7280;
+  --color-ink-faint: #9ca3af;
+  --color-canvas: #f8f7fa;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f3f4f6;
+  --color-line: #eef0f4;
 
-  /* アイボリー基調の無彩〜低彩度 */
-  --color-ink: #3a2e2a;
-  --color-ink-soft: #7c6e64;
-  --color-ink-faint: #a89a8c;
-  --color-canvas: #f6f1e9;
-  --color-surface: #fbf7f0;
-  --color-surface-alt: #f1e9dc;
-  --color-line: #e4d8c6;
-
-  /* 状態色は彩度を落としたミュート版 */
-  --color-success: #4e7a5a;
-  --color-success-soft: #e7eee4;
-  --color-warning: #b07c2e;
-  --color-warning-soft: #f2e7d2;
-  --color-danger: #b0524e;
-  --color-danger-soft: #f0e0dc;
-  --color-info: #5a6e7c;
-  --color-info-soft: #e7ecef;
+  --color-success: #22c55e;
+  --color-success-soft: #e9f9ef;
+  --color-warning: #f59e0b;
+  --color-warning-soft: #fef3e2;
+  --color-danger: #ef4444;
+  --color-danger-soft: #feecec;
+  --color-info: #3b82f6;
+  --color-info-soft: #e8f1fe;
 
   --color-background: var(--color-canvas);
   --color-foreground: var(--color-ink);
@@ -42,16 +37,13 @@
     -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
     "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
-  --font-display:
-    "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP",
-    "Hiragino Mincho Pro", serif;
 
-  --radius-card: 1rem;
+  --radius-card: 1.25rem;
 
-  /* 茶系の低くやわらかな影（彩度を抜く） */
-  --shadow-card: 0 1px 2px rgba(58, 46, 42, 0.08), 0 10px 24px rgba(58, 46, 42, 0.05);
-  --shadow-float: 0 1px 2px rgba(58, 46, 42, 0.12);
-  --shadow-pop: 0 20px 52px rgba(58, 46, 42, 0.18);
+  /* ピンクがほんのり滲む、やわらかな多層シャドウ */
+  --shadow-card: 0 2px 8px rgba(236, 72, 153, 0.06), 0 12px 28px rgba(31, 36, 48, 0.07);
+  --shadow-float: 0 8px 20px rgba(236, 72, 153, 0.28), 0 2px 6px rgba(31, 36, 48, 0.06);
+  --shadow-pop: 0 18px 50px rgba(31, 36, 48, 0.18);
 }
 
 html,
@@ -65,14 +57,12 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  letter-spacing: 0.01em;
 }
 
 /* ── タイポグラフィ・ユーティリティ ── */
 .text-display {
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: 0.04em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 .num-tnum {
   font-feature-settings: "tnum";
@@ -83,7 +73,22 @@ body {
   letter-spacing: 0.18em;
 }
 
-/* ゴールドの便箋セパレータ（中央に短い金線） */
+/* ── ブランドグラデーション（ゆっくり流れる） ── */
+.bg-brand-gradient {
+  background-image: linear-gradient(120deg, #a855f7, #ec4899, #f472b6, #ec4899, #a855f7);
+  background-size: 240% 240%;
+  animation: foil-pan 8s linear infinite;
+}
+.text-foil {
+  background-image: linear-gradient(110deg, #a855f7, #ec4899, #f472b6, #a855f7);
+  background-size: 240% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: foil-pan 8s linear infinite;
+}
+
+/* かわいいセパレータ（中央にワンポイント） */
 .rule-letter {
   display: flex;
   align-items: center;
@@ -94,16 +99,16 @@ body {
   content: "";
   height: 1px;
   flex: 1;
-  background: linear-gradient(90deg, transparent, var(--color-gold-soft), transparent);
+  background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.35), transparent);
 }
 .rule-letter > span {
   margin: 0 0.75rem;
-  color: var(--color-gold);
-  font-size: 0.6rem;
+  color: var(--color-primary);
+  font-size: 0.65rem;
 }
 
 /* ════════════════════════════════════════════
-   アニメーション・カタログ（上品なリッチモーション）
+   アニメーション・カタログ
    ════════════════════════════════════════════ */
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
@@ -121,22 +126,18 @@ body {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
-/* 金箔がきらめくテキスト（インク→ゴールド→インクの光筋） */
 @keyframes foil-pan {
   0% { background-position: 0% 50%; }
-  100% { background-position: 250% 50%; }
+  100% { background-position: 240% 50%; }
 }
-/* 面をゆっくり横切るシャンパンの光 */
 @keyframes sheen {
   0% { transform: translateX(-160%) skewX(-16deg); }
   38%, 100% { transform: translateX(260%) skewX(-16deg); }
 }
-/* ロゴのスパークル */
 @keyframes twinkle {
   0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
-  50% { opacity: 0.7; transform: scale(0.85) rotate(10deg); }
+  50% { opacity: 0.72; transform: scale(0.85) rotate(10deg); }
 }
-/* ベルがときどき小さく揺れる */
 @keyframes bell-swing {
   0%, 14%, 100% { transform: rotate(0deg); }
   2% { transform: rotate(12deg); }
@@ -144,25 +145,21 @@ body {
   8% { transform: rotate(6deg); }
   11% { transform: rotate(-3deg); }
 }
-/* ハートの鼓動 */
 @keyframes heart-beat {
   0%, 40%, 100% { transform: scale(1); }
   10% { transform: scale(1.18); }
   22% { transform: scale(0.96); }
   30% { transform: scale(1.1); }
 }
-/* 未読ドットのゴールドの波紋 */
-@keyframes pulse-gold {
-  0% { box-shadow: 0 0 0 0 rgba(176, 138, 79, 0.55); }
-  70% { box-shadow: 0 0 0 7px rgba(176, 138, 79, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(176, 138, 79, 0); }
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.5); }
+  70% { box-shadow: 0 0 0 7px rgba(236, 72, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
 }
-/* ふわりと浮遊 */
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
-/* 下線がスッと引かれる */
 @keyframes underline-draw {
   from { transform: scaleX(0); }
   to { transform: scaleX(1); }
@@ -175,7 +172,7 @@ body {
 .animate-twinkle { animation: twinkle 3.2s ease-in-out infinite; }
 .animate-bell { transform-origin: top center; animation: bell-swing 6s ease-in-out infinite; }
 .animate-heart { animation: heart-beat 2.4s ease-in-out infinite; }
-.animate-pulse-gold { animation: pulse-gold 2.2s ease-out infinite; }
+.animate-pulse-ring { animation: pulse-ring 2.2s ease-out infinite; }
 .animate-float { animation: float-y 4.5s ease-in-out infinite; }
 .animate-underline { transform-origin: center; animation: underline-draw 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
@@ -194,31 +191,16 @@ body {
 .stagger > *:nth-child(11) { animation-delay: 690ms; }
 .stagger > *:nth-child(12) { animation-delay: 755ms; }
 
-/* 金箔の光筋が流れるテキスト（ワードマーク用・上品な glint） */
-.text-foil {
-  background-image: linear-gradient(
-    100deg,
-    var(--color-ink) 42%,
-    var(--color-gold) 50%,
-    var(--color-ink) 58%
-  );
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: foil-pan 7s linear infinite;
-}
-
-/* 面をゆっくり横切るシャンパンの光（ボタン・コード枠など） */
+/* 面をゆっくり横切る光（主要ボタンなど） */
 .sheen-host { position: relative; overflow: hidden; isolation: isolate; }
 .sheen-host::after {
   content: "";
   position: absolute;
   inset: 0;
   width: 34%;
-  background: linear-gradient(90deg, transparent, rgba(255, 253, 245, 0.34), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
   transform: translateX(-160%) skewX(-16deg);
-  animation: sheen 6.5s ease-in-out infinite;
+  animation: sheen 6s ease-in-out infinite;
   pointer-events: none;
 }
 
@@ -227,16 +209,20 @@ details[open] .details-body { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in, .animate-scale-in, .animate-page,
-  .animate-twinkle, .animate-bell, .animate-heart, .animate-pulse-gold,
-  .animate-float, .animate-underline, .stagger > *, .text-foil,
+  .animate-twinkle, .animate-bell, .animate-heart, .animate-pulse-ring,
+  .animate-float, .animate-underline, .stagger > *,
+  .bg-brand-gradient, .text-foil,
   details[open] .details-body {
     animation: none !important;
   }
-  .text-foil { color: var(--color-ink); background: none; }
+  .text-foil {
+    color: var(--color-primary);
+    background: none;
+  }
   .sheen-host::after { display: none; }
 }
 
-/* スマホ専用フレーム（PCは中央のデバイス枠）＋ごく微細な紙の質感 */
+/* スマホ専用フレーム（PCは中央のデバイス枠） */
 .phone-frame {
   width: 100%;
   max-width: 480px;
@@ -250,7 +236,7 @@ details[open] .details-body { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0
     min-height: calc(100dvh - 40px);
     margin-block: 20px;
     border: 1px solid var(--color-line);
-    border-radius: 28px;
+    border-radius: 32px;
     overflow: hidden;
     box-shadow: var(--shadow-pop);
   }
@@ -271,6 +257,6 @@ select {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(124, 110, 100, 0.35);
+  background: rgba(156, 163, 175, 0.4);
   border-radius: 9999px;
 }

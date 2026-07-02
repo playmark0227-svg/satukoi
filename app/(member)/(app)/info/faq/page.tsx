@@ -36,7 +36,7 @@ export default async function FaqPage() {
           <Card key={item.q} as="details" className="group">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
               <span className="text-sm font-semibold text-ink">{item.q}</span>
-              <span className="text-gold transition-transform duration-300 group-open:rotate-45">
+              <span className="text-primary transition-transform duration-300 group-open:rotate-45">
                 ＋
               </span>
             </summary>

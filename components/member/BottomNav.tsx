@@ -15,7 +15,7 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-gold-soft bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] pt-2.5 backdrop-blur-sm">
+    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-surface/90 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5 backdrop-blur-lg">
       {items.map(({ href, label, Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         const beat = active && href === "/matches";
@@ -24,27 +24,26 @@ export function BottomNav() {
             key={href}
             href={href}
             className={cn(
-              "group flex flex-col items-center gap-1.5 pb-1 text-[10px] transition-colors duration-200",
+              "group flex flex-col items-center gap-1 py-1.5 text-[10px] font-bold transition-colors duration-200",
               active ? "text-primary" : "text-ink-faint hover:text-ink-soft"
             )}
           >
-            <Icon
-              className={cn(
-                "h-[22px] w-[22px] transition-transform duration-200 group-active:scale-90",
-                active && "-translate-y-px scale-110",
-                beat && "animate-heart"
-              )}
-              filled={active}
-            />
-            <span className={active ? "text-display font-medium" : "font-medium"}>
-              {label}
-            </span>
             <span
               className={cn(
-                "h-[1.5px] w-2.5",
-                active ? "animate-underline bg-gold" : "bg-transparent"
+                "flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-200 group-active:scale-90",
+                active && "bg-primary-soft"
               )}
-            />
+            >
+              <Icon
+                className={cn(
+                  "h-[22px] w-[22px] transition-transform duration-200",
+                  active && "scale-110",
+                  beat && "animate-heart"
+                )}
+                filled={active}
+              />
+            </span>
+            {label}
           </Link>
         );
       })}

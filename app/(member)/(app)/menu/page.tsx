@@ -20,15 +20,11 @@ type Tone = "neutral" | "primary" | "info";
 function SectionHeader({ label, tone }: { label: string; tone: Tone }) {
   const cls =
     tone === "primary"
-      ? "text-primary"
+      ? "bg-primary-tint text-primary-strong"
       : tone === "info"
-        ? "text-gold"
-        : "text-ink-soft";
-  return (
-    <p className={`text-display bg-surface-alt px-4 py-2.5 text-xs font-medium tracking-wide ${cls}`}>
-      {label}
-    </p>
-  );
+        ? "bg-info-soft text-info"
+        : "bg-surface-alt text-ink-soft";
+  return <p className={`px-4 py-2.5 text-xs font-bold tracking-wide ${cls}`}>{label}</p>;
 }
 
 function MenuRow({
@@ -66,7 +62,7 @@ function MenuRow({
 export default async function MenuPage() {
   await requireMember();
   const ink = "h-[22px] w-[22px] text-ink-soft";
-  const blue = "h-[22px] w-[22px] text-gold";
+  const blue = "h-[22px] w-[22px] text-info";
 
   return (
     <div className="flex flex-1 flex-col pb-8">
@@ -111,9 +107,9 @@ export default async function MenuPage() {
       {/* ブランドの署名 */}
       <div className="animate-fade-in mt-auto px-6 pb-8 pt-10">
         <div className="rule-letter">
-          <span>◆</span>
+          <span>♥</span>
         </div>
-        <p className="caps-label mt-3 text-center text-[10px] font-medium text-ink-faint">
+        <p className="caps-label mt-3 text-center text-[10px] font-bold text-ink-faint">
           Satsukoi — Sapporo &nbsp;·&nbsp; ver 0.1
         </p>
       </div>

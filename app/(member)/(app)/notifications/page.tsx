@@ -70,7 +70,7 @@ export default async function NotificationsPage() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           {unread && (
-                            <span className="animate-pulse-gold h-2 w-2 shrink-0 rounded-full bg-primary" />
+                            <span className="animate-pulse-ring h-2 w-2 shrink-0 rounded-full bg-primary" />
                           )}
                           <Badge tone={unread ? "primary" : "neutral"}>
                             {NOTIFICATION_TYPE_LABELS[n.type]}
