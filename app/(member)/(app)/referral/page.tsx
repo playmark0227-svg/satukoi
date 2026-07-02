@@ -17,7 +17,7 @@ export default async function ReferralPage() {
         <div className="relative flex flex-col items-center overflow-hidden rounded-2xl border border-gold-soft bg-surface p-6 text-center">
           <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
           <span
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-alt text-gold"
+            className="animate-float flex h-14 w-14 items-center justify-center rounded-full bg-surface-alt text-gold"
             style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
           >
             <IconGift className="h-7 w-7" />
@@ -27,7 +27,7 @@ export default async function ReferralPage() {
             <br />
             お二人に<b className="text-primary-strong">デート代無料</b>の特典が付きます。
           </p>
-          <div className="mt-4 w-full rounded-xl border border-dashed border-gold-soft bg-surface-alt px-4 py-4">
+          <div className="sheen-host mt-4 w-full rounded-xl border border-dashed border-gold-soft bg-surface-alt px-4 py-4">
             <p className="caps-label text-[11px] text-ink-faint">Referral Code</p>
             <p className="num-tnum mt-1 font-mono text-3xl font-bold tracking-[0.3em] text-primary-strong">
               {code?.code ?? "ー"}

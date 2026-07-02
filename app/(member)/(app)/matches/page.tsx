@@ -63,7 +63,7 @@ export default async function MatchesPage() {
           style={{ animationDelay: "80ms" }}
           className="animate-fade-up flex items-start gap-3 rounded-2xl border border-line bg-surface p-5 transition active:scale-[0.99]"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-warning text-surface">
+          <span className="animate-float flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-warning text-surface">
             <IconCoffee className="h-6 w-6" />
           </span>
           <div className="min-w-0">
@@ -83,7 +83,10 @@ export default async function MatchesPage() {
           style={{ animationDelay: "160ms" }}
           className="animate-fade-up flex items-start gap-3 rounded-2xl border border-line bg-surface p-5 transition active:scale-[0.99]"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success text-surface">
+          <span
+            className="animate-float flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-success text-surface"
+            style={{ animationDelay: "1.2s" }}
+          >
             <IconScissors className="h-6 w-6" />
           </span>
           <div className="min-w-0">

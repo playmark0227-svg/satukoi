@@ -58,7 +58,7 @@ export default async function NotificationsPage() {
               />
             </Card>
           ) : (
-            <div className="space-y-2">
+            <div className="stagger space-y-2">
               {notifications.map((n) => {
                 const unread = n.readAt === null;
                 return (
@@ -70,7 +70,7 @@ export default async function NotificationsPage() {
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           {unread && (
-                            <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+                            <span className="animate-pulse-gold h-2 w-2 shrink-0 rounded-full bg-primary" />
                           )}
                           <Badge tone={unread ? "primary" : "neutral"}>
                             {NOTIFICATION_TYPE_LABELS[n.type]}
@@ -96,7 +96,7 @@ export default async function NotificationsPage() {
         {announcements.length > 0 && (
           <div>
             <SectionTitle>運営からのお知らせ</SectionTitle>
-            <div className="space-y-2">
+            <div className="stagger space-y-2">
               {announcements.map((a) => (
                 <Card key={a.id}>
                   <CardBody className="space-y-1">

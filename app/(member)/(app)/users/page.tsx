@@ -85,16 +85,45 @@ export default async function UsersPage({
         <div className="animate-fade-up relative flex items-start gap-3 overflow-hidden rounded-2xl border border-gold-soft bg-surface p-5">
           <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
           <span
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
+            className="animate-float flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
             style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
           >
-            <IconSparkle className="h-5 w-5" />
+            <IconSparkle className="animate-twinkle h-5 w-5" />
           </span>
           <div>
-            <p className="text-display text-base text-ink">新しい出会いが待っています</p>
-            <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-              気になる方を見つけたら、プロフィールをチェックしてデート申し込みしてみましょう。
+            <p className="text-display text-base text-ink">
+              素敵な出会いが、待っています
             </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+              チャットのやり取りは不要。気になる方にデートを申し込むだけで、
+              札幌のカフェでお会いできます。
+            </p>
+          </div>
+        </div>
+
+        {/* サービスの約束（ひと目で分かるUSP） */}
+        <div className="stagger flex flex-wrap justify-center gap-2">
+          {["チャット不要", "本人確認済の方のみ", "カフェで60分"].map((t) => (
+            <span
+              key={t}
+              className="inline-flex items-center gap-1.5 rounded-[6px] border border-line bg-surface px-2.5 py-1 text-[11px] font-medium text-ink-soft"
+            >
+              <span className="text-gold">✓</span>
+              {t}
+            </span>
+          ))}
+        </div>
+
+        {/* セクション見出し */}
+        <div className="animate-fade-up pt-1" style={{ animationDelay: "120ms" }}>
+          <p className="caps-label text-center text-[10px] font-semibold text-gold">
+            Members
+          </p>
+          <h2 className="text-display mt-1 text-center text-lg text-ink">
+            あなたにおすすめのお相手
+          </h2>
+          <div className="rule-letter mt-2.5">
+            <span>◆</span>
           </div>
         </div>
 
@@ -105,13 +134,12 @@ export default async function UsersPage({
             description="絞り込み条件を変えてもう一度お試しください。"
           />
         ) : (
-          <div className="grid grid-cols-2 gap-3.5">
-            {users.map((u, i) => (
+          <div className="stagger grid grid-cols-2 gap-3.5">
+            {users.map((u) => (
               <Link
                 key={u.id}
                 href={`/users/${u.id}`}
-                style={{ animationDelay: `${i * 60}ms` }}
-                className="group animate-fade-up relative block aspect-[3/4] overflow-hidden rounded-2xl bg-surface-alt ring-1 ring-inset ring-gold-soft transition-transform duration-200 active:scale-[0.98] sm:hover:-translate-y-1"
+                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl bg-surface-alt ring-1 ring-inset ring-gold-soft transition-[transform,box-shadow] duration-300 active:scale-[0.98] sm:hover:-translate-y-1 sm:hover:shadow-[var(--shadow-card)]"
               >
                 <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
 

@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 /**
- * カード用の写真。読み込み失敗時はニックネーム頭文字のグラデーション
- * プレースホルダにフォールバック（壊れた画像アイコンを出さない）。
+ * カード用の写真。ふわっと表示され、ホバーでゆっくりズーム（Ken Burns）。
+ * 読み込み失敗時は金の明朝頭文字プレースホルダにフォールバック。
  */
 export function UserPhoto({
   url,
@@ -17,8 +17,10 @@ export function UserPhoto({
 
   if (!url || error) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-surface-alt">
-        <span className="text-display text-5xl text-gold">{name[0] ?? "♡"}</span>
+      <div className="sheen-host flex h-full w-full items-center justify-center bg-surface-alt">
+        <span className="text-display animate-float text-5xl text-gold">
+          {name[0] ?? "♡"}
+        </span>
       </div>
     );
   }
@@ -30,7 +32,7 @@ export function UserPhoto({
       alt={name}
       loading="lazy"
       onError={() => setError(true)}
-      className="h-full w-full object-cover"
+      className="animate-fade-in h-full w-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-[1.07]"
       style={{ filter: "saturate(0.96)" }}
     />
   );

@@ -5,11 +5,11 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold rounded-[14px] tracking-[0.06em] transition-all duration-150 active:brightness-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
+  "inline-flex items-center justify-center gap-2 font-semibold rounded-[14px] tracking-[0.06em] transition-all duration-200 active:scale-[0.98] active:brightness-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-primary text-surface ring-1 ring-inset ring-gold-soft shadow-[var(--shadow-card)] hover:bg-primary-strong",
+    "sheen-host bg-primary text-surface ring-1 ring-inset ring-gold-soft shadow-[var(--shadow-card)] hover:bg-primary-strong hover:-translate-y-px",
   secondary:
     "bg-surface text-primary ring-1 ring-inset ring-gold-soft hover:bg-surface-alt",
   ghost: "bg-transparent text-ink-soft hover:bg-surface-alt",

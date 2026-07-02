@@ -102,9 +102,11 @@ body {
   font-size: 0.6rem;
 }
 
-/* ── 控えめなアニメーション（静謐さ重視） ── */
+/* ════════════════════════════════════════════
+   アニメーション・カタログ（上品なリッチモーション）
+   ════════════════════════════════════════════ */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes fade-in {
@@ -112,18 +114,126 @@ body {
   to { opacity: 1; }
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.97); }
+  from { opacity: 0; transform: scale(0.94); }
   to { opacity: 1; transform: none; }
 }
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+/* 金箔がきらめくテキスト（インク→ゴールド→インクの光筋） */
+@keyframes foil-pan {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 250% 50%; }
+}
+/* 面をゆっくり横切るシャンパンの光 */
+@keyframes sheen {
+  0% { transform: translateX(-160%) skewX(-16deg); }
+  38%, 100% { transform: translateX(260%) skewX(-16deg); }
+}
+/* ロゴのスパークル */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.7; transform: scale(0.85) rotate(10deg); }
+}
+/* ベルがときどき小さく揺れる */
+@keyframes bell-swing {
+  0%, 14%, 100% { transform: rotate(0deg); }
+  2% { transform: rotate(12deg); }
+  5% { transform: rotate(-10deg); }
+  8% { transform: rotate(6deg); }
+  11% { transform: rotate(-3deg); }
+}
+/* ハートの鼓動 */
+@keyframes heart-beat {
+  0%, 40%, 100% { transform: scale(1); }
+  10% { transform: scale(1.18); }
+  22% { transform: scale(0.96); }
+  30% { transform: scale(1.1); }
+}
+/* 未読ドットのゴールドの波紋 */
+@keyframes pulse-gold {
+  0% { box-shadow: 0 0 0 0 rgba(176, 138, 79, 0.55); }
+  70% { box-shadow: 0 0 0 7px rgba(176, 138, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(176, 138, 79, 0); }
+}
+/* ふわりと浮遊 */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+/* 下線がスッと引かれる */
+@keyframes underline-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 .animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 .animate-fade-in { animation: fade-in 0.5s ease both; }
-.animate-scale-in { animation: scale-in 0.45s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
-.animate-page { animation: fade-in 0.4s ease both; }
+.animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.animate-page { animation: page-in 0.45s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.animate-twinkle { animation: twinkle 3.2s ease-in-out infinite; }
+.animate-bell { transform-origin: top center; animation: bell-swing 6s ease-in-out infinite; }
+.animate-heart { animation: heart-beat 2.4s ease-in-out infinite; }
+.animate-pulse-gold { animation: pulse-gold 2.2s ease-out infinite; }
+.animate-float { animation: float-y 4.5s ease-in-out infinite; }
+.animate-underline { transform-origin: center; animation: underline-draw 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+
+/* 子要素が時間差でふわっと現れる（最大12個まで階段状に） */
+.stagger > * { animation: fade-up 0.55s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 40ms; }
+.stagger > *:nth-child(2) { animation-delay: 105ms; }
+.stagger > *:nth-child(3) { animation-delay: 170ms; }
+.stagger > *:nth-child(4) { animation-delay: 235ms; }
+.stagger > *:nth-child(5) { animation-delay: 300ms; }
+.stagger > *:nth-child(6) { animation-delay: 365ms; }
+.stagger > *:nth-child(7) { animation-delay: 430ms; }
+.stagger > *:nth-child(8) { animation-delay: 495ms; }
+.stagger > *:nth-child(9) { animation-delay: 560ms; }
+.stagger > *:nth-child(10) { animation-delay: 625ms; }
+.stagger > *:nth-child(11) { animation-delay: 690ms; }
+.stagger > *:nth-child(12) { animation-delay: 755ms; }
+
+/* 金箔の光筋が流れるテキスト（ワードマーク用・上品な glint） */
+.text-foil {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-ink) 42%,
+    var(--color-gold) 50%,
+    var(--color-ink) 58%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: foil-pan 7s linear infinite;
+}
+
+/* 面をゆっくり横切るシャンパンの光（ボタン・コード枠など） */
+.sheen-host { position: relative; overflow: hidden; isolation: isolate; }
+.sheen-host::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 34%;
+  background: linear-gradient(90deg, transparent, rgba(255, 253, 245, 0.34), transparent);
+  transform: translateX(-160%) skewX(-16deg);
+  animation: sheen 6.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* FAQ など details の中身をふわっと */
+details[open] .details-body { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up, .animate-fade-in, .animate-scale-in, .animate-page {
+  .animate-fade-up, .animate-fade-in, .animate-scale-in, .animate-page,
+  .animate-twinkle, .animate-bell, .animate-heart, .animate-pulse-gold,
+  .animate-float, .animate-underline, .stagger > *, .text-foil,
+  details[open] .details-body {
     animation: none !important;
   }
+  .text-foil { color: var(--color-ink); background: none; }
+  .sheen-host::after { display: none; }
 }
 
 /* スマホ専用フレーム（PCは中央のデバイス枠）＋ごく微細な紙の質感 */

@@ -31,14 +31,16 @@ export default async function FaqPage() {
   return (
     <div className="flex flex-1 flex-col pb-10">
       <AppHeader title="よくある質問" backHref="/menu" />
-      <div className="space-y-3 px-4 py-4">
+      <div className="stagger space-y-3 px-4 py-4">
         {FAQ.map((item) => (
-          <Card key={item.q} as="details">
-            <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3.5">
-              <span className="text-sm font-bold text-ink">{item.q}</span>
-              <span className="text-ink-faint">＋</span>
+          <Card key={item.q} as="details" className="group">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3.5 [&::-webkit-details-marker]:hidden">
+              <span className="text-sm font-semibold text-ink">{item.q}</span>
+              <span className="text-gold transition-transform duration-300 group-open:rotate-45">
+                ＋
+              </span>
             </summary>
-            <p className="border-t border-line px-4 py-3.5 text-sm leading-relaxed text-ink-soft">
+            <p className="details-body border-t border-line px-4 py-3.5 text-sm leading-relaxed text-ink-soft">
               {item.a}
             </p>
           </Card>

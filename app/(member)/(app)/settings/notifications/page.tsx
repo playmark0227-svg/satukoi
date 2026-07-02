@@ -1,6 +1,7 @@
 import { requireMember } from "@/lib/auth";
 import { AppHeader } from "@/components/member/AppHeader";
 import { Card } from "@/components/ui/Card";
+import { Toggle } from "@/components/ui/Toggle";
 
 const ITEMS = [
   { label: "申し受け・マッチング", desc: "お相手からの申し受けやマッチ成立時" },
@@ -21,17 +22,14 @@ export default async function NotificationSettingsPage() {
           メール通知・アプリ内通知の受け取りを項目ごとに設定できます。
         </p>
         <Card>
-          <div className="divide-y divide-line">
+          <div className="stagger divide-y divide-line">
             {ITEMS.map((it) => (
               <div key={it.label} className="flex items-center justify-between gap-3 px-4 py-3.5">
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-ink">{it.label}</p>
+                  <p className="text-sm font-semibold text-ink">{it.label}</p>
                   <p className="mt-0.5 text-xs text-ink-faint">{it.desc}</p>
                 </div>
-                {/* 見た目のみのトグル（ON状態） */}
-                <span className="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full bg-primary">
-                  <span className="absolute right-0.5 h-5 w-5 rounded-full bg-white shadow" />
-                </span>
+                <Toggle defaultOn label={it.label} />
               </div>
             ))}
           </div>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { IconFunnel } from "@/components/member/icons";
 
-/** さがす画面の絞り込み。既定は「絞り込み」バーのみ表示し、タップで条件を展開。 */
+/** さがす画面の絞り込み。タップでパネルがなめらかに展開する。 */
 export function UserFilters({
   ageMin: initialAgeMin,
   ageMax: initialAgeMax,
@@ -50,78 +50,103 @@ export function UserFilters({
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-ink-soft"
+        aria-expanded={open}
+        className="flex w-full items-center gap-2 px-4 py-3 text-ink-soft transition-colors hover:text-ink"
       >
-        <IconFunnel className="h-5 w-5" />
-        <span className="text-sm font-bold">絞り込み</span>
+        <IconFunnel
+          className={
+            "h-5 w-5 transition-transform duration-300" + (open ? " -rotate-12" : "")
+          }
+        />
+        <span className="text-sm font-semibold">絞り込み</span>
         {activeCount > 0 && (
-          <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
+          <span className="animate-scale-in num-tnum ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-surface">
             {activeCount}
           </span>
         )}
-        <span className="ml-auto text-ink-faint">{open ? "▲" : "▼"}</span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={
+            "ml-auto h-4 w-4 text-ink-faint transition-transform duration-300" +
+            (open ? " rotate-180" : "")
+          }
+          aria-hidden
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
       </button>
 
-      {open && (
-        <div className="space-y-3 px-4 pb-4">
-          <Field label="年齢">
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={18}
-                max={120}
-                placeholder="18"
-                value={ageMin}
-                onChange={(e) => setAgeMin(e.target.value)}
-                aria-label="年齢の下限"
-              />
-              <span className="text-ink-faint">〜</span>
-              <Input
-                type="number"
-                inputMode="numeric"
-                min={18}
-                max={120}
-                placeholder="上限"
-                value={ageMax}
-                onChange={(e) => setAgeMax(e.target.value)}
-                aria-label="年齢の上限"
-              />
-              <span className="shrink-0 text-sm text-ink-soft">歳</span>
+      {/* なめらかに開閉するパネル（grid-rows トランジション） */}
+      <div
+        className="grid transition-[grid-template-rows] duration-300 ease-out"
+        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
+      >
+        <div className="overflow-hidden">
+          <div className="space-y-3 px-4 pb-4 pt-1">
+            <Field label="年齢">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={18}
+                  max={120}
+                  placeholder="18"
+                  value={ageMin}
+                  onChange={(e) => setAgeMin(e.target.value)}
+                  aria-label="年齢の下限"
+                />
+                <span className="text-ink-faint">〜</span>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={18}
+                  max={120}
+                  placeholder="上限"
+                  value={ageMax}
+                  onChange={(e) => setAgeMax(e.target.value)}
+                  aria-label="年齢の上限"
+                />
+                <span className="shrink-0 text-sm text-ink-soft">歳</span>
+              </div>
+            </Field>
+
+            <Field label="居住地">
+              <Select
+                value={area}
+                onChange={(e) => setArea(e.target.value)}
+                aria-label="居住地"
+              >
+                <option value="">指定なし</option>
+                {Object.entries(RESIDENCE_AREA_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            <div className="flex gap-2 pt-1">
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                className="flex-1"
+                onClick={apply}
+              >
+                この条件でさがす
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={reset}>
+                リセット
+              </Button>
             </div>
-          </Field>
-
-          <Field label="居住地">
-            <Select
-              value={area}
-              onChange={(e) => setArea(e.target.value)}
-              aria-label="居住地"
-            >
-              <option value="">指定なし</option>
-              {Object.entries(RESIDENCE_AREA_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-
-          <div className="flex gap-2 pt-1">
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              className="flex-1"
-              onClick={apply}
-            >
-              この条件でさがす
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={reset}>
-              リセット
-            </Button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

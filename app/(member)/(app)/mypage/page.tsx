@@ -36,12 +36,19 @@ function Row({
   label: string;
 }) {
   return (
-    <Link href={href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-canvas">
-      <span className={`flex h-9 w-9 items-center justify-center rounded-full ${iconClass}`}>
+    <Link
+      href={href}
+      className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-alt/50"
+    >
+      <span
+        className={`flex h-9 w-9 items-center justify-center rounded-full transition-transform duration-200 group-hover:scale-110 ${iconClass}`}
+      >
         {icon}
       </span>
       <span className="flex-1 text-sm font-medium text-ink">{label}</span>
-      <span className="text-ink-faint">›</span>
+      <span className="text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5">
+        ›
+      </span>
     </Link>
   );
 }
@@ -68,7 +75,7 @@ export default async function MyPage() {
             <Avatar
               url={me.photos[0]?.url}
               name={me.nickname}
-              className="h-20 w-20 shrink-0 text-2xl"
+              className="animate-scale-in h-20 w-20 shrink-0 text-2xl"
             />
             <div className="min-w-0">
               <p className="text-display truncate text-3xl font-medium text-ink">
@@ -129,7 +136,7 @@ export default async function MyPage() {
           <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gold" />
           <div className="flex items-start gap-3">
             <span
-              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
+              className="animate-float flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-alt text-gold"
               style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
             >
               <IconCrown className="h-6 w-6" />

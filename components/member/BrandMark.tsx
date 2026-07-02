@@ -11,7 +11,7 @@ export function BrandMark({ className }: { className?: string }) {
       )}
       style={{ boxShadow: "inset 0 0 0 1px var(--color-gold)" }}
     >
-      <IconSparkle className="h-1/2 w-1/2" />
+      <IconSparkle className="animate-twinkle h-1/2 w-1/2" />
     </span>
   );
 }

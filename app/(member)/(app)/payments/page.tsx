@@ -22,7 +22,7 @@ export default async function PaymentsPage() {
           <EmptyState title="決済履歴はありません" icon="💳" />
         ) : (
           <Card>
-            <div className="divide-y divide-line">
+            <div className="stagger divide-y divide-line">
               {payments.map((p) => (
                 <div key={p.id} className="flex items-center justify-between px-4 py-3.5">
                   <div>

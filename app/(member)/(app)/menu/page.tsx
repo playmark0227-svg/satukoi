@@ -43,15 +43,22 @@ function MenuRow({
   subtitle?: string;
 }) {
   return (
-    <Link href={href} className="flex items-center gap-3.5 px-4 py-3.5 hover:bg-canvas">
-      <span className="shrink-0">{icon}</span>
+    <Link
+      href={href}
+      className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-surface-alt/50"
+    >
+      <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
+        {icon}
+      </span>
       <span className="flex-1">
         <span className="block text-[15px] font-medium text-ink">{label}</span>
         {subtitle && (
           <span className="mt-0.5 block text-xs text-ink-faint">{subtitle}</span>
         )}
       </span>
-      <span className="text-ink-faint">›</span>
+      <span className="text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5">
+        ›
+      </span>
     </Link>
   );
 }
@@ -66,14 +73,14 @@ export default async function MenuPage() {
       <BrandHeader />
 
       <SectionHeader label="アカウント" tone="neutral" />
-      <div className="divide-y divide-line bg-surface">
+      <div className="stagger divide-y divide-line bg-surface">
         <MenuRow href="/mypage/edit" icon={<IconUser className={ink} />} label="プロフィール設定" />
         <MenuRow href="/payments" icon={<IconCard className={ink} />} label="決済履歴" />
         <MenuRow href="/settings/notifications" icon={<IconBell className={ink} />} label="通知設定" />
       </div>
 
       <SectionHeader label="紹介特典" tone="primary" />
-      <div className="divide-y divide-line bg-surface">
+      <div className="stagger divide-y divide-line bg-surface">
         <MenuRow
           href="/referral"
           icon={<IconGift className="h-[22px] w-[22px] text-primary" />}
@@ -83,7 +90,7 @@ export default async function MenuPage() {
       </div>
 
       <SectionHeader label="サポート" tone="info" />
-      <div className="divide-y divide-line bg-surface">
+      <div className="stagger divide-y divide-line bg-surface">
         <MenuRow href="/info/faq" icon={<IconQuestion className={blue} />} label="よくある質問" />
         <MenuRow href="/contact" icon={<IconChat className={blue} />} label="お問い合わせ" />
         <MenuRow href="/info/terms" icon={<IconDoc className={blue} />} label="利用規約" />
@@ -100,6 +107,16 @@ export default async function MenuPage() {
           </form>
         </div>
       )}
+
+      {/* ブランドの署名 */}
+      <div className="animate-fade-in mt-auto px-6 pb-8 pt-10">
+        <div className="rule-letter">
+          <span>◆</span>
+        </div>
+        <p className="caps-label mt-3 text-center text-[10px] font-medium text-ink-faint">
+          Satsukoi — Sapporo &nbsp;·&nbsp; ver 0.1
+        </p>
+      </div>
     </div>
   );
 }
