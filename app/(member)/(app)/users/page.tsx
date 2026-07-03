@@ -4,11 +4,11 @@ import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
+import { BrandMark } from "@/components/member/BrandMark";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UserFilters } from "@/components/member/browse/UserFilters";
 import { UserPhoto } from "@/components/member/UserPhoto";
 import {
-  IconSparkle,
   IconHeart,
   BadgeVerified,
   BadgeCrown,
@@ -86,28 +86,26 @@ export default async function UsersPage({
       />
 
       <div className="space-y-5 px-4 py-5">
-        {/* プロモバナー */}
-        <div className="animate-fade-up flex items-start gap-3 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-4 shadow-[var(--shadow-card)]">
-          <span className="bg-brand-gradient animate-float flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white shadow-[var(--shadow-float)]">
-            <IconSparkle className="animate-twinkle h-5 w-5" />
-          </span>
-          <div>
-            <p className="text-display text-base text-primary-strong">
+        {/* プロモバナー（公式ロゴを主役に） */}
+        <div className="animate-fade-up flex items-center gap-3.5 rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint via-surface to-surface p-4 shadow-[var(--shadow-card)]">
+          <BrandMark className="animate-float h-13 w-13 shrink-0" />
+          <div className="min-w-0">
+            <p className="text-display text-[15px] text-primary-strong">
               素敵な出会いが、待っています
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-primary-strong/75">
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-soft">
               チャットのやり取りは不要。気になる方にデートを申し込むだけで、
               札幌のカフェでお会いできます。
             </p>
           </div>
         </div>
 
-        {/* サービスの約束（ひと目で分かるUSP） */}
-        <div className="stagger flex flex-wrap justify-center gap-2">
-          {["チャット不要", "本人確認済の方のみ", "カフェで60分"].map((t) => (
+        {/* サービスの約束（ひと目で分かるUSP・3等分） */}
+        <div className="stagger grid grid-cols-3 gap-2">
+          {["チャット不要", "本人確認済み", "カフェで60分"].map((t) => (
             <span
               key={t}
-              className="inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-surface px-3 py-1 text-[11px] font-bold text-ink-soft shadow-[var(--shadow-card)]"
+              className="inline-flex items-center justify-center gap-1 rounded-full border border-primary/15 bg-surface px-2 py-1.5 text-[11px] font-bold text-ink-soft shadow-[var(--shadow-card)]"
             >
               <span className="text-primary">✓</span>
               {t}

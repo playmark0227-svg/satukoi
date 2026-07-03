@@ -1,7 +1,10 @@
+import Image from "next/image";
+import mark from "@/public/logo-mark.png";
+
 export function EmptyState({
   title,
   description,
-  icon = "♡",
+  icon,
   action,
 }: {
   title: string;
@@ -12,7 +15,9 @@ export function EmptyState({
   return (
     <div className="animate-fade-up flex flex-col items-center justify-center px-6 py-14 text-center">
       <div className="animate-float mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-primary-soft text-2xl text-primary">
-        {icon}
+        {icon ?? (
+          <Image src={mark} alt="" sizes="40px" className="h-8 w-8 object-contain" />
+        )}
       </div>
       <p className="font-bold text-ink">{title}</p>
       {description && (

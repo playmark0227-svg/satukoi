@@ -17,7 +17,7 @@ export function UserPhoto({
 
   if (!url || error) {
     return (
-      <div className="sheen-host flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-soft via-primary-tint to-violet-100">
+      <div className="sheen-host flex h-full w-full items-center justify-center bg-gradient-to-br from-primary-soft via-primary-tint to-purple-100">
         <span className="text-display animate-float text-5xl text-primary/60">
           {name[0] ?? "♡"}
         </span>

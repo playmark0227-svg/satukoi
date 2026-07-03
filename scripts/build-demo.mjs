@@ -91,7 +91,7 @@ try {
       `<!doctype html><html lang="ja"><head><meta charset="utf-8">` +
         `<meta name="viewport" content="width=device-width, initial-scale=1">` +
         `<title>サツコイ！（仮）</title>` +
-        `<meta name="theme-color" content="#ec4899">` +
+        `<meta name="theme-color" content="#ee3f9b">` +
         `<meta name="description" content="${desc}">` +
         `<link rel="icon" href="${base}/favicon.ico" sizes="any">` +
         `<link rel="icon" type="image/png" href="${base}/icon.png">` +
@@ -110,7 +110,7 @@ try {
         `<body style="margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center;font-family:sans-serif;color:#1f2430;background:#f8f7fa">` +
         `<div style="text-align:center">` +
         `<img src="${base}/logo.png" width="72" height="72" alt="サツコイ" style="filter:drop-shadow(0 4px 12px rgba(219,39,119,.28))">` +
-        `<p style="margin-top:12px;font-size:14px;color:#6b7280">ホームに移動します… <a href="${home}" style="color:#db2777;font-weight:bold;text-decoration:none">こちら</a></p>` +
+        `<p style="margin-top:12px;font-size:14px;color:#6b7280">ホームに移動します… <a href="${home}" style="color:#d31f80;font-weight:bold;text-decoration:none">こちら</a></p>` +
         `</div></body></html>\n`
     );
     console.log("[demo] out/.nojekyll とトップのホーム転送(index.html→/users)を作成しました");
