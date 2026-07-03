@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { SERVICE_NAME, SERVICE_CATCHPHRASE } from "@/lib/constants";
+import { BrandMark } from "@/components/member/BrandMark";
 import { login } from "./actions";
 
 export default async function LoginPage({
@@ -20,11 +21,12 @@ export default async function LoginPage({
   return (
     <div className="flex flex-1 flex-col px-6 pt-16 pb-10">
       {/* ロゴ見出し */}
-      <div className="text-center">
-        <p className="text-sm font-bold text-primary-strong">
+      <div className="animate-fade-up text-center">
+        <BrandMark className="mx-auto h-16 w-16" />
+        <p className="mt-4 text-sm font-bold text-primary-strong">
           {SERVICE_CATCHPHRASE}
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-ink">
+        <h1 className="mt-1 text-3xl font-black tracking-tight text-ink">
           {SERVICE_NAME}
         </h1>
         <p className="mt-3 text-sm text-ink-soft">ログイン</p>

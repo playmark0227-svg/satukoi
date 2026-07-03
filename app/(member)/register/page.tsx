@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppHeader } from "@/components/member/AppHeader";
+import { BrandMark } from "@/components/member/BrandMark";
 import { RegisterWizard } from "@/components/member/register/RegisterWizard";
 import { createMember } from "./actions";
 import { SERVICE_NAME } from "@/lib/constants";
@@ -10,9 +11,12 @@ export default function RegisterPage() {
       <AppHeader title="新規会員登録" backHref="/" />
       <div className="flex-1 px-4 py-4">
         <div className="mb-4">
-          <h2 className="text-lg font-black text-ink">
-            {SERVICE_NAME}にようこそ
-          </h2>
+          <div className="flex items-center gap-2">
+            <BrandMark className="h-8 w-8" />
+            <h2 className="text-lg font-black text-ink">
+              {SERVICE_NAME}にようこそ
+            </h2>
+          </div>
           <p className="mt-1 text-xs leading-relaxed text-ink-soft">
             4つのステップでご登録いただけます。ご入力後、運営が書類を確認し、承認をもってご利用開始となります。
           </p>

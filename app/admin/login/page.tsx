@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { SERVICE_NAME } from "@/lib/constants";
+import { BrandMark } from "@/components/member/BrandMark";
 import { adminLogin } from "./actions";
 
 export default async function AdminLoginPage({
@@ -19,8 +20,9 @@ export default async function AdminLoginPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-10">
       <div className="w-full max-w-sm">
-        <div className="text-center">
-          <h1 className="text-2xl font-black tracking-tight text-ink">
+        <div className="animate-fade-up text-center">
+          <BrandMark className="mx-auto h-16 w-16" />
+          <h1 className="mt-4 text-2xl font-black tracking-tight text-ink">
             {SERVICE_NAME}
           </h1>
           <p className="mt-2 text-sm font-bold text-ink-soft">運営管理画面</p>

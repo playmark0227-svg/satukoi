@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { SERVICE_NAME } from "@/lib/constants";
+import { BrandMark } from "@/components/member/BrandMark";
 import { requestReset } from "./actions";
 
 export default async function ForgotPasswordPage({
@@ -15,8 +16,9 @@ export default async function ForgotPasswordPage({
   return (
     <div className="flex flex-1 flex-col px-6 pt-16 pb-10">
       {/* ロゴ見出し */}
-      <div className="text-center">
-        <h1 className="text-2xl font-black tracking-tight text-ink">
+      <div className="animate-fade-up text-center">
+        <BrandMark className="mx-auto h-14 w-14" />
+        <h1 className="mt-4 text-2xl font-black tracking-tight text-ink">
           {SERVICE_NAME}
         </h1>
         <p className="mt-2 text-sm text-ink-soft">パスワードの再設定</p>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { SERVICE_NAME } from "@/lib/constants";
+import { BrandMark } from "@/components/member/BrandMark";
 
 const nav = [
   { href: "/admin", label: "ダッシュボード", exact: true },
@@ -27,9 +28,12 @@ export function AdminShell({
   return (
     <div className="flex min-h-dvh bg-canvas">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface md:flex">
-        <div className="border-b border-line px-5 py-4">
-          <p className="text-sm font-bold text-primary">{SERVICE_NAME}</p>
-          <p className="text-xs text-ink-faint">運営管理</p>
+        <div className="flex items-center gap-2.5 border-b border-line px-5 py-4">
+          <BrandMark className="h-8 w-8" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-bold text-primary">{SERVICE_NAME}</p>
+            <p className="text-xs text-ink-faint">運営管理</p>
+          </div>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
           {nav.map((it) => {
@@ -69,7 +73,10 @@ export function AdminShell({
       <div className="flex min-w-0 flex-1 flex-col">
         {/* モバイル用上部バー */}
         <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
-          <span className="text-sm font-bold text-primary">{SERVICE_NAME} 運営</span>
+          <span className="flex items-center gap-2 text-sm font-bold text-primary">
+            <BrandMark className="h-6 w-6" />
+            {SERVICE_NAME} 運営
+          </span>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>

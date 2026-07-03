@@ -8,6 +8,7 @@ import {
   RESIDENCE_AREA_LABELS,
 } from "@/lib/constants";
 import { formatYen } from "@/lib/format";
+import { BrandMark } from "@/components/member/BrandMark";
 
 const points = [
   { icon: "💬", title: "チャットなし", desc: "メッセージのやり取りは不要。まずは会う設計。" },
@@ -24,8 +25,9 @@ export default async function LandingPage() {
     <div className="flex flex-1 flex-col">
       {/* ヒーロー */}
       <section className="bg-gradient-to-b from-primary-soft to-canvas px-6 pt-14 pb-10 text-center">
-        <p className="text-sm font-bold text-primary-strong">{SERVICE_CATCHPHRASE}</p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-ink">
+        <BrandMark className="animate-float mx-auto h-24 w-24" />
+        <p className="mt-5 text-sm font-bold text-primary-strong">{SERVICE_CATCHPHRASE}</p>
+        <h1 className="mt-1 text-3xl font-black tracking-tight text-ink">
           {SERVICE_NAME}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-ink-soft">

@@ -80,18 +80,38 @@ try {
     // GitHub Pages の Jekyll 処理を無効化（_next ディレクトリを配信させる）
     writeFileSync("out/.nojekyll", "");
     // ルート(/)を開いたら即ホーム（さがす一覧）へ。先方提案用にログイン画面を挟まない。
-    const home = "/satukoi/users/";
+    // このページは Next の metadata を経由しないため、favicon/OG は手動で basePath 付き指定。
+    const base = "/satukoi";
+    const home = `${base}/users/`;
+    const desc =
+      "チャットなし、ちゃんと会える！札幌恋活マッチングサービス「サツコイ！（仮）」";
+    const ogImage = `https://playmark0227-svg.github.io${base}/opengraph-image.png`;
     writeFileSync(
       "out/index.html",
       `<!doctype html><html lang="ja"><head><meta charset="utf-8">` +
         `<meta name="viewport" content="width=device-width, initial-scale=1">` +
         `<title>サツコイ！（仮）</title>` +
+        `<meta name="theme-color" content="#ec4899">` +
+        `<meta name="description" content="${desc}">` +
+        `<link rel="icon" href="${base}/favicon.ico" sizes="any">` +
+        `<link rel="icon" type="image/png" href="${base}/icon.png">` +
+        `<link rel="apple-touch-icon" href="${base}/apple-icon.png">` +
+        `<link rel="manifest" href="${base}/manifest.webmanifest">` +
+        `<meta property="og:type" content="website">` +
+        `<meta property="og:title" content="サツコイ！（仮）">` +
+        `<meta property="og:description" content="${desc}">` +
+        `<meta property="og:image" content="${ogImage}">` +
+        `<meta name="twitter:card" content="summary_large_image">` +
+        `<meta name="twitter:image" content="${ogImage}">` +
         `<meta http-equiv="refresh" content="0; url=${home}">` +
         `<link rel="canonical" href="${home}">` +
         `<script>location.replace(${JSON.stringify(home)});</script>` +
-        `</head><body style="font-family:sans-serif;padding:24px;color:#2b2d42">` +
-        `<p>ホームに移動します… <a href="${home}">表示されない場合はこちら</a></p>` +
-        `</body></html>\n`
+        `</head>` +
+        `<body style="margin:0;display:flex;min-height:100vh;align-items:center;justify-content:center;font-family:sans-serif;color:#1f2430;background:#f8f7fa">` +
+        `<div style="text-align:center">` +
+        `<img src="${base}/logo.png" width="72" height="72" alt="サツコイ" style="filter:drop-shadow(0 4px 12px rgba(219,39,119,.28))">` +
+        `<p style="margin-top:12px;font-size:14px;color:#6b7280">ホームに移動します… <a href="${home}" style="color:#db2777;font-weight:bold;text-decoration:none">こちら</a></p>` +
+        `</div></body></html>\n`
     );
     console.log("[demo] out/.nojekyll とトップのホーム転送(index.html→/users)を作成しました");
   }
