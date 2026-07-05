@@ -1,4 +1,5 @@
 import { AppHeader } from "@/components/member/AppHeader";
+import { BrandMark } from "@/components/member/BrandMark";
 import { Card, CardBody } from "@/components/ui/Card";
 import { ButtonLink } from "@/components/ui/Button";
 import { MemberStatusBadge } from "@/components/ui/StatusBadge";
@@ -10,7 +11,7 @@ export default function RegisterCompletePage() {
       <div className="flex flex-1 flex-col px-4 py-6">
         <Card>
           <CardBody className="space-y-4 text-center">
-            <div className="text-5xl">🎉</div>
+            <BrandMark className="animate-scale-in mx-auto h-14 w-14" />
             <h2 className="text-lg font-black text-ink">ご登録ありがとうございます</h2>
             <div className="flex justify-center">
               <MemberStatusBadge status="DOCUMENT_REVIEW" />

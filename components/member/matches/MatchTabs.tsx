@@ -32,12 +32,12 @@ function TabButton({
       onClick={onClick}
       className={cn(
         "relative flex flex-1 items-center justify-center gap-2 py-3.5 text-sm transition-colors duration-200",
-        active ? "text-display text-primary-strong" : "font-medium text-ink-faint"
+        active ? "font-bold text-ink" : "font-medium text-ink-faint"
       )}
     >
       {label}
       {count ? (
-        <span className="animate-scale-in num-tnum inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-surface">
+        <span className="num-tnum inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-surface">
           {count}
         </span>
       ) : null}
@@ -57,7 +57,7 @@ function MatchRow({ it }: { it: MatchItem }) {
         className="h-16 w-16 shrink-0 text-xl transition-transform duration-300 group-hover:scale-105"
       />
       <div className="min-w-0 flex-1">
-        <p className="text-display truncate text-lg font-medium text-ink">{it.nickname}</p>
+        <p className="truncate text-[15px] font-bold text-ink">{it.nickname}</p>
         <p className="num-tnum text-sm text-ink-soft">
           {it.age}歳 / {it.area}
         </p>
@@ -105,10 +105,9 @@ export function MatchTabs({
         {/* スライドインジケーター */}
         <span
           className={cn(
-            "absolute -bottom-px left-0 h-[3px] w-1/2 rounded-full bg-primary transition-transform duration-300 ease-out",
+            "absolute -bottom-px left-0 h-0.5 w-1/2 bg-primary transition-transform duration-300 ease-out",
             tab === "confirmed" && "translate-x-full"
           )}
-          style={{ transformOrigin: "center" }}
         />
       </div>
 

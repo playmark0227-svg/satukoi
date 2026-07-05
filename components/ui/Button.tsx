@@ -8,8 +8,7 @@ const base =
   "inline-flex items-center justify-center gap-2 font-bold rounded-full transition-all duration-200 active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 
 const variants: Record<Variant, string> = {
-  primary:
-    "sheen-host bg-brand-gradient text-white shadow-[var(--shadow-float)] hover:-translate-y-px hover:brightness-105",
+  primary: "bg-primary text-white hover:bg-primary-strong",
   secondary: "bg-primary-soft text-primary-strong hover:bg-primary-soft/70",
   ghost: "bg-transparent text-ink-soft hover:bg-line/60",
   danger: "bg-danger text-white hover:brightness-105",

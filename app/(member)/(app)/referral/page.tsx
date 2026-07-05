@@ -14,22 +14,25 @@ export default async function ReferralPage() {
     <div className="flex flex-1 flex-col pb-10">
       <AppHeader title="お友達を紹介する" backHref="/menu" />
       <div className="space-y-4 px-4 py-4">
-        <div className="flex flex-col items-center rounded-3xl border border-primary/15 bg-gradient-to-br from-primary-tint to-surface p-6 text-center shadow-[var(--shadow-card)]">
-          <span className="bg-brand-gradient animate-float flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-[var(--shadow-float)]">
-            <IconGift className="h-7 w-7" />
-          </span>
-          <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-            お知り合いのご登録時にこのコードをご入力いただくと、
-            <br />
-            お二人に<b className="text-primary-strong">デート代無料</b>の特典が付きます。
-          </p>
-          <div className="sheen-host mt-4 w-full rounded-2xl border border-dashed border-primary/40 bg-surface px-4 py-4">
-            <p className="caps-label text-[11px] font-bold text-primary">Referral Code</p>
-            <p className="num-tnum mt-1 font-mono text-3xl font-black tracking-[0.3em] text-primary-strong">
-              {code?.code ?? "ー"}
-            </p>
-          </div>
-        </div>
+        <Card>
+          <CardBody className="space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-alt text-ink-soft">
+                <IconGift className="h-5 w-5" />
+              </span>
+              <p className="text-sm leading-relaxed text-ink-soft">
+                お知り合いのご登録時にこのコードをご入力いただくと、お二人に
+                <b className="text-primary-strong">デート代無料</b>の特典が付きます。
+              </p>
+            </div>
+            <div className="rounded-xl border border-dashed border-line bg-surface-alt/60 px-4 py-3">
+              <p className="text-xs font-bold text-ink-faint">紹介コード</p>
+              <p className="num-tnum mt-1 font-mono text-2xl font-bold tracking-widest text-ink">
+                {code?.code ?? "ー"}
+              </p>
+            </div>
+          </CardBody>
+        </Card>
 
         <Card>
           <CardBody className="flex items-center justify-between">

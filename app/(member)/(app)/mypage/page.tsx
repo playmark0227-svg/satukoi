@@ -94,58 +94,58 @@ export default async function MyPage() {
 
         {/* スタッツ */}
         <div
-          style={{ animationDelay: "90ms" }}
-          className="animate-fade-up grid grid-cols-3 divide-x divide-line rounded-2xl border border-line/70 bg-surface py-4 shadow-[var(--shadow-card)]"
+          style={{ animationDelay: "60ms" }}
+          className="animate-fade-up grid grid-cols-3 divide-x divide-line rounded-2xl border border-line bg-surface py-4"
         >
-          <Stat n={matchCount} label="マッチング" color="text-primary" />
-          <Stat n={sentCount} label="申し込み" color="text-info" />
-          <Stat n={receivedCount} label="申し受け" color="text-purple-500" />
+          <Stat n={matchCount} label="マッチング" color="text-ink" />
+          <Stat n={sentCount} label="申し込み" color="text-ink" />
+          <Stat n={receivedCount} label="申し受け" color="text-ink" />
         </div>
 
         {/* 導線リスト */}
         <div
-          style={{ animationDelay: "180ms" }}
-          className="animate-fade-up divide-y divide-line overflow-hidden rounded-2xl border border-line/70 bg-surface shadow-[var(--shadow-card)]"
+          style={{ animationDelay: "120ms" }}
+          className="animate-fade-up divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface"
         >
           <Row
             href="/matches"
             icon={<IconHeart className="h-5 w-5" />}
-            iconClass="bg-primary-soft text-primary"
+            iconClass="bg-surface-alt text-ink-soft"
             label="マッチング履歴"
           />
           <Row
             href="/applications?tab=sent"
             icon={<IconSend className="h-5 w-5" />}
-            iconClass="bg-info-soft text-info"
+            iconClass="bg-surface-alt text-ink-soft"
             label="申し込み"
           />
           <Row
             href="/applications?tab=received"
             icon={<IconChat className="h-5 w-5" />}
-            iconClass="bg-purple-100 text-purple-600"
+            iconClass="bg-surface-alt text-ink-soft"
             label="申し受け"
           />
         </div>
 
-        {/* プレミアム（サロン）バナー */}
+        {/* プレミアム（サロン）案内 */}
         <Link
           href="#"
-          style={{ animationDelay: "270ms" }}
-          className="animate-fade-up block rounded-3xl border border-purple-200 bg-gradient-to-br from-purple-50 to-primary-tint p-4 shadow-[var(--shadow-card)]"
+          style={{ animationDelay: "180ms" }}
+          className="animate-fade-up block rounded-2xl border border-line bg-surface p-4 transition-colors hover:bg-canvas"
         >
           <div className="flex items-start gap-3">
-            <span className="bg-brand-gradient animate-float flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-white shadow-[var(--shadow-float)]">
-              <IconCrown className="h-6 w-6" />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+              <IconCrown className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2.5 py-0.5 text-[11px] font-bold text-purple-700">
-                ♛ プレミアム
+              <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-600">
+                プレミアム
               </span>
-              <p className="text-display mt-1 text-base text-ink">婚活サロン会員募集</p>
-              <p className="num-tnum mt-1 text-sm leading-relaxed text-ink-soft">
+              <p className="mt-1 text-[15px] font-bold text-ink">婚活サロン会員募集</p>
+              <p className="num-tnum mt-1 text-[13px] leading-relaxed text-ink-soft">
                 月9,900円〜でデート代無料・全国10万人以上とマッチング・専属カウンセラー
               </p>
-              <p className="mt-2 text-sm font-bold text-purple-700">詳細を見る →</p>
+              <p className="mt-2 text-[13px] font-bold text-primary">詳細を見る →</p>
             </div>
           </div>
         </Link>

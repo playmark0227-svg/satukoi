@@ -24,8 +24,8 @@ export default async function LandingPage() {
   return (
     <div className="flex flex-1 flex-col">
       {/* ヒーロー */}
-      <section className="bg-gradient-to-b from-primary-soft to-canvas px-6 pt-14 pb-10 text-center">
-        <BrandMark className="animate-float mx-auto h-24 w-24" />
+      <section className="animate-fade-up border-b border-line bg-surface px-6 pt-14 pb-10 text-center">
+        <BrandMark className="mx-auto h-24 w-24" />
         <p className="mt-5 text-sm font-bold text-primary-strong">{SERVICE_CATCHPHRASE}</p>
         <h1 className="mt-1 text-3xl font-black tracking-tight text-ink">
           {SERVICE_NAME}
@@ -46,15 +46,19 @@ export default async function LandingPage() {
       </section>
 
       {/* 特長 */}
-      <section className="grid grid-cols-2 gap-3 px-5 py-8">
+      <section className="stagger grid grid-cols-2 gap-3 px-5 py-8">
         {points.map((p) => (
           <div
             key={p.title}
             className="rounded-2xl border border-line bg-surface p-4 shadow-[var(--shadow-card)]"
           >
-            <div className="text-2xl">{p.icon}</div>
-            <p className="mt-2 text-sm font-bold text-ink">{p.title}</p>
-            <p className="mt-1 text-xs leading-relaxed text-ink-soft">{p.desc}</p>
+            <p className="text-sm font-bold text-ink">
+              <span className="mr-1.5 text-base" aria-hidden>
+                {p.icon}
+              </span>
+              {p.title}
+            </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{p.desc}</p>
           </div>
         ))}
       </section>
@@ -62,7 +66,7 @@ export default async function LandingPage() {
       {/* 料金 */}
       <section className="px-5 pb-8">
         <div className="rounded-2xl border border-line bg-surface p-5 shadow-[var(--shadow-card)]">
-          <h2 className="text-sm font-bold text-ink-soft">料金</h2>
+          <h2 className="text-[15px] font-bold text-ink">料金</h2>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt className="text-ink-soft">登録料</dt>
@@ -85,8 +89,8 @@ export default async function LandingPage() {
 
       {/* 対象エリア */}
       <section className="px-5 pb-12">
-        <h2 className="px-1 text-sm font-bold text-ink-soft">対象エリア（在住・在勤）</h2>
-        <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+        <h2 className="px-1 text-[15px] font-bold text-ink">対象エリア（在住・在勤）</h2>
+        <p className="mt-2 px-1 text-xs leading-relaxed text-ink-soft">
           {Object.values(RESIDENCE_AREA_LABELS).join("・")}（18歳以上）
         </p>
       </section>

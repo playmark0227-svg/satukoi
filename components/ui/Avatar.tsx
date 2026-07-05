@@ -24,7 +24,7 @@ export function Avatar({
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-primary-soft flex items-center justify-center text-primary-strong font-bold",
+        "relative overflow-hidden bg-surface-alt flex items-center justify-center text-ink-faint font-bold",
         radius,
         className
       )}
@@ -38,7 +38,7 @@ export function Avatar({
           className="h-full w-full object-cover"
         />
       ) : (
-        <span>{name?.[0] ?? "♡"}</span>
+        <span>{name?.[0] ?? "?"}</span>
       )}
     </div>
   );

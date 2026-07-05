@@ -62,15 +62,15 @@ export default async function NotificationsPage() {
               {notifications.map((n) => {
                 const unread = n.readAt === null;
                 return (
-                  <Card
-                    key={n.id}
-                    className={unread ? "border-primary-soft bg-primary-tint/40" : ""}
-                  >
+                  <Card key={n.id} className={unread ? "overflow-hidden" : ""}>
+                    {unread && (
+                      <span className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-primary" />
+                    )}
                     <CardBody className="space-y-1">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           {unread && (
-                            <span className="animate-pulse-ring h-2 w-2 shrink-0 rounded-full bg-primary" />
+                            <span className="h-2 w-2 shrink-0 rounded-full bg-danger" />
                           )}
                           <Badge tone={unread ? "primary" : "neutral"}>
                             {NOTIFICATION_TYPE_LABELS[n.type]}

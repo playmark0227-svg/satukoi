@@ -451,7 +451,7 @@ export function RegisterWizard({
                 name="agreed"
                 checked={f.agreed}
                 onChange={(e) => set("agreed", e.target.checked)}
-                className="mt-0.5 h-5 w-5 accent-[var(--color-primary,#e85d8a)]"
+                className="mt-0.5 h-5 w-5 accent-[var(--color-primary)]"
               />
               <span className="text-sm leading-relaxed text-ink">
                 利用規約・プライバシーポリシー、キャンセルポリシーに同意します。

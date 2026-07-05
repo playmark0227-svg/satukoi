@@ -31,7 +31,7 @@ export function AdminShell({
         <div className="flex items-center gap-2.5 border-b border-line px-5 py-4">
           <BrandMark className="h-8 w-8" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-primary">{SERVICE_NAME}</p>
+            <p className="truncate text-sm font-bold text-ink">{SERVICE_NAME}</p>
             <p className="text-xs text-ink-faint">運営管理</p>
           </div>
         </div>
@@ -73,7 +73,7 @@ export function AdminShell({
       <div className="flex min-w-0 flex-1 flex-col">
         {/* モバイル用上部バー */}
         <header className="flex items-center justify-between border-b border-line bg-surface px-4 py-3 md:hidden">
-          <span className="flex items-center gap-2 text-sm font-bold text-primary">
+          <span className="flex items-center gap-2 text-sm font-bold text-ink">
             <BrandMark className="h-6 w-6" />
             {SERVICE_NAME} 運営
           </span>

@@ -19,7 +19,7 @@ import {
 import { AppHeader } from "@/components/member/AppHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { BadgeVerified, BadgeCrown } from "@/components/member/icons";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Textarea, Select } from "@/components/ui/Input";
@@ -86,21 +86,25 @@ export default async function UserDetailPage({
     <div className="flex flex-1 flex-col pb-8">
       <AppHeader title={`${user.nickname}さん`} backHref="/users" />
 
-      <div className="space-y-4 px-4 py-4">
-        {/* 写真 */}
+      <div className="stagger space-y-4 px-4 py-4">
+        {/* 写真＋名前（写真の下に白背景で情報。オーバーレイ文字は使わない） */}
         <Card className="overflow-hidden">
           <Avatar
             url={user.photos[0]?.url}
             name={user.nickname}
             rounded="xl"
-            className="aspect-[4/3] w-full text-5xl"
+            className="aspect-[4/5] w-full text-5xl"
           />
           <CardBody className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg font-black text-ink">{user.nickname}</h2>
-              <Badge tone="primary">{calcAge(user.birthDate)}歳</Badge>
+            <div className="flex items-center gap-1.5">
+              <h2 className="truncate text-lg font-bold text-ink">
+                {user.nickname}
+              </h2>
+              {user.incomeCertVerified && <BadgeVerified className="shrink-0" />}
+              {user.accountType === "SALON" && <BadgeCrown className="shrink-0" />}
             </div>
-            <p className="text-sm text-ink-soft">
+            <p className="num-tnum text-sm text-ink-soft">
+              {calcAge(user.birthDate)}歳・
               {RESIDENCE_AREA_LABELS[user.residenceArea]}（
               {ELIGIBILITY_LABELS[user.eligibilityType]}）・{user.occupation}
             </p>

@@ -1,25 +1,25 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════
-   サツコイ！（仮） デザイントークン — マッチングアプリUI
-   ビビッドピンク×パープルのグラデーション、白いカード、
-   大きな丸み、写真主役。明るくフレンドリーで今っぽく。
+   サツコイ！（仮） デザイントークン v3 — 「実在アプリ」基調
+   ベースは白・黒・グレー。ブランドピンク（ロゴ実測 #ee3f9b）は
+   CTA・アクティブ状態・通知などのアクセントに限定し、面で塗らない。
    ════════════════════════════════════════════════════════════ */
 @theme {
-  /* ブランド：公式ロゴのグラデーション（#f03e96 → #aa45e7）に較正 */
+  /* ブランド（ロゴ実測色）— アクセント専用 */
   --color-primary: #ee3f9b;
   --color-primary-strong: #d31f80;
   --color-primary-soft: #fce7f3;
   --color-primary-tint: #fdf2f8;
   --color-accent-violet: #ab48e5;
 
-  --color-ink: #1f2430;
-  --color-ink-soft: #6b7280;
-  --color-ink-faint: #9ca3af;
-  --color-canvas: #f8f7fa;
+  --color-ink: #14161c;
+  --color-ink-soft: #626875;
+  --color-ink-faint: #9aa0ab;
+  --color-canvas: #f7f7f8;
   --color-surface: #ffffff;
-  --color-surface-alt: #f3f4f6;
-  --color-line: #eef0f4;
+  --color-surface-alt: #f2f3f5;
+  --color-line: #e8eaee;
 
   --color-success: #22c55e;
   --color-success-soft: #e9f9ef;
@@ -38,12 +38,12 @@
     "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
 
-  --radius-card: 1.25rem;
+  --radius-card: 1rem;
 
-  /* ピンクがほんのり滲む、やわらかな多層シャドウ（ロゴのピンク #f03e96 基準） */
-  --shadow-card: 0 2px 8px rgba(240, 62, 150, 0.06), 0 12px 28px rgba(31, 36, 48, 0.07);
-  --shadow-float: 0 8px 20px rgba(240, 62, 150, 0.28), 0 2px 6px rgba(31, 36, 48, 0.06);
-  --shadow-pop: 0 18px 50px rgba(31, 36, 48, 0.18);
+  /* ほぼ気づかない程度のニュートラルな影（色付きの滲みは使わない） */
+  --shadow-card: 0 1px 2px rgba(17, 20, 26, 0.04), 0 4px 14px rgba(17, 20, 26, 0.05);
+  --shadow-float: 0 2px 8px rgba(17, 20, 26, 0.1);
+  --shadow-pop: 0 12px 32px rgba(17, 20, 26, 0.14);
 }
 
 html,
@@ -68,50 +68,12 @@ body {
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
 }
-.caps-label {
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-}
-
-/* ── ブランドグラデーション（公式ロゴの実測色：#f03e96→#c944cb→#aa45e7） ── */
-.bg-brand-gradient {
-  background-image: linear-gradient(120deg, #f03e96, #c944cb, #aa45e7, #c944cb, #f03e96);
-  background-size: 240% 240%;
-  animation: foil-pan 8s linear infinite;
-}
-.text-foil {
-  background-image: linear-gradient(110deg, #f03e96, #c944cb, #aa45e7, #f03e96);
-  background-size: 240% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: foil-pan 8s linear infinite;
-}
-
-/* かわいいセパレータ（中央にワンポイント） */
-.rule-letter {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.rule-letter::before,
-.rule-letter::after {
-  content: "";
-  height: 1px;
-  flex: 1;
-  background: linear-gradient(90deg, transparent, rgba(240, 62, 150, 0.35), transparent);
-}
-.rule-letter > span {
-  margin: 0 0.75rem;
-  color: var(--color-primary);
-  font-size: 0.65rem;
-}
 
 /* ════════════════════════════════════════════
-   アニメーション・カタログ
+   アニメーション（入場系のみ。無限ループ装飾は置かない）
    ════════════════════════════════════════════ */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(14px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
 @keyframes fade-in {
@@ -119,107 +81,43 @@ body {
   to { opacity: 1; }
 }
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.94); }
+  from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: none; }
 }
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
-@keyframes foil-pan {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 240% 50%; }
-}
-@keyframes sheen {
-  0% { transform: translateX(-160%) skewX(-16deg); }
-  38%, 100% { transform: translateX(260%) skewX(-16deg); }
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
-  50% { opacity: 0.72; transform: scale(0.85) rotate(10deg); }
-}
-@keyframes bell-swing {
-  0%, 14%, 100% { transform: rotate(0deg); }
-  2% { transform: rotate(12deg); }
-  5% { transform: rotate(-10deg); }
-  8% { transform: rotate(6deg); }
-  11% { transform: rotate(-3deg); }
-}
-@keyframes heart-beat {
-  0%, 40%, 100% { transform: scale(1); }
-  10% { transform: scale(1.18); }
-  22% { transform: scale(0.96); }
-  30% { transform: scale(1.1); }
-}
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(240, 62, 150, 0.5); }
-  70% { box-shadow: 0 0 0 7px rgba(240, 62, 150, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(240, 62, 150, 0); }
-}
-@keyframes float-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-@keyframes underline-draw {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
 
-.animate-fade-up { animation: fade-up 0.6s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
-.animate-fade-in { animation: fade-in 0.5s ease both; }
-.animate-scale-in { animation: scale-in 0.5s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
-.animate-page { animation: page-in 0.45s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
-.animate-twinkle { animation: twinkle 3.2s ease-in-out infinite; }
-.animate-bell { transform-origin: top center; animation: bell-swing 6s ease-in-out infinite; }
-.animate-heart { animation: heart-beat 2.4s ease-in-out infinite; }
-.animate-pulse-ring { animation: pulse-ring 2.2s ease-out infinite; }
-.animate-float { animation: float-y 4.5s ease-in-out infinite; }
-.animate-underline { transform-origin: center; animation: underline-draw 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.animate-fade-up { animation: fade-up 0.4s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.animate-fade-in { animation: fade-in 0.35s ease both; }
+.animate-scale-in { animation: scale-in 0.3s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.animate-page { animation: page-in 0.3s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
-/* 子要素が時間差でふわっと現れる（最大12個まで階段状に） */
-.stagger > * { animation: fade-up 0.55s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
-.stagger > *:nth-child(1) { animation-delay: 40ms; }
-.stagger > *:nth-child(2) { animation-delay: 105ms; }
-.stagger > *:nth-child(3) { animation-delay: 170ms; }
-.stagger > *:nth-child(4) { animation-delay: 235ms; }
-.stagger > *:nth-child(5) { animation-delay: 300ms; }
-.stagger > *:nth-child(6) { animation-delay: 365ms; }
-.stagger > *:nth-child(7) { animation-delay: 430ms; }
-.stagger > *:nth-child(8) { animation-delay: 495ms; }
-.stagger > *:nth-child(9) { animation-delay: 560ms; }
-.stagger > *:nth-child(10) { animation-delay: 625ms; }
-.stagger > *:nth-child(11) { animation-delay: 690ms; }
-.stagger > *:nth-child(12) { animation-delay: 755ms; }
-
-/* 面をゆっくり横切る光（主要ボタンなど） */
-.sheen-host { position: relative; overflow: hidden; isolation: isolate; }
-.sheen-host::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  width: 34%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transform: translateX(-160%) skewX(-16deg);
-  animation: sheen 6s ease-in-out infinite;
-  pointer-events: none;
-}
+/* 子要素が時間差でふわっと現れる（控えめ・短め） */
+.stagger > * { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 20ms; }
+.stagger > *:nth-child(2) { animation-delay: 50ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 110ms; }
+.stagger > *:nth-child(5) { animation-delay: 140ms; }
+.stagger > *:nth-child(6) { animation-delay: 170ms; }
+.stagger > *:nth-child(7) { animation-delay: 200ms; }
+.stagger > *:nth-child(8) { animation-delay: 230ms; }
+.stagger > *:nth-child(9) { animation-delay: 260ms; }
+.stagger > *:nth-child(10) { animation-delay: 290ms; }
+.stagger > *:nth-child(11) { animation-delay: 320ms; }
+.stagger > *:nth-child(12) { animation-delay: 350ms; }
 
 /* FAQ など details の中身をふわっと */
-details[open] .details-body { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+details[open] .details-body { animation: fade-up 0.3s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in, .animate-scale-in, .animate-page,
-  .animate-twinkle, .animate-bell, .animate-heart, .animate-pulse-ring,
-  .animate-float, .animate-underline, .stagger > *,
-  .bg-brand-gradient, .text-foil,
+  .stagger > *,
   details[open] .details-body {
     animation: none !important;
   }
-  .text-foil {
-    color: var(--color-primary);
-    background: none;
-  }
-  .sheen-host::after { display: none; }
 }
 
 /* スマホ専用フレーム（PCは中央のデバイス枠） */
@@ -236,7 +134,7 @@ details[open] .details-body { animation: fade-up 0.35s cubic-bezier(0.22, 0.8, 0
     min-height: calc(100dvh - 40px);
     margin-block: 20px;
     border: 1px solid var(--color-line);
-    border-radius: 32px;
+    border-radius: 28px;
     overflow: hidden;
     box-shadow: var(--shadow-pop);
   }
@@ -257,6 +155,6 @@ select {
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.4);
+  background: rgba(154, 160, 171, 0.4);
   border-radius: 9999px;
 }

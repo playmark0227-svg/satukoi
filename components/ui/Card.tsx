@@ -21,7 +21,7 @@ export function Card({
       )}
     >
       {accent && (
-        <span className="bg-brand-gradient pointer-events-none absolute inset-x-0 top-0 h-1" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-primary" />
       )}
       {children}
     </Tag>

@@ -19,7 +19,7 @@ export default function CompanyPage() {
       <div className="space-y-4 px-4 py-4">
         <Card>
           <CardBody className="space-y-1 text-center">
-            <p className="text-lg font-black text-primary-strong">
+            <p className="text-lg font-black text-ink">
               {SERVICE_NAME}
             </p>
             <p className="text-sm text-ink-soft">{SERVICE_CATCHPHRASE}</p>

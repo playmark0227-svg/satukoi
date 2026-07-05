@@ -15,34 +15,19 @@ const items = [
 export function BottomNav() {
   const pathname = usePathname();
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-surface/90 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5 backdrop-blur-lg">
+    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-surface/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-lg">
       {items.map(({ href, label, Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
-        const beat = active && href === "/matches";
         return (
           <Link
             key={href}
             href={href}
             className={cn(
-              "group flex flex-col items-center gap-1 py-1.5 text-[10px] font-bold transition-colors duration-200",
-              active ? "text-primary" : "text-ink-faint hover:text-ink-soft"
+              "flex flex-col items-center gap-0.5 pb-2 pt-2.5 text-[10px] transition-colors duration-150 active:opacity-70",
+              active ? "font-bold text-primary" : "font-medium text-ink-faint"
             )}
           >
-            <span
-              className={cn(
-                "flex h-8 w-12 items-center justify-center rounded-full transition-colors duration-200 group-active:scale-90",
-                active && "bg-primary-soft"
-              )}
-            >
-              <Icon
-                className={cn(
-                  "h-[22px] w-[22px] transition-transform duration-200",
-                  active && "scale-110",
-                  beat && "animate-heart"
-                )}
-                filled={active}
-              />
-            </span>
+            <Icon className="h-6 w-6" filled={active} />
             {label}
           </Link>
         );

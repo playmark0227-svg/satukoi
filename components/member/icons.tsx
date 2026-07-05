@@ -170,11 +170,11 @@ export function IconScissors({ className }: P) {
   );
 }
 
-/** サロン会員バッジ（グラデーションの王冠） */
+/** サロン会員バッジ（金の王冠） */
 export function BadgeCrown({ className }: P) {
   return (
     <span
-      className={"bg-brand-gradient inline-flex h-5 w-5 items-center justify-center rounded-full text-white ring-2 ring-white/80 " + (className ?? "")}
+      className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-white ring-2 ring-white/80 " + (className ?? "")}
       title="サロン会員"
     >
       <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden>
