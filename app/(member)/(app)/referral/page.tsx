@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { AppHeader } from "@/components/member/AppHeader";
 import { Card, CardBody } from "@/components/ui/Card";
+import { GIFT_TICKET_AMOUNT } from "@/lib/constants";
 import { IconGift } from "@/components/member/icons";
 
 export default async function ReferralPage() {
@@ -25,12 +27,25 @@ export default async function ReferralPage() {
                 <b className="text-primary-strong">デート代無料</b>の特典が付きます。
               </p>
             </div>
+            <ul className="num-tnum space-y-1 rounded-xl bg-surface-alt/60 px-4 py-3 text-[13px] leading-relaxed text-ink-soft">
+              <li>特典① デート代無料 1回</li>
+              <li>
+                特典② 提携店ギフト券 {GIFT_TICKET_AMOUNT.toLocaleString("ja-JP")}
+                円分
+              </li>
+            </ul>
             <div className="rounded-xl border border-dashed border-line bg-surface-alt/60 px-4 py-3">
               <p className="text-xs font-bold text-ink-faint">紹介コード</p>
               <p className="num-tnum mt-1 font-mono text-2xl font-bold tracking-widest text-ink">
                 {code?.code ?? "ー"}
               </p>
             </div>
+            <Link
+              href="/tickets"
+              className="inline-block text-[13px] font-bold text-primary"
+            >
+              保有ギフト券を見る →
+            </Link>
           </CardBody>
         </Card>
 

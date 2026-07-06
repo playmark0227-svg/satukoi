@@ -139,6 +139,10 @@ model Member {
   stripeCustomerId String?
   cardRegistered   Boolean @default(false)
 
+  // LINE連携（LINEログイン・LINE通知）
+  lineConnected Boolean @default(false)
+  notifyViaLine Boolean @default(true)
+
   // ── プロフィール（②プロフィール登録：すべて必須） ──
   // ※ 登録後に自己編集不可：name / birthDate / sex / residenceArea /
   //   incomeBracket / hasMarriageHistory / hasChildren
@@ -167,6 +171,7 @@ model Member {
 
   // 紹介制度
   referralBonusRemaining Int @default(0) // 紹介特典（デート代無料）残数
+  giftTickets            GiftTicket[] // 提携店ギフト券（紹介報酬など）
 
   // 更新料の自動決済管理（登録から1年後に自動決済）
   nextRenewalAt DateTime?
@@ -471,6 +476,40 @@ model Store {
   updatedAt DateTime @updatedAt
 
   dateEvents DateEvent[]
+}
+
+// ─────────────────────────────────────────────
+//  提携店ギフト券（紹介報酬・キャンペーン特典として発行）
+// ─────────────────────────────────────────────
+
+enum GiftTicketStatus {
+  ACTIVE // 利用可能
+  USED // 使用済み
+  EXPIRED // 期限切れ
+}
+
+enum GiftTicketReason {
+  REFERRAL // お友達紹介の報酬
+  CAMPAIGN // キャンペーン
+  COMPENSATION // 補償（無断キャンセル被害など）
+}
+
+/// 提携店（飲食店・美容室など）で使える金券。運営が発行・使用済み処理を行う。
+model GiftTicket {
+  id        String           @id @default(cuid())
+  member    Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId  String
+  code      String           @unique // 店頭提示用コード
+  amount    Int              @default(5000) // JPY
+  reason    GiftTicketReason @default(REFERRAL)
+  status    GiftTicketStatus @default(ACTIVE)
+  note      String? // 運営メモ（対象キャンペーン等）
+  issuedAt  DateTime         @default(now())
+  expiresAt DateTime? // 有効期限（未設定なら無期限）
+  usedAt    DateTime?
+
+  @@index([memberId])
+  @@index([status])
 }
 
 // ─────────────────────────────────────────────

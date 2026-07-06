@@ -3,6 +3,7 @@ import { requireMember } from "@/lib/auth";
 import { IS_DEMO, getDemoMember } from "@/lib/demo";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
+import { compatScore } from "@/lib/compat";
 import {
   RESIDENCE_AREA_LABELS,
   ELIGIBILITY_LABELS,
@@ -19,6 +20,7 @@ import {
 import { AppHeader } from "@/components/member/AppHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { BadgeVerified, BadgeCrown } from "@/components/member/icons";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
@@ -75,6 +77,9 @@ export default async function UserDetailPage({
   });
   if (blocked) redirect("/users");
 
+  // AIによる相性スコア（デモでは決定的な擬似スコア。lib/compat.ts 参照）
+  const compat = compatScore(me.id, user.id);
+
   const holidayText =
     user.holidayType === "OTHER_FIXED" && user.fixedHolidays.length > 0
       ? `${HOLIDAY_TYPE_LABELS[user.holidayType]}（${user.fixedHolidays
@@ -102,6 +107,9 @@ export default async function UserDetailPage({
               </h2>
               {user.incomeCertVerified && <BadgeVerified className="shrink-0" />}
               {user.accountType === "SALON" && <BadgeCrown className="shrink-0" />}
+              <Badge tone="primary" className="num-tnum ml-auto shrink-0">
+                相性 {compat}%
+              </Badge>
             </div>
             <p className="num-tnum text-sm text-ink-soft">
               {calcAge(user.birthDate)}歳・

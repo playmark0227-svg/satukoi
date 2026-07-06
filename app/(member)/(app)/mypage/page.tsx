@@ -13,6 +13,7 @@ import {
   IconSend,
   IconChat,
   IconCrown,
+  IconBuilding,
 } from "@/components/member/icons";
 
 function Stat({ n, label, color }: { n: number; label: string; color: string }) {
@@ -144,6 +145,28 @@ export default async function MyPage() {
               <p className="mt-1 text-[15px] font-bold text-ink">婚活サロン会員募集</p>
               <p className="num-tnum mt-1 text-[13px] leading-relaxed text-ink-soft">
                 月9,900円〜でデート代無料・全国10万人以上とマッチング・専属カウンセラー
+              </p>
+              <p className="mt-2 text-[13px] font-bold text-primary">詳細を見る →</p>
+            </div>
+          </div>
+        </Link>
+
+        {/* 不動産シナジー（成婚・同棲サポート） */}
+        <Link
+          href="#"
+          style={{ animationDelay: "240ms" }}
+          className="animate-fade-up block rounded-2xl border border-line bg-surface p-4 transition-colors hover:bg-canvas"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-alt text-ink-soft">
+              <IconBuilding className="h-5 w-5" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[15px] font-bold text-ink">
+                成婚・同棲のお部屋探しもサポート
+              </p>
+              <p className="num-tnum mt-1 text-[13px] leading-relaxed text-ink-soft">
+                提携不動産でのお部屋探しで、お祝い金をキャッシュバック。新生活まで伴走します。
               </p>
               <p className="mt-2 text-[13px] font-bold text-primary">詳細を見る →</p>
             </div>

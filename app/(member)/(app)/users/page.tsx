@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
+import { compatScore } from "@/lib/compat";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
 import { BrandMark } from "@/components/member/BrandMark";
@@ -10,6 +11,7 @@ import { UserFilters } from "@/components/member/browse/UserFilters";
 import { UserPhoto } from "@/components/member/UserPhoto";
 import {
   IconHeart,
+  IconSparkle,
   BadgeVerified,
   BadgeCrown,
 } from "@/components/member/icons";
@@ -70,11 +72,16 @@ export default async function UsersPage({
     ...(Object.keys(birthDate).length > 0 ? { birthDate } : {}),
   };
 
-  const users = await prisma.member.findMany({
+  const rows = await prisma.member.findMany({
     where,
     include: { photos: { orderBy: { order: "asc" }, take: 1 } },
     orderBy: { createdAt: "desc" },
   });
+
+  // AIが相性の良い順に表示（デモでは決定的な擬似スコア。lib/compat.ts 参照）
+  const users = rows
+    .map((u) => ({ ...u, compat: compatScore(me.id, u.id) }))
+    .sort((a, b) => b.compat - a.compat);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -99,13 +106,31 @@ export default async function UsersPage({
           </div>
         </div>
 
+        {/* AIアドバイザー導線 */}
+        <Link
+          href="/advisor"
+          className="animate-fade-up flex items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-3 transition-colors hover:bg-surface-alt/50 active:opacity-70"
+          style={{ animationDelay: "40ms" }}
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-alt text-ink-soft">
+            <IconSparkle className="h-4 w-4" />
+          </span>
+          <span className="flex-1 text-[13.5px] font-bold text-ink">
+            AIアドバイザーに相談する
+          </span>
+          <span className="text-ink-faint">›</span>
+        </Link>
+
         {/* セクション見出し */}
         <div
           className="animate-fade-up flex items-baseline justify-between px-0.5 pt-1"
           style={{ animationDelay: "60ms" }}
         >
           <h2 className="text-[15px] font-bold text-ink">おすすめのお相手</h2>
-          <span className="num-tnum text-xs text-ink-faint">{users.length}人</span>
+          <span className="flex items-baseline gap-1.5">
+            <span className="text-[11px] text-ink-faint">AI相性順</span>
+            <span className="num-tnum text-xs text-ink-faint">{users.length}人</span>
+          </span>
         </div>
 
         {/* ユーザーグリッド（写真＋下に情報） */}
@@ -139,7 +164,8 @@ export default async function UsersPage({
                       )}
                     </p>
                     <p className="num-tnum mt-0.5 text-xs text-ink-soft">
-                      {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
+                      <span className="font-bold text-primary">相性{u.compat}%</span>
+                      ・{calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
                     </p>
                   </div>
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink-faint transition-colors group-hover:border-primary/40 group-hover:text-primary">

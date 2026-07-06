@@ -178,6 +178,22 @@ export const PAYMENT_STATUS_LABELS = {
   PARTIALLY_REFUNDED: "一部返金",
 } as const;
 
+// ── 提携店ギフト券 ──
+
+export const GIFT_TICKET_AMOUNT = 5000; // 紹介報酬の標準額
+
+export const GIFT_TICKET_STATUS_LABELS = {
+  ACTIVE: "利用可能",
+  USED: "使用済み",
+  EXPIRED: "期限切れ",
+} as const;
+
+export const GIFT_TICKET_REASON_LABELS = {
+  REFERRAL: "お友達紹介",
+  CAMPAIGN: "キャンペーン",
+  COMPENSATION: "補償",
+} as const;
+
 export const CANCELLATION_CATEGORY_LABELS = {
   BEFORE_24H: "24時間前まで",
   H24_TO_2H: "24時間前〜2時間前",

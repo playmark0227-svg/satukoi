@@ -413,8 +413,13 @@ export function RegisterWizard({
               <Input type="file" name="singleCert" accept="image/*" />
             </Field>
             <Field
-              label="所得証明"
-              hint="ご提出・確認後に年収帯が公開されます（任意）。"
+              label="所得証明（源泉徴収票）"
+              required={f.sex === "MALE"}
+              hint={
+                f.sex === "MALE"
+                  ? "男性は源泉徴収票のご提出が必須です（女性は任意）。年収欄の公開には所得証明の確認が必要です。"
+                  : "女性は任意です（男性は必須）。年収欄の公開には所得証明の確認が必要です。"
+              }
             >
               <Input type="file" name="incomeCert" accept="image/*" />
             </Field>

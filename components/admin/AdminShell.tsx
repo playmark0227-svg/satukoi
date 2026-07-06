@@ -15,6 +15,7 @@ const nav = [
   { href: "/admin/announcements", label: "お知らせ" },
   { href: "/admin/ads", label: "広告" },
   { href: "/admin/stores", label: "店舗" },
+  { href: "/admin/gift-tickets", label: "ギフト券" },
 ];
 
 export function AdminShell({

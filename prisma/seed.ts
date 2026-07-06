@@ -41,6 +41,7 @@ async function clean() {
   await prisma.dateEvent.deleteMany();
   await prisma.match.deleteMany();
   await prisma.dateApplication.deleteMany();
+  await prisma.giftTicket.deleteMany();
   await prisma.referral.deleteMany();
   await prisma.referralCode.deleteMany();
   await prisma.report.deleteMany();
@@ -102,6 +103,8 @@ async function createMember(args: {
       approvedAt: daysFromNow(-30),
       cardRegistered: true,
       stripeCustomerId: `cus_stub_${sex}${i}`,
+      lineConnected: i % 2 === 1, // デモ会員（けんた=男性i=1）はLINE連携済み
+      notifyViaLine: true,
       fullName: name[0],
       nickname: name[1],
       birthDate: yearsAgo(26 + i * 2),
@@ -132,6 +135,10 @@ async function createMember(args: {
         create: [
           { type: "ID_DOCUMENT", url: "pending-upload", checkStatus: "OK", checkedAt: daysFromNow(-29) },
           { type: "SINGLE_CERT", url: "pending-upload", checkStatus: "OK", checkedAt: daysFromNow(-29) },
+          // 男性は源泉徴収票等の所得証明が必須
+          ...(sex === "MALE"
+            ? [{ type: "INCOME_CERT" as const, url: "pending-upload", checkStatus: "OK" as const, checkedAt: daysFromNow(-29) }]
+            : []),
         ],
       },
     },
@@ -199,6 +206,30 @@ async function main() {
       },
     });
   }
+
+  // 提携店ギフト券（デモ会員けんた＝males[1]に発行例）
+  await prisma.giftTicket.create({
+    data: {
+      memberId: males[1].id,
+      code: "SATSU-GIFT-2001",
+      amount: 5000,
+      reason: "REFERRAL",
+      status: "ACTIVE",
+      note: "お友達紹介の報酬",
+      expiresAt: daysFromNow(180),
+    },
+  });
+  await prisma.giftTicket.create({
+    data: {
+      memberId: males[1].id,
+      code: "SATSU-GIFT-1001",
+      amount: 5000,
+      reason: "CAMPAIGN",
+      status: "USED",
+      note: "リリース記念キャンペーン",
+      usedAt: daysFromNow(-10),
+    },
+  });
 
   // 1人を書類確認中（承認待ち）に
   const pending = await createMember({

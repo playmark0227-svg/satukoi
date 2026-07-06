@@ -13,6 +13,7 @@ import {
   IconDoc,
   IconShield,
   IconBuilding,
+  IconSparkle,
 } from "@/components/member/icons";
 
 function SectionHeader({ label }: { label: string }) {
@@ -68,13 +69,29 @@ export default async function MenuPage() {
         <MenuRow href="/settings/notifications" icon={<IconBell className={ink} />} label="通知設定" />
       </div>
 
-      <SectionHeader label="紹介特典" />
+      <SectionHeader label="相談" />
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
+        <MenuRow
+          href="/advisor"
+          icon={<IconSparkle className={ink} />}
+          label="AIアドバイザー"
+          subtitle="恋愛・活動の悩みをAIに相談"
+        />
+      </div>
+
+      <SectionHeader label="紹介・特典" />
       <div className="stagger divide-y divide-line border-y border-line bg-surface">
         <MenuRow
           href="/referral"
           icon={<IconGift className={ink} />}
           label="お友達を紹介する"
           subtitle="両者にデート無料特典"
+        />
+        <MenuRow
+          href="/tickets"
+          icon={<IconCard className={ink} />}
+          label="ギフト券"
+          subtitle="提携店で使える金券"
         />
       </div>
 
