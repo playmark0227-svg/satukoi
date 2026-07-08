@@ -208,7 +208,7 @@ function SchedulingView({
                     <span className="text-sm font-bold text-ink">
                       {formatSlot(c.startAt, c.endAt)}
                     </span>
-                    <Button type="submit" size="sm">
+                    <Button type="submit" size="sm" variant="secondary">
                       この日時で確定
                     </Button>
                   </form>

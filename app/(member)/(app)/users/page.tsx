@@ -154,6 +154,9 @@ export default async function UsersPage({
                       <BadgeCrown />
                     </span>
                   )}
+                  <span className="num-tnum absolute bottom-2 left-2 rounded-full bg-white/95 px-2 py-0.5 text-[11px] font-bold text-primary shadow-[var(--shadow-float)]">
+                    相性{u.compat}%
+                  </span>
                 </div>
                 <div className="mt-2 flex items-start justify-between gap-2 px-0.5">
                   <div className="min-w-0">
@@ -164,8 +167,7 @@ export default async function UsersPage({
                       )}
                     </p>
                     <p className="num-tnum mt-0.5 text-xs text-ink-soft">
-                      <span className="font-bold text-primary">相性{u.compat}%</span>
-                      ・{calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
+                      {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
                     </p>
                   </div>
                   <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink-faint transition-colors group-hover:border-primary/40 group-hover:text-primary">

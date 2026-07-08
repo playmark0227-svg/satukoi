@@ -57,22 +57,33 @@ export default async function TicketsPage() {
                   key={t.id}
                   className={t.status !== "ACTIVE" ? "opacity-60" : undefined}
                 >
-                  <CardBody>
+                  <CardBody className="pb-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="num-tnum text-2xl font-black text-ink">
                         ¥{t.amount.toLocaleString("ja-JP")}
+                        <span className="ml-1.5 align-middle text-xs font-bold text-ink-faint">
+                          {GIFT_TICKET_REASON_LABELS[t.reason]}
+                        </span>
                       </p>
                       <Badge tone={t.status === "ACTIVE" ? "success" : "neutral"}>
                         {GIFT_TICKET_STATUS_LABELS[t.status]}
                       </Badge>
                     </div>
-                    <p className="mt-2 font-mono text-sm tracking-wide text-ink">
-                      {t.code}
-                    </p>
-                    <p className="num-tnum mt-1 text-xs text-ink-faint">
-                      {GIFT_TICKET_REASON_LABELS[t.reason]} ／ 有効期限{" "}
-                      {t.expiresAt ? formatDate(t.expiresAt) : "なし"}
-                    </p>
+                    {/* 金券らしい切り取り線 */}
+                    <div className="mt-3 border-t border-dashed border-line" />
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold text-ink-faint">
+                          店頭提示コード
+                        </p>
+                        <p className="mt-0.5 font-mono text-sm font-bold tracking-wide text-ink">
+                          {t.code}
+                        </p>
+                      </div>
+                      <p className="num-tnum shrink-0 text-xs text-ink-faint">
+                        有効期限 {t.expiresAt ? formatDate(t.expiresAt) : "なし"}
+                      </p>
+                    </div>
                   </CardBody>
                 </Card>
               ))}

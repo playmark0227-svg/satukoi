@@ -7,7 +7,9 @@
 // 併せてフリー入力の内容は担当カウンセラーへの共有キューに連携する想定。
 
 import { useEffect, useRef, useState } from "react";
-import { IconSparkle, IconSend } from "@/components/member/icons";
+import Image from "next/image";
+import { IconSend } from "@/components/member/icons";
+import mark from "@/public/logo-mark.png";
 
 type Stats = {
   matchCount: number;
@@ -61,8 +63,8 @@ function freeReply(nickname: string): string {
 
 function AiAvatar() {
   return (
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-alt text-ink-soft">
-      <IconSparkle className="h-4 w-4" />
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-surface">
+      <Image src={mark} alt="" sizes="20px" className="h-4.5 w-4.5 object-contain" />
     </span>
   );
 }

@@ -54,6 +54,29 @@ function Row({
   );
 }
 
+/** プロフィール充実度（任意項目の充足率）。実アプリ定番の改善促進UI。 */
+function profileCompleteness(me: {
+  photos: { url: string }[];
+  selfIntroduction: string | null;
+  hobbies: string | null;
+  qualifications: string | null;
+  incomeCertVerified: boolean;
+}): { percent: number; hint: string | null } {
+  const items: [boolean, string][] = [
+    [me.photos.length > 0, "写真を追加すると印象が大きく変わります"],
+    [!!me.selfIntroduction, "自己紹介を書くと申し込みが通りやすくなります"],
+    [!!me.hobbies, "趣味を追加すると会話のきっかけになります"],
+    [!!me.qualifications, "資格を追加すると信頼感がアップします"],
+    [me.incomeCertVerified, "所得証明を提出すると年収が公開されます"],
+  ];
+  const done = items.filter(([ok]) => ok).length;
+  const firstMissing = items.find(([ok]) => !ok);
+  return {
+    percent: Math.round((done / items.length) * 100),
+    hint: firstMissing ? firstMissing[1] : null,
+  };
+}
+
 export default async function MyPage() {
   const me = await requireMember();
 
@@ -87,7 +110,31 @@ export default async function MyPage() {
               </p>
             </div>
           </div>
-          <ButtonLink href="/mypage/edit" size="lg" className="mt-4">
+          {/* プロフィール充実度 */}
+          {(() => {
+            const { percent, hint } = profileCompleteness(me);
+            return (
+              <div className="mt-4 rounded-2xl border border-line bg-surface p-3.5">
+                <div className="flex items-baseline justify-between">
+                  <p className="text-xs font-bold text-ink-soft">プロフィール充実度</p>
+                  <p className="num-tnum text-sm font-black text-primary">{percent}%</p>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-alt">
+                  <div
+                    className="h-full rounded-full bg-primary transition-[width] duration-500"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
+                {hint && (
+                  <p className="mt-2 text-[11px] leading-relaxed text-ink-faint">
+                    {hint}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
+
+          <ButtonLink href="/mypage/edit" size="lg" className="mt-3">
             <IconPencil className="h-5 w-5" />
             プロフィールを編集
           </ButtonLink>
