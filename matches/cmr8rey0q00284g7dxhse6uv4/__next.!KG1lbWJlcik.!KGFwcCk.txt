@@ -1,0 +1,5 @@
+1:"$Sreact.fragment"
+2:I[39756,["/satukoi/_next/static/chunks/05-c3ty_6dwfk.js","/satukoi/_next/static/chunks/00i0p4bsv-8b0.js"],"default"]
+3:I[37457,["/satukoi/_next/static/chunks/05-c3ty_6dwfk.js","/satukoi/_next/static/chunks/00i0p4bsv-8b0.js"],"default"]
+4:I[48033,["/satukoi/_next/static/chunks/05-c3ty_6dwfk.js","/satukoi/_next/static/chunks/00i0p4bsv-8b0.js","/satukoi/_next/static/chunks/0o0hymzy0q-0k.js"],"BottomNav"]
+0:{"rsc":["$","$1","c",{"children":[[["$","script","script-0",{"src":"/satukoi/_next/static/chunks/0o0hymzy0q-0k.js","async":true}]],[["$","div",null,{"className":"flex-1","children":["$","$L2",null,{"parallelRouterKey":"children","template":["$","div",null,{"className":"animate-page flex flex-1 flex-col","children":["$","$L3",null,{}]}],"templateStyles":[],"templateScripts":[]}]}],["$","$L4",null,{}]]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"Xe_w5VN7yrVw8hjAP5Akn"}
