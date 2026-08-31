@@ -13,6 +13,10 @@ from reportlab.platypus import (
     TableStyle, PageBreak, Image, Flowable, KeepTogether,
 )
 
+# 日本語の禁則処理を自動適用する段落に差し替える（行頭の句読点・閉じ括弧、
+# 英単語やカタカナ語の途中改行を防ぐ）
+from pdf_common import JPParagraph as Paragraph  # noqa: E402
+
 JP = "JPGothic"
 pdfmetrics.registerFont(TTFont(JP, "/usr/share/fonts/opentype/ipaexfont-gothic/ipaexg.ttf"))
 
@@ -54,6 +58,7 @@ def h1(text):
         ("LINEBEFORE", (0, 0), (0, 0), 3, PRIMARY), ("LEFTPADDING", (0, 0), (-1, -1), 9),
         ("TOPPADDING", (0, 0), (-1, -1), 0), ("BOTTOMPADDING", (0, 0), (-1, -1), 0)]))
     t.spaceBefore, t.spaceAfter = 15, 7
+    t.keepWithNext = True
     return t
 
 def li(text, style="li"):
@@ -215,7 +220,7 @@ class Gantt(Flowable):
     def __init__(self, width, tasks, nweeks):
         super().__init__()
         self.width = width; self.tasks = tasks; self.nweeks = nweeks
-        self.label_w = 66 * mm; self.header_h = 12 * mm; self.row_h = 6.7 * mm
+        self.label_w = 66 * mm; self.header_h = 11 * mm; self.row_h = 6.0 * mm
         self.height = self.header_h + self.row_h * len(tasks) + 2 * mm
     def wrap(self, aw, ah):
         return (self.width, self.height)
@@ -275,7 +280,7 @@ def detail_block(no, name, role, days, weeks, subs, dod):
     flow = []
     head = Table([[Paragraph(f"{no}. {name}", S["blk"]),
                    Paragraph(f"担当：{role}　／　目安 {days}人日　／　{weeks}", S["meta"])]],
-                 colWidths=[CW * 0.5, CW * 0.5],
+                 colWidths=[CW * 0.40, CW * 0.60],
                  style=TableStyle([("VALIGN", (0, 0), (-1, -1), "BOTTOM"), ("LEFTPADDING", (0, 0), (-1, -1), 0),
                                    ("RIGHTPADDING", (0, 0), (-1, -1), 0), ("TOPPADDING", (0, 0), (-1, -1), 0),
                                    ("BOTTOMPADDING", (0, 0), (-1, -1), 2), ("LINEBELOW", (0, 0), (-1, -1), 0.5, LINE)]))
@@ -297,7 +302,8 @@ def make_doc(path, footer):
             canv.drawString(M, 9 * mm, footer); canv.drawRightString(W - M, 9 * mm, f"{doc.page - 1}")
         canv.restoreState()
     doc = BaseDocTemplate(path, pagesize=A4, leftMargin=M, rightMargin=M, topMargin=16 * mm, bottomMargin=18 * mm)
-    frame = Frame(M, 18 * mm, CW, H - 34 * mm, id="main")
+    frame = Frame(M, 18 * mm, CW, H - 34 * mm, id="main",
+                  leftPadding=0, rightPadding=0, topPadding=0, bottomPadding=0)
     doc.addPageTemplates([PageTemplate(id="p", frames=[frame], onPage=on_page)])
     return doc
 
@@ -352,15 +358,16 @@ def build(path):
     for (no, name, role, days, weeks, subs, dod) in DETAIL:
         st.append(detail_block(no, name, role, days, weeks, subs, dod))
 
-    # 5 工数サマリー
-    st.append(h1("5. 工数サマリー"))
-    st.append(Paragraph(f"全工程の工数目安は合計 <b>約{TOTAL_DAYS}人日</b>（ViFightの概算・契約時に精査）。8週間（実働約40日）で、複数役割が並行して進めます。1日あたりの平均稼働はおよそ3名相当で、開発の山場（W3〜W6）に人員を厚く配分します。", S["body"]))
-    st.append(li("最も重い工程：Stripe本決済（14人日）、会員機能の本番化（12人日）、管理画面の本番化・自動テスト整備（各10人日）。"))
-    st.append(li("お金・書類・通知など「事故が許されない領域」に工数を厚く配分し、テスト・バッファも明示的に確保しています。"))
-    st.append(Paragraph("※ 具体的な人数配分・期間割当・費用は、体制と単価の確定後にお見積りでご提示します（要確定）。", S["note"]))
+    # 5 工数サマリー（節が分断されて1行だけ次ページに残らないよう、まとめて配置）
+    st.append(KeepTogether([
+        h1("5. 工数サマリー"),
+        Paragraph(f"全工程の工数目安は合計 <b>約{TOTAL_DAYS}人日</b>（ViFightの概算・契約時に精査）。8週間（実働約40日）で、複数役割が並行して進めます。1日あたりの平均稼働はおよそ3名相当で、開発の山場（W3〜W6）に人員を厚く配分します。", S["body"]),
+        li("最も重い工程：Stripe本決済（14人日）、会員機能の本番化（12人日）、管理画面の本番化・自動テスト整備（各10人日）。"),
+        li("お金・書類・通知など「事故が許されない領域」に工数を厚く配分し、テスト・バッファも明示的に確保しています。"),
+        Paragraph("※ 具体的な人数配分・期間割当・費用は、体制と単価の確定後にお見積りでご提示します（要確定）。", S["note"]),
+    ]))
 
     # 6 マイルストーン
-    st.append(PageBreak())
     st.append(h1("6. マイルストーン"))
     st.append(tbl(["", "時期の目安", "内容・判定"], [
         ["M1", "W1末", "要件・設計・デザイン・品質基準（DoD）の確定。外部審査・法務の着手。"],
@@ -379,7 +386,6 @@ def build(path):
     st.append(li("ドキュメント（ご利用ガイド・管理画面マニュアル・運用手順書・環境構成図）"))
 
     # 8 お客様
-    st.append(PageBreak())
     st.append(h1("8. お客様にご準備・ご対応いただくこと"))
     st.append(Paragraph("以下は納期を守るために特に重要です。外部審査には各社のリードタイム（LINE公式アカウント認証は目安10営業日程度、Stripe本番審査は数日〜、追加書類を求められる場合あり）があるため、契約後すぐの着手をお願いします。", S["body"]))
     st.append(tbl(["ご対応いただくこと", "内容", "期日の目安"], [
@@ -404,7 +410,6 @@ def build(path):
     ], [CW * 0.5, CW * 0.5], soft_cols=(1,)))
 
     # 10 支払い
-    st.append(PageBreak())
     st.append(h1("10. お支払いについて（要確定）"))
     st.append(Paragraph("お支払いの金額・比率・回数は<b>要確定</b>です。受託開発では、進行の節目に分けてお支払いいただくのが一般的で、一例として下記の構成があります（あくまで例で、確定値ではありません）。", S["body"]))
     st.append(tbl(["区分（例）", "タイミング（例）"], [
@@ -422,7 +427,6 @@ def build(path):
     st.append(li("<b>継続保守（任意）</b>：依存更新・キャッシュ整理・バグ修正・小改修を月額の保守契約としてご提案可能です（条件は要確定）。"))
 
     # 12 前提・リスク
-    st.append(PageBreak())
     st.append(h1("12. 前提条件・リスクと対策"))
     st.append(Paragraph("前提条件", S["body"]))
     st.append(li("ViFightの専任チームが本件に継続稼働できること。"))
@@ -440,7 +444,6 @@ def build(path):
     ], [CW * 0.4, CW * 0.6]))
 
     # 13 TBD
-    st.append(PageBreak())
     st.append(h1("13. 要確定事項（TBD）一覧"))
     st.append(Paragraph("本工程表では、以下の項目を<b>推測で埋めていません</b>。確定でき次第、本書に反映します。", S["body"]))
     st.append(tbl(["項目", "内容", "状態"], [
