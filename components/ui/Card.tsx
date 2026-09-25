@@ -9,13 +9,13 @@ export function Card({
   className?: string;
   children: React.ReactNode;
   as?: React.ElementType;
-  /** 上辺にブランドグラデーションのアクセントライン（重要カード用） */
+  /** 上辺に細いアクセントライン（重要カード用） */
   accent?: boolean;
 }) {
   return (
     <Tag
       className={cn(
-        "relative bg-surface border border-line/80 rounded-[var(--radius-card)] shadow-[var(--shadow-card)]",
+        "relative bg-surface border border-line rounded-[var(--radius-card)]",
         accent && "overflow-hidden",
         className
       )}
@@ -49,7 +49,7 @@ export function SectionTitle({
 }) {
   return (
     <div className={cn("flex items-center justify-between px-1 mb-2", className)}>
-      <h2 className="text-sm font-bold text-ink-soft">{children}</h2>
+      <h2 className="text-[15px] font-bold text-ink">{children}</h2>
       {action}
     </div>
   );

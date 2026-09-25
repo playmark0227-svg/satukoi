@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import { cn } from "@/lib/cn";
 
 const fieldClass =
-  "w-full rounded-xl border border-line bg-surface px-3.5 h-12 text-ink placeholder:text-ink-faint outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft disabled:bg-canvas disabled:text-ink-faint";
+  "w-full rounded-lg border border-line bg-[#fafafa] px-3.5 h-11 text-ink placeholder:text-ink-faint outline-none transition-colors focus:border-ink-faint focus:bg-surface disabled:bg-surface-alt disabled:text-ink-faint";
 
 export const Input = forwardRef<
   HTMLInputElement,

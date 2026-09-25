@@ -20,9 +20,9 @@ export function Field({
 }) {
   return (
     <label className={cn("block", className)}>
-      <span className="mb-1.5 flex items-center gap-2 text-sm font-bold text-ink">
+      <span className="mb-1.5 flex items-center gap-1.5 text-[13px] font-semibold text-ink">
         {label}
-        {required && <span className="text-primary text-xs">必須</span>}
+        {required && <span className="text-[11px] font-medium text-danger">必須</span>}
         {locked && (
           <span className="rounded bg-line px-1.5 py-0.5 text-[10px] font-medium text-ink-faint">
             登録後編集不可

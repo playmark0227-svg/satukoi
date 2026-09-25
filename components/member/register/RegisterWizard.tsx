@@ -94,11 +94,14 @@ const initial: Form = {
 /** 会員登録ウィザード（4ステップで入力、最終ステップで一括送信） */
 export function RegisterWizard({
   createMember,
+  defaultNickname = "",
 }: {
   createMember: (formData: FormData) => void | Promise<void>;
+  /** LINE 連携で登録する場合、LINE の表示名を初期値にする */
+  defaultNickname?: string;
 }) {
   const [step, setStep] = useState(1);
-  const [f, setF] = useState<Form>(initial);
+  const [f, setF] = useState<Form>({ ...initial, nickname: defaultNickname });
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
     setF((prev) => ({ ...prev, [key]: value }));

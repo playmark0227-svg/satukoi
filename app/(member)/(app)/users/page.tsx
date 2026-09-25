@@ -5,22 +5,17 @@ import { calcAge } from "@/lib/format";
 import { compatScore } from "@/lib/compat";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
-import { BrandMark } from "@/components/member/BrandMark";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { UserFilters } from "@/components/member/browse/UserFilters";
-import { UserPhoto } from "@/components/member/UserPhoto";
-import {
-  IconHeart,
-  IconSparkle,
-  BadgeVerified,
-  BadgeCrown,
-  IconChevronRight,
-} from "@/components/member/icons";
-import type { Prisma, ResidenceArea } from "@prisma/client";
+import { Avatar } from "@/components/ui/Avatar";
+import { UserFeed, type FeedUser } from "@/components/member/browse/UserFeed";
+
+/** この日数以内に登録した会員を「新着」としてストーリーの輪で強調 */
+const NEW_DAYS = 14;
+const isNewMember = (createdAt: Date) => createdAt.getTime() >= Date.now() - NEW_DAYS * 86_400_000;
 
 /**
- * さがす（ホーム）：異性のみ・有効会員・自分以外・ブロック関係（双方）を除外して一覧表示。
- * searchParams: ageMin / ageMax / area で絞り込み。
+ * ホーム（Instagram 風）：上に新着のお相手（ストーリー）、下にAI相性順のフィード。
+ * 異性のみ・有効会員・自分以外・ブロック関係（双方）を除外。
+ * searchParams（ageMin / ageMax / area）は絞り込みの初期値として使う。
  */
 export default async function UsersPage({
   searchParams,
@@ -30,156 +25,132 @@ export default async function UsersPage({
   const me = await requireMember();
   const sp = await searchParams;
 
-  const unread = await prisma.notification.count({
-    where: { memberId: me.id, readAt: null },
-  });
-
   const oppositeSex = me.sex === "MALE" ? "FEMALE" : "MALE";
 
-  // ── ブロック関係（双方）の相手IDを集める ──
-  const blocks = await prisma.block.findMany({
-    where: { OR: [{ blockerId: me.id }, { blockedId: me.id }] },
-    select: { blockerId: true, blockedId: true },
-  });
+  const [unread, blocks] = await Promise.all([
+    prisma.notification.count({ where: { memberId: me.id, readAt: null } }),
+    prisma.block.findMany({
+      where: { OR: [{ blockerId: me.id }, { blockedId: me.id }] },
+      select: { blockerId: true, blockedId: true },
+    }),
+  ]);
   const excludeIds = new Set<string>([me.id]);
   for (const b of blocks) {
     excludeIds.add(b.blockerId);
     excludeIds.add(b.blockedId);
   }
 
-  // ── 年齢レンジ → 生年月日レンジへ変換 ──
-  const ageMin = sp.ageMin ? Number(sp.ageMin) : undefined;
-  const ageMax = sp.ageMax ? Number(sp.ageMax) : undefined;
-  const area =
-    sp.area && sp.area in RESIDENCE_AREA_LABELS ? (sp.area as ResidenceArea) : undefined;
+  const [rows, myPending, theirPending, activeMatches] = await Promise.all([
+    prisma.member.findMany({
+      where: { sex: oppositeSex, status: "ACTIVE", id: { notIn: Array.from(excludeIds) } },
+      include: { photos: { orderBy: { order: "asc" }, take: 1 } },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.dateApplication.findMany({
+      where: { applicantId: me.id, status: "PENDING" },
+      select: { receiverId: true },
+    }),
+    prisma.dateApplication.findMany({
+      where: { receiverId: me.id, status: "PENDING" },
+      select: { applicantId: true },
+    }),
+    prisma.match.findMany({
+      where: {
+        phase: { in: ["SCHEDULING", "CONFIRMED"] },
+        OR: [{ applicantId: me.id }, { receiverId: me.id }],
+      },
+      select: { id: true, applicantId: true, receiverId: true },
+    }),
+  ]);
 
-  const birthDate: Prisma.DateTimeFilter = {};
-  if (ageMin !== undefined && !Number.isNaN(ageMin)) {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - ageMin);
-    birthDate.lte = d;
+  const relation = new Map<string, FeedUser["relation"]>();
+  for (const a of myPending) {
+    relation.set(a.receiverId, { label: "申込済み", cta: "お返事待ち", href: `/users/${a.receiverId}` });
   }
-  if (ageMax !== undefined && !Number.isNaN(ageMax)) {
-    const d = new Date();
-    d.setFullYear(d.getFullYear() - (ageMax + 1));
-    birthDate.gt = d;
+  for (const a of theirPending) {
+    relation.set(a.applicantId, { label: "申込が届いています", cta: "お申込みを確認する", href: "/applications" });
   }
-
-  const where: Prisma.MemberWhereInput = {
-    sex: oppositeSex,
-    status: "ACTIVE",
-    id: { notIn: Array.from(excludeIds) },
-    ...(area ? { residenceArea: area } : {}),
-    ...(Object.keys(birthDate).length > 0 ? { birthDate } : {}),
-  };
-
-  const rows = await prisma.member.findMany({
-    where,
-    include: { photos: { orderBy: { order: "asc" }, take: 1 } },
-    orderBy: { createdAt: "desc" },
-  });
+  for (const m of activeMatches) {
+    const other = m.applicantId === me.id ? m.receiverId : m.applicantId;
+    relation.set(other, { label: "マッチ中", cta: "日程調整を見る", href: `/matches/${m.id}` });
+  }
 
   // AIが相性の良い順に表示（デモでは決定的な擬似スコア。lib/compat.ts 参照）
-  const users = rows
-    .map((u) => ({ ...u, compat: compatScore(me.id, u.id) }))
+  const users: FeedUser[] = rows
+    .map((u) => ({
+      id: u.id,
+      nickname: u.nickname,
+      age: calcAge(u.birthDate),
+      area: u.residenceArea,
+      areaLabel: RESIDENCE_AREA_LABELS[u.residenceArea],
+      photoUrl: u.photos[0]?.url ?? null,
+      compat: compatScore(me.id, u.id),
+      verified: u.incomeCertVerified,
+      salon: u.accountType === "SALON",
+      isNew: isNewMember(u.createdAt),
+      occupation: u.occupation,
+      hobbies: u.hobbies,
+      intro: u.selfIntroduction,
+      relation: relation.get(u.id) ?? null,
+    }))
     .sort((a, b) => b.compat - a.compat);
+
+  // ストーリー：新しく登録した順
+  const stories = [...rows].slice(0, 10);
 
   return (
     <div className="flex flex-1 flex-col">
       <BrandHeader unread={unread} bell />
-      <UserFilters
-        ageMin={sp.ageMin ?? ""}
-        ageMax={sp.ageMax ?? ""}
-        area={sp.area ?? ""}
-      />
 
-      <div className="space-y-4 px-4 py-4">
-        {/* サービス案内（控えめなお知らせカード） */}
-        <div className="animate-fade-up flex items-center gap-3 rounded-2xl border border-line bg-surface p-3.5">
-          <BrandMark className="h-10 w-10 shrink-0" />
-          <div className="min-w-0">
-            <p className="text-[13.5px] font-bold text-ink">
-              チャットなしで、カフェで会える
-            </p>
-            <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
-              気になる方にデートを申し込むだけ。全員本人確認済みです。
-            </p>
-          </div>
-        </div>
-
-        {/* AIアドバイザー導線 */}
-        <Link
-          href="/advisor"
-          className="animate-fade-up flex items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-3 transition-colors hover:bg-surface-alt/50 active:opacity-70"
-          style={{ animationDelay: "40ms" }}
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-surface-alt text-ink-soft">
-            <IconSparkle className="h-4 w-4" />
-          </span>
-          <span className="flex-1 text-[13.5px] font-bold text-ink">
-            AIアドバイザーに相談する
-          </span>
-          <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint" />
-        </Link>
-
-        {/* セクション見出し */}
-        <div
-          className="animate-fade-up flex items-baseline justify-between px-0.5 pt-1"
-          style={{ animationDelay: "60ms" }}
-        >
-          <h2 className="text-[15px] font-bold text-ink">おすすめのお相手</h2>
-          <span className="flex items-baseline gap-1.5">
-            <span className="text-[11px] text-ink-faint">AI相性順</span>
-            <span className="num-tnum text-xs text-ink-faint">{users.length}人</span>
-          </span>
-        </div>
-
-        {/* ユーザーグリッド（写真＋下に情報） */}
-        {users.length === 0 ? (
-          <EmptyState
-            title="該当するお相手がいません"
-            description="絞り込み条件を変えてもう一度お試しください。"
-          />
-        ) : (
-          <div className="stagger grid grid-cols-2 gap-x-3 gap-y-5">
-            {users.map((u) => (
+      {/* ストーリー（新着のお相手） */}
+      <section aria-label="新着のお相手" className="pb-3 pt-1">
+        <div className="flex gap-3.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Link
+            href="/mypage/edit"
+            className="flex w-[68px] shrink-0 flex-col items-center gap-1 active:opacity-70"
+          >
+            <span className="relative">
+              <span className="story-ring-seen">
+                <Avatar url={me.photos[0]?.url} name={me.nickname} className="h-[58px] w-[58px] text-lg" />
+              </span>
+              <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white ring-2 ring-surface">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="h-3 w-3" aria-hidden>
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </span>
+            </span>
+            <span className="w-full truncate text-center text-[11px] text-ink-soft">あなた</span>
+          </Link>
+          {stories.map((u) => {
+            const isNew = isNewMember(u.createdAt);
+            return (
               <Link
                 key={u.id}
                 href={`/users/${u.id}`}
-                className="group block transition-opacity active:opacity-70"
+                className="flex w-[68px] shrink-0 flex-col items-center gap-1 active:opacity-70"
               >
-                <div className="relative aspect-square overflow-hidden rounded-xl bg-surface-alt">
-                  <UserPhoto url={u.photos[0]?.url} name={u.nickname} />
-                  {u.accountType === "SALON" && (
-                    <span className="absolute left-2 top-2">
-                      <BadgeCrown />
-                    </span>
-                  )}
-                  <span className="num-tnum absolute bottom-2 left-2 rounded-full bg-white/95 px-2 py-0.5 text-[11px] font-bold text-primary shadow-[var(--shadow-float)]">
-                    相性{u.compat}%
-                  </span>
-                </div>
-                <div className="mt-2 flex items-start justify-between gap-2 px-0.5">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1 text-[15px] font-bold text-ink">
-                      <span className="truncate">{u.nickname}</span>
-                      {u.incomeCertVerified && (
-                        <BadgeVerified className="shrink-0" />
-                      )}
-                    </p>
-                    <p className="num-tnum mt-0.5 text-xs text-ink-soft">
-                      {calcAge(u.birthDate)}歳・{RESIDENCE_AREA_LABELS[u.residenceArea]}
-                    </p>
-                  </div>
-                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-line bg-surface text-ink-faint transition-colors group-hover:border-primary/40 group-hover:text-primary">
-                    <IconHeart className="h-4.5 w-4.5" />
-                  </span>
-                </div>
+                <span className={isNew ? "story-ring" : "story-ring-seen"}>
+                  <Avatar
+                    url={u.photos[0]?.url}
+                    name={u.nickname}
+                    className="h-[58px] w-[58px] text-lg"
+                  />
+                </span>
+                <span className="w-full truncate text-center text-[11px] text-ink">
+                  {u.nickname}
+                </span>
               </Link>
-            ))}
-          </div>
-        )}
-      </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <UserFeed
+        users={users}
+        initialAgeMin={sp.ageMin ?? ""}
+        initialAgeMax={sp.ageMax ?? ""}
+        initialArea={sp.area ?? ""}
+      />
     </div>
   );
 }

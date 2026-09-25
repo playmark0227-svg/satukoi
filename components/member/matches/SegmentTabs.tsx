@@ -20,9 +20,12 @@ export type Segment = {
 export function SegmentTabs({
   segments,
   initial,
+  top = "brand",
 }: {
   segments: Segment[];
   initial?: string;
+  /** 固定位置：BrandHeader(h-14) の下か AppHeader(h-12) の下か */
+  top?: "brand" | "app";
 }) {
   const [active, setActive] = useState(initial ?? segments[0]?.key);
   const current = segments.find((s) => s.key === active) ?? segments[0];
@@ -31,7 +34,10 @@ export function SegmentTabs({
     <>
       <div
         role="tablist"
-        className="sticky top-14 z-10 grid border-b border-line bg-surface"
+        className={cn(
+          "sticky z-10 grid border-b border-line-soft bg-surface",
+          top === "app" ? "top-12" : "top-14"
+        )}
         style={{ gridTemplateColumns: `repeat(${segments.length}, minmax(0, 1fr))` }}
       >
         {segments.map((s) => {
@@ -44,13 +50,13 @@ export function SegmentTabs({
               aria-selected={on}
               onClick={() => setActive(s.key)}
               className={cn(
-                "relative flex items-center justify-center gap-1.5 py-3.5 text-sm transition-colors duration-200",
-                on ? "font-bold text-ink" : "font-medium text-ink-faint"
+                "relative flex items-center justify-center gap-1.5 py-3 text-sm font-semibold transition-colors duration-200",
+                on ? "text-ink" : "text-ink-faint"
               )}
             >
               {s.label}
               {s.badge ? (
-                <span className="num-tnum inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-bold text-white">
+                <span className="num-tnum inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-like px-1 text-[11px] font-bold text-white">
                   {s.badge}
                 </span>
               ) : s.count !== undefined ? (
@@ -58,7 +64,7 @@ export function SegmentTabs({
               ) : null}
               <span
                 className={cn(
-                  "absolute inset-x-6 bottom-0 h-0.5 rounded-full bg-primary transition-opacity duration-200",
+                  "absolute inset-x-0 -bottom-px h-px bg-ink transition-opacity duration-200",
                   on ? "opacity-100" : "opacity-0"
                 )}
               />

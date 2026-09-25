@@ -140,6 +140,7 @@ model Member {
   cardRegistered   Boolean @default(false)
 
   // LINE連携（LINEログイン・LINE通知）
+  lineUserId    String? @unique // LINE ユーザーID（LIFF／LINEログインで紐付け）
   lineConnected Boolean @default(false)
   notifyViaLine Boolean @default(true)
 

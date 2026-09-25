@@ -1,50 +1,88 @@
 @import "tailwindcss";
 
 /* ════════════════════════════════════════════════════════════
-   サツコイ！（仮） デザイントークン v3 — 「実在アプリ」基調
-   ベースは白・黒・グレー。ブランドピンク（ロゴ実測 #ee3f9b）は
-   CTA・アクティブ状態・通知などのアクセントに限定し、面で塗らない。
+   サツコイ！（仮） デザイントークン v4 — 「Instagram のような」雰囲気
+   ・ベースは真っ白＋黒文字＋細いグレー罫線。影や色面はほぼ使わない
+   ・操作（ボタン・リンク・選択中）はブルー
+   ・ブランドのグラデーション（ロゴのピンク→紫にオレンジを足したもの）は
+     ストーリーの輪・ロゴ・ごく一部の強調だけに使う
    ════════════════════════════════════════════════════════════ */
 @theme {
-  /* ブランド（ロゴ実測色）— アクセント専用 */
-  --color-primary: #ee3f9b;
-  --color-primary-strong: #d31f80;
-  --color-primary-soft: #fce7f3;
-  --color-primary-tint: #fdf2f8;
+  /* 操作色（ボタン・リンク・選択状態） */
+  --color-primary: #0095f6;
+  --color-primary-strong: #1877f2;
+  --color-primary-soft: #e0f1fe;
+  --color-primary-tint: #f0f8ff;
+
+  /* ブランド（ロゴ実測）— グラデーションの素材。面で塗らない */
+  --color-brand: #ee3f9b;
+  --color-brand-violet: #ab48e5;
+  --color-brand-orange: #ff8a3d;
   --color-accent-violet: #ab48e5;
 
-  --color-ink: #14161c;
-  --color-ink-soft: #626875;
-  --color-ink-faint: #9aa0ab;
-  --color-canvas: #f7f7f8;
-  --color-surface: #ffffff;
-  --color-surface-alt: #f2f3f5;
-  --color-line: #e8eaee;
+  /* いいね・未読など */
+  --color-like: #ff3040;
 
-  --color-success: #22c55e;
-  --color-success-soft: #e9f9ef;
+  --color-ink: #0c0c0d;
+  --color-ink-soft: #737373;
+  --color-ink-faint: #a8a8a8;
+  --color-canvas: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-alt: #efefef;
+  --color-line: #dbdbdb;
+  --color-line-soft: #efefef;
+
+  --color-success: #20b15a;
+  --color-success-soft: #e7f7ee;
   --color-warning: #f59e0b;
   --color-warning-soft: #fef3e2;
   --color-warning-strong: #b45309; /* 淡い警告背景の上に載せる文字色（コントラスト確保） */
-  --color-danger: #ef4444;
-  --color-danger-soft: #feecec;
-  --color-info: #3b82f6;
-  --color-info-soft: #e8f1fe;
+  --color-danger: #ed4956;
+  --color-danger-soft: #fdecee;
+  --color-info: #0095f6;
+  --color-info-soft: #e0f1fe;
 
   --color-background: var(--color-canvas);
   --color-foreground: var(--color-ink);
 
   --font-sans:
-    -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN",
-    "Hiragino Sans", "Noto Sans JP", "Yu Gothic", "Meiryo", "Segoe UI",
-    Roboto, Helvetica, Arial, sans-serif;
+    -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN",
+    "Noto Sans JP", "Yu Gothic", "Meiryo", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  --radius-card: 1rem;
+  --radius-card: 0.75rem;
 
-  /* ほぼ気づかない程度のニュートラルな影（色付きの滲みは使わない） */
-  --shadow-card: 0 1px 2px rgba(17, 20, 26, 0.04), 0 4px 14px rgba(17, 20, 26, 0.05);
-  --shadow-float: 0 2px 8px rgba(17, 20, 26, 0.1);
-  --shadow-pop: 0 12px 32px rgba(17, 20, 26, 0.14);
+  /* 影は原則なし（罫線で区切る）。浮かせる要素だけ最小限 */
+  --shadow-card: none;
+  --shadow-float: 0 1px 4px rgba(0, 0, 0, 0.12);
+  --shadow-pop: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+
+:root {
+  /* ブランドグラデーション：ストーリーの輪・ロゴ周りのみで使用 */
+  --gradient-brand: linear-gradient(45deg, #ffb347 0%, #ff7a45 28%, #ee3f9b 62%, #ab48e5 100%);
+}
+
+/* ストーリーの輪：<span class="story-ring"><img/アバター></span>（未読・新着のときだけ） */
+.story-ring {
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 2px;
+  background: var(--gradient-brand);
+}
+.story-ring > * {
+  border: 2px solid #fff;
+  border-radius: 9999px;
+}
+/* 既読・通常時の輪（グレーの細線） */
+.story-ring-seen {
+  display: inline-flex;
+  border-radius: 9999px;
+  padding: 1px;
+  background: var(--color-line);
+}
+.story-ring-seen > * {
+  border: 2.5px solid #fff;
+  border-radius: 9999px;
 }
 
 html,
@@ -153,9 +191,9 @@ details[open] .details-body { animation: fade-up 0.3s cubic-bezier(0.22, 0.8, 0.
     min-height: calc(100dvh - 40px);
     margin-block: 20px;
     border: 1px solid var(--color-line);
-    border-radius: 28px;
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: var(--shadow-pop);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
   }
 }
 

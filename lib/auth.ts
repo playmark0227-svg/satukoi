@@ -55,6 +55,53 @@ async function clear(kind: SessionKind) {
   store.delete(kind === "member" ? MEMBER_COOKIE : ADMIN_COOKIE);
 }
 
+// ── LINE 連携の一時情報（未登録の LINE ユーザーが新規登録へ進む間だけ保持） ──
+
+const LINE_PENDING_COOKIE = "satukoi_line_pending";
+const LINE_PENDING_MAX_AGE = 60 * 30; // 30分
+
+export type LinePending = { sub: string; name?: string; picture?: string };
+
+export async function setLinePending(p: LinePending) {
+  const token = await new SignJWT({ kind: "line", name: p.name, picture: p.picture })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(p.sub)
+    .setIssuedAt()
+    .setExpirationTime(`${LINE_PENDING_MAX_AGE}s`)
+    .sign(secret());
+  const store = await cookies();
+  store.set(LINE_PENDING_COOKIE, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: LINE_PENDING_MAX_AGE,
+  });
+}
+
+export async function readLinePending(): Promise<LinePending | null> {
+  if (IS_DEMO) return null;
+  const store = await cookies();
+  const token = store.get(LINE_PENDING_COOKIE)?.value;
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secret());
+    if (payload.kind !== "line" || !payload.sub) return null;
+    return {
+      sub: payload.sub,
+      name: typeof payload.name === "string" ? payload.name : undefined,
+      picture: typeof payload.picture === "string" ? payload.picture : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function clearLinePending() {
+  const store = await cookies();
+  store.delete(LINE_PENDING_COOKIE);
+}
+
 // ── 会員セッション ──
 
 export function createMemberSession(memberId: string) {

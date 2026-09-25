@@ -10,7 +10,6 @@ import {
 import { AppHeader } from "@/components/member/AppHeader";
 import { SegmentTabs } from "@/components/member/matches/SegmentTabs";
 import { Avatar } from "@/components/ui/Avatar";
-import { Card } from "@/components/ui/Card";
 import { Badge, type Tone } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -83,6 +82,7 @@ export default async function ApplicationsPage({
       <AppHeader title="お申込み" backHref="/matches" />
 
       <SegmentTabs
+        top="app"
         initial={initial}
         segments={[
           {
@@ -101,18 +101,18 @@ export default async function ApplicationsPage({
                 }
                 renderActions={(item) =>
                   item.status === "PENDING" ? (
-                    <div className="mt-3 border-t border-line pt-3">
+                    <div className="mt-3">
                       <div className="grid grid-cols-2 gap-2">
-                        <form action={declineApplication}>
-                          <input type="hidden" name="applicationId" value={item.id} />
-                          <Button type="submit" variant="outline" size="md" className="w-full">
-                            見送る
-                          </Button>
-                        </form>
                         <form action={acceptApplication}>
                           <input type="hidden" name="applicationId" value={item.id} />
                           <Button type="submit" variant="primary" size="md" className="w-full">
                             承諾する
+                          </Button>
+                        </form>
+                        <form action={declineApplication}>
+                          <input type="hidden" name="applicationId" value={item.id} />
+                          <Button type="submit" variant="secondary" size="md" className="w-full">
+                            見送る
                           </Button>
                         </form>
                       </div>
@@ -164,19 +164,21 @@ function List({
 }) {
   if (items.length === 0) return <div className="px-4 py-4">{empty}</div>;
   return (
-    <div className="stagger space-y-3 px-4 py-4">
+    <div className="stagger divide-y divide-line-soft">
       {items.map((item) => (
-        <Card key={item.id}>
-          <div className="p-4">
+        <div key={item.id}>
+          <div className="px-4 py-4">
             <Link href={`/users/${item.other.id}`} className="flex items-start gap-3">
-              <Avatar
-                url={item.other.photos[0]?.url}
-                name={item.other.nickname}
-                className="h-14 w-14 text-xl"
-              />
+              <span className={item.status === "PENDING" ? "story-ring" : "story-ring-seen"}>
+                <Avatar
+                  url={item.other.photos[0]?.url}
+                  name={item.other.nickname}
+                  className="h-12 w-12 text-lg"
+                />
+              </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-[15px] font-bold text-ink">
+                  <p className="truncate text-[15px] font-semibold text-ink">
                     {item.other.nickname}
                   </p>
                   <Badge tone={statusTone[item.status]} className="shrink-0">
@@ -190,13 +192,13 @@ function List({
               </div>
             </Link>
             {item.message && (
-              <p className="mt-3 rounded-xl bg-surface-alt px-3 py-2.5 text-[13px] leading-relaxed text-ink">
+              <p className="mt-3 rounded-2xl rounded-tl-md bg-surface-alt px-3.5 py-2.5 text-sm leading-relaxed text-ink">
                 {item.message}
               </p>
             )}
             {renderActions?.(item)}
           </div>
-        </Card>
+        </div>
       ))}
     </div>
   );

@@ -1,4 +1,6 @@
-// シンプルな SVG アイコン群（デザイン合わせ用）。currentColor で色を継承。
+// シンプルな SVG アイコン群（独自作図＋Feather Icons[MIT] 準拠の形）。currentColor で色を継承。
+import { cn } from "@/lib/cn";
+
 type P = { className?: string };
 
 export function IconSparkle({ className }: P) {
@@ -28,17 +30,20 @@ export function IconFunnel({ className }: P) {
 }
 
 export function IconHome({ className, filled }: P & { filled?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
-      <path d="M3 10.5 12 3l9 7.5" />
-      <path d="M5 9.5V20h14V9.5" />
+  return filled ? (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <path d="M3 9.6 12 2.6l9 7V20a2 2 0 0 1-2 2h-4.2v-6.6H9.2V22H5a2 2 0 0 1-2-2V9.6Z" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M3 9.6 12 2.6l9 7V20a2 2 0 0 1-2 2h-4.2v-6.6H9.2V22H5a2 2 0 0 1-2-2V9.6Z" />
     </svg>
   );
 }
 
 export function IconHeart({ className, filled }: P & { filled?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   );
@@ -55,21 +60,52 @@ export function IconUser({ className, filled }: P & { filled?: boolean }) {
 
 export function IconMenu({ className }: P & { filled?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" className={className} aria-hidden>
-      <path d="M4 7h16M4 12h16M4 17h16" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className} aria-hidden>
+      <path d="M3 5h18M3 12h18M3 19h18" />
     </svg>
   );
 }
 
-/** 本人確認済バッジ（グリーンのチェック） */
-export function BadgeVerified({ className }: P) {
+export function IconSearch({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <circle cx="11" cy="11" r="8" />
+      <path d="m21 21-4.35-4.35" />
+    </svg>
+  );
+}
+
+export function IconBookmark({ className, filled }: P & { filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+export function IconMore({ className }: P) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="6" cy="12" r="1.5" />
+      <circle cx="18" cy="12" r="1.5" />
+    </svg>
+  );
+}
+
+/** 本人確認済バッジ（ブルーのチェック。Instagram の認証バッジのような見え方） */
+export function BadgeVerified({ className, size = "md" }: P & { size?: "sm" | "md" }) {
   return (
     <span
-      className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-success text-white ring-2 ring-white/80 " + (className ?? "")}
+      className={cn(
+        "inline-flex items-center justify-center rounded-full bg-primary text-white",
+        size === "sm" ? "h-4 w-4" : "h-5 w-5",
+        className
+      )}
       title="本人確認済"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden>
-        <path d="M4 12l5 5L20 6" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" className={size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3"} aria-hidden>
+        <path d="M5 12.5l4.5 4.5L19 7.5" />
       </svg>
     </span>
   );
@@ -132,9 +168,9 @@ export function IconBuilding({ className }: P) {
 }
 export function IconSend({ className }: P) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
-      <path d="M21 3L3 10.5l7 2.5 2.5 7L21 3z" />
-      <path d="M10 13l4-4" />
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M22 2 11 13" />
+      <path d="M22 2 15 22l-4-9-9-4 20-7z" />
     </svg>
   );
 }
@@ -225,13 +261,17 @@ export function IconCheck({ className }: P) {
 }
 
 /** サロン会員バッジ（金の王冠） */
-export function BadgeCrown({ className }: P) {
+export function BadgeCrown({ className, size = "md" }: P & { size?: "sm" | "md" }) {
   return (
     <span
-      className={"inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-white ring-2 ring-white/80 " + (className ?? "")}
+      className={cn(
+        "inline-flex items-center justify-center rounded-full bg-amber-400 text-white",
+        size === "sm" ? "h-4 w-4" : "h-5 w-5",
+        className
+      )}
       title="サロン会員"
     >
-      <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="currentColor" className={size === "sm" ? "h-2.5 w-2.5" : "h-3 w-3"} aria-hidden>
         <path d="M3 7l4 4 5-6 5 6 4-4v11H3V7z" />
       </svg>
     </span>

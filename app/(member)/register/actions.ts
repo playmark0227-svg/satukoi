@@ -3,7 +3,7 @@
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { createMemberSession } from "@/lib/auth";
+import { createMemberSession, readLinePending, clearLinePending } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import type {
   Sex,
@@ -42,10 +42,14 @@ export async function createMember(formData: FormData) {
 
   const referralCodeInput = str(formData, "referralCode");
 
+  // LINE（LIFF）から来た場合は LINE アカウントを紐付けて登録
+  const line = await readLinePending();
+
   const member = await prisma.member.create({
     data: {
       email,
       passwordHash,
+      ...(line ? { lineUserId: line.sub, lineConnected: true } : {}),
       status: "DOCUMENT_REVIEW",
       fullName: str(formData, "fullName"),
       nickname: str(formData, "nickname"),
@@ -113,6 +117,7 @@ export async function createMember(formData: FormData) {
     }
   }
 
+  if (line) await clearLinePending();
   await createMemberSession(member.id);
   redirect("/register/complete");
 }
