@@ -66,7 +66,7 @@ export default async function AdminMembersPage({
               <Input
                 name="q"
                 defaultValue={q}
-                placeholder="例：山本 / みさき / female1@..."
+                placeholder="例：山本 / みさき / misaki@..."
               />
             </Field>
             <Field label="ステータスで絞り込み">

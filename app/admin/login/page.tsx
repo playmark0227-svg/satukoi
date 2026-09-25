@@ -18,7 +18,7 @@ export default async function AdminLoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-[#fafafa] px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="animate-fade-up text-center">
           <BrandMark className="mx-auto h-16 w-16" />
@@ -28,7 +28,7 @@ export default async function AdminLoginPage({
           <p className="mt-2 text-sm font-bold text-ink-soft">運営管理画面</p>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-line bg-surface p-6 shadow-sm">
+        <div className="mt-6 rounded-lg border border-line bg-surface px-8 py-7">
           <p className="text-center text-sm font-bold text-ink">
             運営ログイン
           </p>

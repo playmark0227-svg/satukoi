@@ -29,10 +29,15 @@
 ## 主な機能（追加実装分）
 
 基盤機能（会員登録〜マッチング〜日程調整〜デート〜アンケートの一連フロー、運営管理画面）に加え、
-以下を追加実装しています。外部連携（LINE OAuth・Stripe 実決済）はデモでは見た目とフローを再現した
+以下を追加実装しています。Stripe 実決済・LINE 通知（Messaging API）はデモでは見た目とフローを再現した
 スタブで、本実装方針は各コードのコメントおよび `docs/ROADMAP.md` に記載しています。
 
-- **LINE ログイン / LINE 通知 UI** … LINE 連携状態（`Member.lineConnected`）と通知先の切替（`Member.notifyViaLine`）。本実装では LINE Login（LIFF）＋ Messaging API に接続。
+- **LIFF（LINE アプリ内で動作）** … `@line/liff` を組み込み済み。LINE から開くと自動ログイン（ID トークンを
+  `app/api/auth/line/route.ts` で LINE の検証 API に照会 → 会員セッション発行）。未登録なら LINE 連携で新規登録、
+  メールでログイン中なら LINE を紐付け（`Member.lineUserId`）。紹介コードは LINE のシェア画面で送信。
+  メール＋パスワードのログインも併用可能。設定手順は下記「LIFF の設定」。
+- **LINE 通知 UI** … 通知先の切替（`Member.notifyViaLine`）。本実装では Messaging API に接続。
+- **デザイン** … Instagram のような雰囲気（白ベース・罫線・ブルーの操作色・ストーリーの輪）。詳細は `docs/DESIGN.md`。
 - **成功報酬型課金の訴求** … 登録料 11,000 円＋「デートの日程が確定したときだけ」5,500 円の都度課金（`PRICING.DATE_FEE`）。月額課金なしを前面に訴求。
 - **AI 相性スコア推薦（デモ）** … プロフィール項目にもとづく相性スコア付きのおすすめ表示。本実装では成婚データ駆動の推薦モデルへ。
 - **提携店ギフト券管理** … `GiftTicket` モデル（紹介特典 / キャンペーン / 補償の発行理由、有効・使用済み・期限切れのステータス管理）。
@@ -169,6 +174,21 @@ prisma/
 | 注意事項テンプレ | `dateNotesTemplate()` |
 
 ---
+
+## LIFF の設定
+
+1. [LINE Developers](https://developers.line.biz/) で「LINE ログイン」チャネルを作成（プロバイダーはお客様名義）
+2. チャネルの「LIFF」タブで LIFF アプリを追加
+   - エンドポイント URL：本番のアプリ URL（例 `https://<本番ドメイン>/users`）
+   - スコープ：`openid` `profile`（メールアドレスも使う場合は `email` ＋申請）
+   - サイズ：Full
+3. `.env` に設定
+   - `NEXT_PUBLIC_LIFF_ID`：発行された LIFF ID
+   - `LINE_LOGIN_CHANNEL_ID`：上記 LINE ログインチャネルのチャネル ID（ID トークンの検証に使用）
+4. LINE 公式アカウントのリッチメニュー等に `https://liff.line.me/<LIFF ID>` を設定すると、LINE から直接開けます
+
+未設定のあいだは通常の Web アプリとして動作します（GitHub Pages のデモもこの状態で、「LINEでログイン」は
+ホームへ進むだけのデモ動作）。
 
 ## スタブ（未実装・本番で差し替え）
 

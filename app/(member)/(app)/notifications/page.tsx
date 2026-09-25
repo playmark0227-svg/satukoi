@@ -142,8 +142,8 @@ export default async function NotificationsPage() {
           <h2 className="px-4 pb-1 text-base font-bold text-ink">運営からのお知らせ</h2>
           <ul>
             {announcements.map((a) => (
-              <li key={a.id} className="flex gap-3 px-4 py-2.5">
-                <span className="story-ring-seen shrink-0">
+              <li key={a.id} className="flex items-start gap-3 px-4 py-2.5">
+                <span className="story-ring-seen shrink-0 self-start">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface">
                     <BrandMark className="h-6 w-6" />
                   </span>

@@ -1,54 +1,51 @@
-# サツコイ！ デザインシステム v3 — 「実在アプリ」基調（脱AI）
+# サツコイ！ デザインシステム v4 — 「Instagram のような」雰囲気
 
-## 哲学
+## 方針
 
-実在の人気マッチングアプリ（Pairs / with / Omiai / tapple）の共通言語に合わせる。
-**画面のベースは白・黒・グレー。ブランドピンクは「アクセント」に限定し、面で塗らない。**
+ユーザーが毎日開き慣れている Instagram の「空気感」に合わせる（見た目の真似ではなく、構成と余白の考え方を借りる）。
+アイコン・ロゴ等の素材は Instagram のものを使わない（独自作図＋Feather Icons[MIT] 準拠）。
 
-AIが作ったUIに見える典型要素（=禁止）:
+- 画面のベースは **真っ白**。区切りは影ではなく **細いグレーの罫線**（`line` / `line-soft`）
+- 文字は黒（`ink`）とグレー（`ink-soft` / `ink-faint`）の2〜3段階だけ
+- 操作（主ボタン・リンク・選択中）は **ブルー**（`primary`）。サブボタンは **グレーの面ボタン**（`secondary`）
+- ブランドのグラデーション（ロゴのピンク→紫にオレンジを足したもの）は
+  **ストーリーの輪・ロゴまわりのみ**。面を塗らない、文字に使わない
+- 未読・件数バッジは赤（`like`）
 
-- 面をピンク/グラデーションで塗る（バナー、チップ、ヘッダー帯、アイコン枠）
-- 無限ループする装飾アニメ（グラデーションが流れる文字、シアン光沢、キラキラ、浮遊、鼓動、ベル揺れ、波紋）
-- グラデーション文字・ゴールド/foil表現
-- 飾りの英語大文字ラベル（"PICK UP" 等）と ♥ 区切り線
-- 中央揃えの誇張された見出し・過剰な角丸（24px超）・ピンク色の影
+## トークン（app/globals.css @theme）
 
-## トークン（globals.css @theme）
+| 役割 | トークン | 値 |
+|---|---|---|
+| 操作色 | primary / primary-strong / primary-soft / primary-tint | #0095f6 / #1877f2 / #e0f1fe / #f0f8ff |
+| ブランド（グラデの素材） | brand / brand-violet / brand-orange | #ee3f9b / #ab48e5 / #ff8a3d |
+| 未読・いいね | like | #ff3040 |
+| 文字 | ink / ink-soft / ink-faint | #0c0c0d / #737373 / #a8a8a8 |
+| 面 | canvas・surface / surface-alt | #ffffff / #efefef |
+| 罫線 | line / line-soft | #dbdbdb / #efefef |
 
-- primary `#ee3f9b` / primary-strong `#d31f80`（ロゴ実測）— **CTAボタン・アクティブ状態・通知数・強調テキストのみ**
-- ink `#14161c` / ink-soft `#626875` / ink-faint `#9aa0ab`
-- canvas `#f7f7f8` / surface `#ffffff` / surface-alt `#f2f3f5` / line `#e8eaee`
-- radius-card `1rem`。影はニュートラルでごく薄く（ピンクの滲み禁止）
+- 角丸：ボタン・入力欄 8px（`rounded-lg`）、カード 12px（`--radius-card`）
+- 影：原則なし（`--shadow-card: none`）
+- グラデーション：`var(--gradient-brand)`（`.story-ring` のみが使用）
 
-## 禁止クラス（コード中に残してはならない）
+## 部品のきまり
 
-`bg-brand-gradient` `text-foil` `sheen-host` `animate-twinkle` `animate-float`
-`animate-heart` `animate-bell` `animate-pulse-ring` `rule-letter` `caps-label`
+- **下タブ**：アイコンのみ（ホーム／マッチ／マイページ＝自分の写真／メニュー）。選択中は塗りつぶし。未対応の申込があればマッチに赤い点
+- **ヘッダー**：トップは左にロゴ＋ワードマーク、右にベル（未読数の赤バッジ）。下層は中央タイトル＋左に戻る
+- **ストーリーの輪**：`.story-ring`（新着・要対応）／`.story-ring-seen`（既読・通常）。輪の中はアバター
+- **フィード**：投稿ヘッダー（輪付きアバター＋名前＋地域）→ 4:5 の写真（端から端まで）→ アクション行 → キャプション（自己紹介）
+- **ボタン**：`primary`（ブルー）は1画面に原則1つ。並べるときは「主＝ブルー、副＝グレー面」
+- **リスト**：カードで囲まず、白地に罫線区切り。右端はシェブロン
+- **見出し**：左揃え `text-[15px] font-bold text-ink`
+- **バッジ**：本人確認＝ブルーのチェック、サロン会員＝amber の王冠、プレミアム訴求＝amber
+- **LINE ボタン**：LINE 公式色 #06C755（LINE 関連の操作だけに使用）
 
-置き換え指針:
+## 禁止
 
-| 旧 | 新 |
-|---|---|
-| bg-brand-gradient のボタン | `bg-primary text-white hover:bg-primary-strong`（Buttonコンポーネント使用） |
-| bg-brand-gradient のアイコン枠 | 白カード上の小さな `bg-surface-alt text-ink-soft` 円/角丸、または文脈色（プレミアム=amber） |
-| text-foil ワードマーク | `text-ink font-black`（プレーン） |
-| animate-float / twinkle / sheen-host | 削除（置き換え不要） |
-| animate-pulse-ring の未読ドット | 静的な `bg-danger` ドット |
-| rule-letter / caps-label | 削除。見出しは左揃え `text-[15px] font-bold text-ink`、補助ラベルは `text-xs font-bold text-ink-faint` |
-| ピンク面のバナー | 白カード `border border-line rounded-2xl` ＋ ink見出し＋グレー本文 |
-| 色付きセクション帯（メニュー） | canvas上のプレーンな `text-xs font-bold text-ink-faint` ラベル |
+- 面をグラデーションで塗る／グラデーション文字／キラキラ・浮遊・点滅など無限ループの装飾
+- 色付きの影、24px を超える角丸、ピンクの面
+- 旧クラス：`bg-brand-gradient` `text-foil` `sheen-host` `animate-twinkle` `animate-float` `animate-heart` `animate-bell` `animate-pulse-ring` `rule-letter` `caps-label`
 
-## 許可されるアニメーション
+## アニメーション
 
-入場系のみ: `animate-fade-up` `animate-fade-in` `animate-scale-in` `animate-page` `.stagger`
-＋押下フィードバック（`active:scale-*` / hover遷移）。無限ループは通知ドット含めすべて不可。
-
-## レイアウト定石
-
-- セクション見出し: 左揃え。`<h2 class="text-[15px] font-bold text-ink">` ＋ 右側に件数/リンク（text-xs text-ink-faint）
-- 一覧カード: 写真は `aspect-square rounded-xl`、**情報は写真の下**（名前=ink太字15px、年齢・地域=ink-soft 12px）。オーバーレイ文字は使わない
-- バッジ: 本人確認=緑チェック（既存BadgeVerified）、サロン会員=amber王冠（BadgeCrown）
-- リスト行: 白背景 divide-y、アイコンは `bg-surface-alt text-ink-soft` の小円、右端 ›
-- 空状態: グレー円＋ロゴマーク小、太字ink見出し、グレー説明
-- CTA: 1画面に主ボタンは1つ。Button primary（ピンク単色）
-- プレミアム/サロン訴求: amber（金）系の控えめなワンポイント。紫グラデ禁止
+入場系のみ：`animate-fade-up` `animate-fade-in` `animate-scale-in` `animate-page` `.stagger`
+＋押下フィードバック（`active:opacity-*` / `active:scale-*`）。

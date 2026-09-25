@@ -65,6 +65,8 @@
 /* ストーリーの輪：<span class="story-ring"><img/アバター></span>（未読・新着のときだけ） */
 .story-ring {
   display: inline-flex;
+  height: max-content; /* flex 内で縦に引き伸ばされないように */
+  width: max-content;
   border-radius: 9999px;
   padding: 2px;
   background: var(--gradient-brand);
@@ -76,6 +78,8 @@
 /* 既読・通常時の輪（グレーの細線） */
 .story-ring-seen {
   display: inline-flex;
+  height: max-content;
+  width: max-content;
   border-radius: 9999px;
   padding: 1px;
   background: var(--color-line);
@@ -108,9 +112,13 @@ body {
   word-break: normal;
 }
 
-/* 見出しは行長をそろえ、本文は最終行の1文字だけの行を避ける */
-h1, h2, h3, h4 { text-wrap: balance; }
-p, li, dd { text-wrap: pretty; }
+/* 見出しは行長をそろえ、本文は最終行の1文字だけの行を避ける。
+   ・折り返し方（text-wrap-style）だけを指定し、折り返す／しない（text-wrap-mode）には触れない
+   ・@layer base に置き、truncate / whitespace-nowrap などのユーティリティが必ず優先されるようにする */
+@layer base {
+  h1, h2, h3, h4 { text-wrap-style: balance; }
+  p, li, dd { text-wrap-style: pretty; }
+}
 
 /* ── タイポグラフィ・ユーティリティ ── */
 .text-display {

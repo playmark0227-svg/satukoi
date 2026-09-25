@@ -52,7 +52,7 @@ export function MatchPhaseBadge({ phase }: { phase: MatchPhase }) {
 export function MemberFacingPhaseBadge({ phase }: { phase: MatchPhase }) {
   const confirmed = phase === "CONFIRMED";
   return (
-    <Badge tone={confirmed ? "primary" : "info"}>
+    <Badge tone={confirmed ? "primary" : "neutral"}>
       {confirmed ? "日程確定" : "日程調整中"}
     </Badge>
   );
