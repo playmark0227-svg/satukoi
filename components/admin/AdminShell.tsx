@@ -25,7 +25,8 @@ export function AdminShell({
   adminName: string;
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
+  // 静的デモ（trailingSlash）では末尾に / が付くため正規化して判定
+  const pathname = usePathname().replace(/(.)\/$/, "$1");
   return (
     <div className="flex min-h-dvh bg-canvas">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface md:flex">

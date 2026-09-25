@@ -21,12 +21,13 @@ import { updateProfile } from "./actions";
 
 const WEEKDAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
 
-/** 編集不可項目（表示のみ） */
+/** 編集不可項目（表示のみ・1行） */
 function LockedField({ label, value }: { label: string; value: string }) {
   return (
-    <Field label={label} locked>
-      <Input value={value} disabled readOnly />
-    </Field>
+    <div className="flex items-center justify-between gap-4 py-2.5">
+      <span className="shrink-0 text-sm text-ink-soft">{label}</span>
+      <span className="num-tnum text-right text-sm font-medium text-ink">{value}</span>
+    </div>
   );
 }
 
@@ -40,9 +41,9 @@ export default async function ProfileEditPage() {
       <form action={updateProfile} className="space-y-4 px-4 py-4">
         {/* 編集不可項目 */}
         <div>
-          <SectionTitle>登録情報（変更は運営へお申し出ください）</SectionTitle>
+          <SectionTitle>登録情報</SectionTitle>
           <Card>
-            <CardBody className="space-y-3">
+            <CardBody className="divide-y divide-line py-1">
               <LockedField label="名前" value={me.fullName} />
               <LockedField
                 label="生年月日"
@@ -67,6 +68,9 @@ export default async function ProfileEditPage() {
               />
             </CardBody>
           </Card>
+          <p className="mt-2 px-1 text-[11px] leading-relaxed text-ink-faint">
+            ※ 登録情報は登録後にご自身で変更できません。変更は運営へお申し出ください。
+          </p>
         </div>
 
         {/* 編集可能項目 */}

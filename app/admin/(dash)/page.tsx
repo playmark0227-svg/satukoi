@@ -123,7 +123,7 @@ export default async function AdminDashboardPage() {
             value={completedDates}
             unit="件"
             href="/admin/matches"
-            sub={<span>実施済（COMPLETED）の累計</span>}
+            sub={<span>デート実施済みの累計</span>}
           />
           <MetricCard
             label="要対応件数"
@@ -151,7 +151,7 @@ export default async function AdminDashboardPage() {
               href="/admin/members"
             />
             <ActionRow
-              label="書類の未確認（PENDING）"
+              label="未確認の提出書類"
               count={pendingDocs}
               href="/admin/members"
             />

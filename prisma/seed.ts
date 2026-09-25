@@ -18,8 +18,16 @@ const yearsAgo = (n: number) => {
   d.setFullYear(d.getFullYear() - n);
   return d;
 };
-const hoursFromNow = (h: number) => new Date(Date.now() + h * 3_600_000);
-const daysFromNow = (d: number) => new Date(Date.now() + d * 86_400_000);
+/**
+ * 日本時間で「今日から days 日後の h:m」。デモの時刻を 19:00 などキリのよい値にそろえる
+ * （実行時刻に依存した 16:12 のような半端な時刻を出さない）。
+ */
+const jstAt = (days: number, h: number, m = 0) => {
+  const d = new Date(Date.now() + 9 * 3_600_000); // 日本時間の壁時計
+  d.setUTCDate(d.getUTCDate() + days);
+  d.setUTCHours(h, m, 0, 0);
+  return new Date(d.getTime() - 9 * 3_600_000);
+};
 
 // デモ用のポートレート画像（性別ごと・安定URL）。実運用ではアップロード画像に差し替え。
 const portrait = (sex: "MALE" | "FEMALE", i: number) =>
@@ -84,6 +92,12 @@ const FEMALE_NAMES = [
   ["吉田 真央", "まお"],
   ["山田 彩花", "あやか"],
 ];
+// ログイン用メールアドレス（ニックネームのローマ字 @example.com）
+const ROMAJI: Record<string, string> = {
+  だいすけ: "daisuke", けんた: "kenta", しょう: "sho", りょう: "ryo", たくや: "takuya", しゅう: "shu",
+  みさき: "misaki", あおい: "aoi", ゆい: "yui", ななみ: "nanami", まお: "mao", あやか: "ayaka",
+  まちお: "machio",
+};
 const OCCUPATIONS = ["会社員", "公務員", "看護師", "美容師", "ITエンジニア", "教員"];
 const HOBBIES = ["カフェ巡り", "映画鑑賞", "ドライブ", "ランニング", "料理", "スノーボード"];
 
@@ -92,15 +106,21 @@ async function createMember(args: {
   sex: "MALE" | "FEMALE";
   name: [string, string];
   accountType?: "NORMAL" | "SALON";
+  /** 何日前に登録したか（登録→翌日に書類確認→翌々日に承認、の順で日付を作る） */
+  joinedDaysAgo?: number;
 }) {
   const { i, sex, name } = args;
+  const joined = args.joinedDaysAgo ?? 26 + ((i * 7 + (sex === "FEMALE" ? 4 : 0)) % 38);
+  const createdAt = jstAt(-joined, 10 + (i % 11), (i % 4) * 15);
+  const checkedAt = jstAt(-joined + 1, 15, 30);
   return prisma.member.create({
     data: {
-      email: `${sex.toLowerCase()}${i}@satukoi.local`,
+      email: `${ROMAJI[name[1]] ?? `${sex.toLowerCase()}${i}`}@example.com`,
       passwordHash: hash("password"),
       accountType: args.accountType ?? "NORMAL",
       status: "ACTIVE",
-      approvedAt: daysFromNow(-30),
+      createdAt,
+      approvedAt: jstAt(-joined + 2, 11, 0),
       cardRegistered: true,
       stripeCustomerId: `cus_stub_${sex}${i}`,
       lineConnected: i % 2 === 1, // デモ会員（けんた=男性i=1）はLINE連携済み
@@ -127,17 +147,17 @@ async function createMember(args: {
       selfIntroduction:
         "はじめまして。札幌在住です。休日はカフェ巡りが好きです。よろしくお願いします。",
       referralBonusRemaining: i === 1 ? 1 : 0,
-      nextRenewalAt: daysFromNow(335),
+      nextRenewalAt: new Date(createdAt.getTime() + 365 * 86_400_000),
       photos: {
         create: [{ url: portrait(sex, i), order: 0 }],
       },
       documents: {
         create: [
-          { type: "ID_DOCUMENT", url: "pending-upload", checkStatus: "OK", checkedAt: daysFromNow(-29) },
-          { type: "SINGLE_CERT", url: "pending-upload", checkStatus: "OK", checkedAt: daysFromNow(-29) },
+          { type: "ID_DOCUMENT", url: "pending-upload", checkStatus: "OK", checkedAt },
+          { type: "SINGLE_CERT", url: "pending-upload", checkStatus: "OK", checkedAt },
           // 男性は源泉徴収票等の所得証明が必須
           ...(sex === "MALE"
-            ? [{ type: "INCOME_CERT" as const, url: "pending-upload", checkStatus: "OK" as const, checkedAt: daysFromNow(-29) }]
+            ? [{ type: "INCOME_CERT" as const, url: "pending-upload", checkStatus: "OK" as const, checkedAt }]
             : []),
         ],
       },
@@ -196,6 +216,21 @@ async function main() {
     );
   }
 
+  // 登録料（一般会員のみ。サロン会員＝結婚相談所会員は無料）
+  for (const m of [...males, ...females]) {
+    if (m.accountType !== "NORMAL") continue;
+    await prisma.payment.create({
+      data: {
+        memberId: m.id,
+        purpose: "REGISTRATION",
+        amount: 11000,
+        status: "SUCCEEDED",
+        stripePaymentIntentId: `pi_stub_reg_${m.id.slice(-6)}`,
+        createdAt: m.createdAt,
+      },
+    });
+  }
+
   // 紹介コード（各会員に1つ）
   for (const m of [...males, ...females]) {
     await prisma.referralCode.create({
@@ -216,7 +251,8 @@ async function main() {
       reason: "REFERRAL",
       status: "ACTIVE",
       note: "お友達紹介の報酬",
-      expiresAt: daysFromNow(180),
+      issuedAt: jstAt(-6, 10, 0),
+      expiresAt: jstAt(174, 23, 59),
     },
   });
   await prisma.giftTicket.create({
@@ -227,7 +263,8 @@ async function main() {
       reason: "CAMPAIGN",
       status: "USED",
       note: "リリース記念キャンペーン",
-      usedAt: daysFromNow(-10),
+      issuedAt: jstAt(-25, 10, 0),
+      usedAt: jstAt(-10, 14, 5),
     },
   });
 
@@ -236,6 +273,7 @@ async function main() {
     i: 9,
     sex: "MALE",
     name: ["承認 待男", "まちお"],
+    joinedDaysAgo: 1,
   });
   await prisma.member.update({
     where: { id: pending.id },
@@ -252,7 +290,9 @@ async function main() {
       applicantId: males[1].id,
       receiverId: females[0].id,
       status: "ACCEPTED",
-      respondedAt: daysFromNow(-3),
+      message: "はじめまして。カフェ巡りがお好きと拝見して、ぜひお話ししてみたいです。",
+      createdAt: jstAt(-5, 21, 10),
+      respondedAt: jstAt(-4, 12, 30),
     },
   });
   const match1 = await prisma.match.create({
@@ -261,8 +301,8 @@ async function main() {
       receiverId: females[0].id,
       applicationId: app1.id,
       phase: "SCHEDULING",
-      matchedAt: daysFromNow(-3),
-      lastActionAt: daysFromNow(-1),
+      matchedAt: jstAt(-4, 12, 30),
+      lastActionAt: jstAt(-1, 20, 5),
     },
   });
   await prisma.scheduleProposal.create({
@@ -270,13 +310,26 @@ async function main() {
       matchId: match1.id,
       proposedById: females[0].id,
       round: 1,
+      createdAt: jstAt(-1, 20, 5),
       candidates: {
         create: [
-          { startAt: daysFromNow(5), endAt: hoursFromNow(24 * 5 + 1) },
-          { startAt: daysFromNow(7), endAt: hoursFromNow(24 * 7 + 1) },
-          { startAt: daysFromNow(9), endAt: hoursFromNow(24 * 9 + 1) },
+          { startAt: jstAt(5, 19, 0), endAt: jstAt(5, 20, 0) },
+          { startAt: jstAt(7, 19, 30), endAt: jstAt(7, 20, 30) },
+          { startAt: jstAt(9, 14, 0), endAt: jstAt(9, 15, 0) },
         ],
       },
+    },
+  });
+  await prisma.notification.create({
+    data: {
+      memberId: males[1].id,
+      type: "MATCHED",
+      title: "マッチングが成立しました",
+      body: `${females[0].nickname}さんがお申込みを承諾しました。日程候補が届くまでお待ちください。`,
+      matchId: match1.id,
+      emailSentAt: jstAt(-4, 12, 30),
+      readAt: jstAt(-4, 12, 45),
+      createdAt: jstAt(-4, 12, 30),
     },
   });
   await prisma.notification.create({
@@ -286,7 +339,8 @@ async function main() {
       title: "デート日程候補が届きました",
       body: `${females[0].nickname}さんから日程候補が3件届いています。`,
       matchId: match1.id,
-      emailSentAt: daysFromNow(-1),
+      emailSentAt: jstAt(-1, 20, 5),
+      createdAt: jstAt(-1, 20, 5),
     },
   });
 
@@ -296,7 +350,9 @@ async function main() {
       applicantId: males[1].id,
       receiverId: females[1].id,
       status: "ACCEPTED",
-      respondedAt: daysFromNow(-6),
+      message: "映画がお好きなんですね。おすすめの作品などお話しできたらうれしいです。",
+      createdAt: jstAt(-8, 22, 40),
+      respondedAt: jstAt(-7, 9, 10),
     },
   });
   const match2 = await prisma.match.create({
@@ -305,31 +361,32 @@ async function main() {
       receiverId: females[1].id,
       applicationId: app2.id,
       phase: "CONFIRMED",
-      matchedAt: daysFromNow(-6),
-      lastActionAt: daysFromNow(-2),
+      matchedAt: jstAt(-7, 9, 10),
+      lastActionAt: jstAt(-2, 21, 30),
     },
   });
   const prop2 = await prisma.scheduleProposal.create({
-    data: { matchId: match2.id, proposedById: females[1].id, round: 1 },
+    data: { matchId: match2.id, proposedById: females[1].id, round: 1, createdAt: jstAt(-6, 19, 0) },
   });
   await prisma.scheduleCandidate.create({
     data: {
       proposalId: prop2.id,
-      startAt: daysFromNow(3),
-      endAt: hoursFromNow(24 * 3 + 1),
+      startAt: jstAt(3, 14, 0),
+      endAt: jstAt(3, 15, 0),
       isSelected: true,
       selectedById: males[1].id,
-      selectedAt: daysFromNow(-2),
+      selectedAt: jstAt(-2, 21, 30),
     },
   });
   await prisma.dateEvent.create({
     data: {
       matchId: match2.id,
-      startAt: daysFromNow(3),
-      endAt: hoursFromNow(24 * 3 + 1),
+      startAt: jstAt(3, 14, 0),
+      endAt: jstAt(3, 15, 0),
       status: "SCHEDULED",
+      confirmedAt: jstAt(-2, 21, 30),
       storeId: stores[0].id,
-      storeConfirmedAt: daysFromNow(-2),
+      storeConfirmedAt: jstAt(-2, 21, 30),
       reservationName: "サツコイ！",
       notesTemplate:
         "サツコイ！（仮）で予約しています。\nお席での待ち合わせでお願い致します。\nデート時間は60分を目安にお願い致します。\nデート代金は割り勘がルールです。",
@@ -344,6 +401,7 @@ async function main() {
         amount: 5500,
         status: "SUCCEEDED",
         stripePaymentIntentId: "pi_stub_5500",
+        createdAt: jstAt(-2, 21, 30),
       },
     });
     await prisma.notification.create({
@@ -351,34 +409,60 @@ async function main() {
         memberId: m.id,
         type: "DATE_CONFIRMED",
         title: "デート日程が確定しました",
-        body: "店舗情報をアプリでご確認ください。",
+        body: "お店の情報と当日の注意事項をアプリでご確認ください。",
         matchId: match2.id,
-        emailSentAt: daysFromNow(-2),
+        emailSentAt: jstAt(-2, 21, 31),
+        readAt: jstAt(-2, 21, 40),
+        createdAt: jstAt(-2, 21, 31),
       },
     });
   }
 
   // ── マッチ③：デート実施済（アンケート回答済） ──
+  const app3 = await prisma.dateApplication.create({
+    data: {
+      applicantId: males[1].id,
+      receiverId: females[4].id,
+      status: "ACCEPTED",
+      createdAt: jstAt(-24, 20, 0),
+      respondedAt: jstAt(-23, 12, 0),
+    },
+  });
   const match3 = await prisma.match.create({
     data: {
       applicantId: males[1].id,
-      receiverId: females[1].id,
+      receiverId: females[4].id,
+      applicationId: app3.id,
       phase: "COMPLETED",
-      matchedAt: daysFromNow(-20),
-      lastActionAt: daysFromNow(-10),
+      matchedAt: jstAt(-23, 12, 0),
+      lastActionAt: jstAt(-10, 21, 0),
     },
   });
   await prisma.dateEvent.create({
     data: {
       matchId: match3.id,
-      startAt: daysFromNow(-10),
-      endAt: hoursFromNow(-24 * 10 + 1),
+      startAt: jstAt(-10, 14, 0),
+      endAt: jstAt(-10, 15, 0),
       status: "COMPLETED",
+      confirmedAt: jstAt(-14, 18, 0),
       storeId: stores[1].id,
-      storeConfirmedAt: daysFromNow(-12),
+      storeConfirmedAt: jstAt(-14, 18, 0),
       reservationName: "サツコイ！",
     },
   });
+  for (const m of [males[1], females[4]]) {
+    await prisma.payment.create({
+      data: {
+        memberId: m.id,
+        matchId: match3.id,
+        purpose: "DATE_FEE",
+        amount: 5500,
+        status: "SUCCEEDED",
+        stripePaymentIntentId: "pi_stub_5500",
+        createdAt: jstAt(-14, 18, 0),
+      },
+    });
+  }
   await prisma.surveyResponse.create({
     data: {
       matchId: match3.id,
@@ -387,11 +471,38 @@ async function main() {
       q2Satisfaction: "SATISFIED",
       q3Impression: "とても話しやすい方でした。",
       q4Intent: "WANT_AGAIN",
-      submittedAt: daysFromNow(-9),
-      sentAt: daysFromNow(-10),
-      dueAt: daysFromNow(-9),
+      submittedAt: jstAt(-10, 21, 0),
+      sentAt: jstAt(-10, 16, 0),
+      dueAt: jstAt(-9, 16, 0),
     },
   });
+
+  // ── 受け取ったお申込み（デモ会員けんた宛・お返事待ち） ──
+  const received: [number, string | null, Date][] = [
+    [2, "プロフィールを拝見しました。休日が合いそうなので、よろしければお会いしたいです。", jstAt(-1, 22, 15)],
+    [3, null, jstAt(-2, 19, 45)],
+  ];
+  for (const [fi, message, at] of received) {
+    await prisma.dateApplication.create({
+      data: {
+        applicantId: females[fi].id,
+        receiverId: males[1].id,
+        status: "PENDING",
+        message,
+        createdAt: at,
+      },
+    });
+    await prisma.notification.create({
+      data: {
+        memberId: males[1].id,
+        type: "APPLICATION_RECEIVED",
+        title: "デートのお申込みが届きました",
+        body: `${females[fi].nickname}さんからデートのお申込みが届いています。`,
+        emailSentAt: at,
+        createdAt: at,
+      },
+    });
+  }
 
   // 通報・お問い合わせ
   await prisma.report.create({
@@ -401,6 +512,7 @@ async function main() {
       type: "INAPPROPRIATE_CONTENT",
       content: "プロフィール写真が本人と異なる可能性があります。",
       status: "OPEN",
+      createdAt: jstAt(-1, 18, 20),
     },
   });
   await prisma.inquiry.create({
@@ -410,6 +522,7 @@ async function main() {
       subject: "領収書の発行について",
       body: "登録料の領収書を発行いただけますか？",
       status: "OPEN",
+      createdAt: jstAt(-1, 9, 5),
     },
   });
 
@@ -420,7 +533,7 @@ async function main() {
       body: "サツコイ！（仮）をご利用いただきありがとうございます。",
       target: "ALL",
       isPublished: true,
-      publishedAt: daysFromNow(-30),
+      publishedAt: jstAt(-30, 10, 0),
     },
   });
   await prisma.announcement.create({

@@ -8,7 +8,7 @@ import { SERVICE_NAME } from "@/lib/constants";
 export default function RegisterPage() {
   return (
     <div className="flex flex-1 flex-col">
-      <AppHeader title="新規会員登録" backHref="/" />
+      <AppHeader title="新規会員登録" backHref="/login" />
       <div className="flex-1 px-4 py-4">
         <div className="mb-4">
           <div className="flex items-center gap-2">

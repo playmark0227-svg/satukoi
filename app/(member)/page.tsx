@@ -98,8 +98,7 @@ export default async function LandingPage() {
                 成婚・同棲のお部屋探しサポート
               </h2>
               <p className="mt-1.5 text-[13px] leading-relaxed text-ink-soft">
-                提携不動産でお部屋探しをすると、お祝い金をキャッシュバック。
-                出会いから、ふたりの新生活のスタートまで伴走します。
+                提携不動産でお部屋探しをすると、お祝い金をキャッシュバック。出会いから、ふたりの新生活のスタートまで伴走します。
               </p>
             </div>
           </div>

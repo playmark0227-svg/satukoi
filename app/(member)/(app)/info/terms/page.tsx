@@ -36,7 +36,7 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="利用規約" backHref="/mypage" />
+      <AppHeader title="利用規約" backHref="/menu" />
 
       <div className="space-y-4 px-4 py-4">
         <p className="text-xs text-ink-faint">最終更新日：2026年6月25日</p>

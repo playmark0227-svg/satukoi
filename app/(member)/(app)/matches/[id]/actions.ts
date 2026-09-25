@@ -44,8 +44,9 @@ export async function proposeCandidates(formData: FormData) {
     const start = String(formData.get(`start_${key}`) ?? "");
     const end = String(formData.get(`end_${key}`) ?? "");
     if (!date || !start || !end) continue;
-    const startAt = new Date(`${date}T${start}`);
-    const endAt = new Date(`${date}T${end}`);
+    // 入力は日本時間の壁時計。サーバーのタイムゾーン（UTC 等）に依存しないよう +09:00 を明示
+    const startAt = new Date(`${date}T${start}:00+09:00`);
+    const endAt = new Date(`${date}T${end}:00+09:00`);
     if (Number.isNaN(startAt.getTime()) || Number.isNaN(endAt.getTime())) continue;
     candidates.push({ startAt, endAt });
   }

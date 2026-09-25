@@ -14,7 +14,7 @@ const ROWS: { label: string; value: string }[] = [
 export default function CompanyPage() {
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="運営会社" backHref="/mypage" />
+      <AppHeader title="運営会社" backHref="/menu" />
 
       <div className="space-y-4 px-4 py-4">
         <Card>
@@ -29,14 +29,9 @@ export default function CompanyPage() {
         <Card>
           <CardBody className="divide-y divide-line py-1">
             {ROWS.map((r) => (
-              <div
-                key={r.label}
-                className="flex items-start justify-between gap-3 py-3"
-              >
-                <span className="shrink-0 text-sm text-ink-soft">{r.label}</span>
-                <span className="text-right text-sm font-medium text-ink">
-                  {r.value}
-                </span>
+              <div key={r.label} className="grid grid-cols-[6.5rem_1fr] gap-3 py-3">
+                <span className="text-sm text-ink-soft">{r.label}</span>
+                <span className="text-sm font-medium leading-relaxed text-ink">{r.value}</span>
               </div>
             ))}
           </CardBody>

@@ -25,6 +25,7 @@
   --color-success-soft: #e9f9ef;
   --color-warning: #f59e0b;
   --color-warning-soft: #fef3e2;
+  --color-warning-strong: #b45309; /* 淡い警告背景の上に載せる文字色（コントラスト確保） */
   --color-danger: #ef4444;
   --color-danger-soft: #feecec;
   --color-info: #3b82f6;
@@ -57,7 +58,16 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* 日本語の改行品質：行頭禁則を厳格にし、文節の途中で折り返さない
+     （auto-phrase 非対応ブラウザは通常の改行にフォールバック） */
+  line-break: strict;
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
 }
+
+/* 見出しは行長をそろえ、本文は最終行の1文字だけの行を避ける */
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li, dd { text-wrap: pretty; }
 
 /* ── タイポグラフィ・ユーティリティ ── */
 .text-display {
@@ -108,6 +118,10 @@ body {
 .stagger > *:nth-child(10) { animation-delay: 290ms; }
 .stagger > *:nth-child(11) { animation-delay: 320ms; }
 .stagger > *:nth-child(12) { animation-delay: 350ms; }
+
+/* details の既定の三角マーカーは使わない（各所でシェブロン等を明示） */
+summary { list-style: none; }
+summary::-webkit-details-marker { display: none; }
 
 /* FAQ など details の中身をふわっと */
 details[open] .details-body { animation: fade-up 0.3s cubic-bezier(0.22, 0.8, 0.2, 1) both; }

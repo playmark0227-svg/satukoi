@@ -13,6 +13,22 @@ export async function applyToUser(formData: FormData) {
   const targetId = String(formData.get("targetId"));
   const message = String(formData.get("message") ?? "").trim();
 
+  // 二重申込みの防止：マッチ中ならその画面へ、どちらかの申込みがお返事待ちならお申込み一覧へ
+  const pair = [
+    { applicantId: me.id, receiverId: targetId },
+    { applicantId: targetId, receiverId: me.id },
+  ];
+  const active = await prisma.match.findFirst({
+    where: { phase: { in: ["SCHEDULING", "CONFIRMED"] }, OR: pair },
+    select: { id: true },
+  });
+  if (active) redirect(`/matches/${active.id}`);
+  const pending = await prisma.dateApplication.findFirst({
+    where: { status: "PENDING", OR: pair },
+    select: { id: true },
+  });
+  if (pending) redirect("/applications");
+
   await prisma.dateApplication.create({
     data: {
       applicantId: me.id,
@@ -29,8 +45,8 @@ export async function applyToUser(formData: FormData) {
     body: `${me.nickname}さんからデートのお申込みが届いています。`,
   });
 
-  revalidatePath("/matches");
-  redirect("/matches");
+  revalidatePath("/applications");
+  redirect("/applications?tab=sent");
 }
 
 /** ブロック：双方に今後非表示。Block を upsert。 */

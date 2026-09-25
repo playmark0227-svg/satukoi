@@ -138,7 +138,7 @@ export function RegisterWizard({
               <Input
                 type="password"
                 name="password"
-                placeholder="••••••••"
+                placeholder="パスワードを入力"
                 value={f.password}
                 onChange={(e) => set("password", e.target.value)}
               />
@@ -154,7 +154,7 @@ export function RegisterWizard({
                 type="text"
                 name="cardNumber"
                 inputMode="numeric"
-                placeholder="4242 4242 4242 4242"
+                placeholder="1234 5678 9012 3456"
                 value={f.cardNumber}
                 onChange={(e) => set("cardNumber", e.target.value)}
               />

@@ -7,7 +7,27 @@ import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import type { AnnouncementTarget } from "@prisma/client";
+import Link from "next/link";
+import {
+  IconBell,
+  IconCalendar,
+  IconChat,
+  IconCheck,
+  IconHeart,
+  IconSend,
+} from "@/components/member/icons";
+import type { AnnouncementTarget, NotificationType } from "@prisma/client";
+
+const TYPE_ICON: Record<NotificationType, (p: { className?: string }) => React.ReactNode> = {
+  APPLICATION_RECEIVED: IconSend,
+  MATCHED: IconHeart,
+  CANDIDATE_RECEIVED: IconCalendar,
+  DATE_CONFIRMED: IconCheck,
+  DAY_OF_CONTACT: IconChat,
+  DATE_CANCELLED: IconCalendar,
+  RESCHEDULE_REQUEST: IconCalendar,
+  ADMIN_ANNOUNCEMENT: IconBell,
+};
 import { markAllRead } from "./actions";
 
 export default async function NotificationsPage() {
@@ -34,6 +54,7 @@ export default async function NotificationsPage() {
     <div className="flex flex-1 flex-col pb-10">
       <AppHeader
         title="お知らせ"
+        backHref="/users"
         right={
           hasUnread ? (
             <form action={markAllRead}>
@@ -45,65 +66,91 @@ export default async function NotificationsPage() {
         }
       />
 
-      <div className="space-y-4 px-4 py-4">
-        {/* 通知一覧 */}
-        <div>
+      <div className="space-y-5 px-4 py-4">
+        {/* 通知一覧（タップで該当画面へ） */}
+        <section>
           <SectionTitle>通知</SectionTitle>
           {notifications.length === 0 ? (
             <Card>
               <EmptyState
-                icon="🔔"
+                icon={<IconBell className="h-6 w-6 text-ink-faint" />}
                 title="お知らせはありません"
                 description="新しい通知が届くとここに表示されます。"
               />
             </Card>
           ) : (
-            <div className="stagger space-y-2">
+            <ul className="stagger divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line/80 bg-surface shadow-[var(--shadow-card)]">
               {notifications.map((n) => {
                 const unread = n.readAt === null;
-                return (
-                  <Card key={n.id} className={unread ? "overflow-hidden" : ""}>
-                    {unread && (
-                      <span className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-primary" />
-                    )}
-                    <CardBody className="space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          {unread && (
-                            <span className="h-2 w-2 shrink-0 rounded-full bg-danger" />
-                          )}
-                          <Badge tone={unread ? "primary" : "neutral"}>
-                            {NOTIFICATION_TYPE_LABELS[n.type]}
-                          </Badge>
-                        </div>
-                        <span className="shrink-0 text-xs text-ink-faint">
+                const href =
+                  n.type === "APPLICATION_RECEIVED"
+                    ? "/applications"
+                    : n.matchId
+                      ? `/matches/${n.matchId}`
+                      : null;
+                const Icon = TYPE_ICON[n.type];
+                const body = (
+                  <>
+                    <span
+                      className={
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full " +
+                        (unread ? "bg-primary-soft text-primary-strong" : "bg-surface-alt text-ink-faint")
+                      }
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="truncate text-[11px] font-bold text-ink-faint">
+                          {NOTIFICATION_TYPE_LABELS[n.type]}
+                        </span>
+                        <span className="num-tnum shrink-0 text-[11px] text-ink-faint">
                           {fromNow(n.createdAt)}
                         </span>
-                      </div>
-                      <p className="text-sm font-bold text-ink">{n.title}</p>
-                      <p className="text-sm leading-relaxed text-ink-soft">
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-1.5">
+                        {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                        <span className={"text-sm text-ink " + (unread ? "font-bold" : "font-medium")}>
+                          {n.title}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block text-[13px] leading-relaxed text-ink-soft">
                         {n.body}
-                      </p>
-                    </CardBody>
-                  </Card>
+                      </span>
+                    </span>
+                  </>
+                );
+                return (
+                  <li key={n.id}>
+                    {href ? (
+                      <Link
+                        href={href}
+                        className="flex gap-3 px-4 py-3.5 transition-colors hover:bg-canvas active:bg-surface-alt"
+                      >
+                        {body}
+                      </Link>
+                    ) : (
+                      <div className="flex gap-3 px-4 py-3.5">{body}</div>
+                    )}
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           )}
-        </div>
+        </section>
 
         {/* 運営からのお知らせ */}
         {announcements.length > 0 && (
-          <div>
+          <section>
             <SectionTitle>運営からのお知らせ</SectionTitle>
             <div className="stagger space-y-2">
               {announcements.map((a) => (
                 <Card key={a.id}>
                   <CardBody className="space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <Badge tone="info">運営からのお知らせ</Badge>
+                      <Badge tone="info">お知らせ</Badge>
                       {a.publishedAt && (
-                        <span className="shrink-0 text-xs text-ink-faint">
+                        <span className="num-tnum shrink-0 text-[11px] text-ink-faint">
                           {formatDate(a.publishedAt)}
                         </span>
                       )}
@@ -116,7 +163,7 @@ export default async function NotificationsPage() {
                 </Card>
               ))}
             </div>
-          </div>
+          </section>
         )}
       </div>
     </div>

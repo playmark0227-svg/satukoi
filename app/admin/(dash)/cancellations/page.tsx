@@ -74,8 +74,7 @@ export default async function AdminCancellationsPage() {
         キャンセル・ペナルティ
       </h1>
       <p className="mb-4 text-sm text-ink-soft">
-        デートのキャンセル履歴を確認し、警告点の付与・利用停止・強制退会を行います（全 {cancellations.length} 件）。
-        1年以内に警告 {WARNING_RULES.FORCED_WITHDRAWAL_POINTS} 点以上で強制退会の対象です。
+        {`デートのキャンセル履歴を確認し、警告点の付与・利用停止・強制退会を行います（全 ${cancellations.length} 件）。1年以内に警告 ${WARNING_RULES.FORCED_WITHDRAWAL_POINTS} 点以上で強制退会の対象です。`}
       </p>
 
       {cancellations.length === 0 ? (

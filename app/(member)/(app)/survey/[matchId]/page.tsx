@@ -12,6 +12,8 @@ import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Textarea } from "@/components/ui/Input";
+import { IconCheck } from "@/components/member/icons";
+import { formatDateTime } from "@/lib/format";
 import { submitSurvey } from "./actions";
 
 /** ラジオボタン群（選択式設問） */
@@ -92,16 +94,20 @@ export default async function SurveyPage({
 
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="デート後アンケート" backHref="/matches" />
+      <AppHeader title="デート後アンケート" backHref={`/matches/${match.id}`} />
 
       <div className="px-4 py-4">
         <Card className="mb-4">
           <CardBody>
             <p className="text-sm leading-relaxed text-ink-soft">
-              {partner.nickname}さんとのデート、お疲れさまでした。
-              今後のサービス改善のため、5つの質問にお答えください。
-              ご回答内容はお相手には公開されません。
+              {`${partner.nickname}さんとのデート、お疲れさまでした。今後のサービス改善のため、5つの質問にお答えください。ご回答内容はお相手には公開されません。`}
             </p>
+            {existing?.submittedAt && (
+              <p className="mt-3 flex items-center gap-1.5 rounded-xl bg-success-soft px-3 py-2 text-xs font-bold text-success">
+                <IconCheck className="h-3.5 w-3.5" />
+                {`${formatDateTime(existing.submittedAt)} に回答済みです。内容を修正して再送信できます。`}
+              </p>
+            )}
           </CardBody>
         </Card>
 
@@ -158,7 +164,7 @@ export default async function SurveyPage({
           </Field>
 
           <Button type="submit" variant="primary" size="lg">
-            アンケートを送信する
+            {existing?.submittedAt ? "回答を更新する" : "アンケートを送信する"}
           </Button>
         </form>
       </div>

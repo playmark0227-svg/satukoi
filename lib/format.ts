@@ -1,7 +1,15 @@
-import dayjs from "dayjs";
+import dayjsBase from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/ja";
 
-dayjs.locale("ja");
+dayjsBase.extend(utc);
+dayjsBase.extend(timezone);
+dayjsBase.locale("ja");
+
+/** 表示は常に日本時間。サーバー（UTC 等）や閲覧端末のタイムゾーンに左右されない。 */
+export const APP_TIME_ZONE = "Asia/Tokyo";
+const dayjs = (d?: Date | string) => dayjsBase(d).tz(APP_TIME_ZONE);
 
 /** 生年月日から年齢を自動算出 */
 export function calcAge(birthDate: Date | string): number {

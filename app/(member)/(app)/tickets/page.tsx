@@ -44,53 +44,92 @@ export default async function TicketsPage() {
             </CardBody>
           </Card>
         ) : (
-          <section>
-            <div className="mb-2 flex items-center justify-between px-1">
-              <h2 className="text-[15px] font-bold text-ink">保有ギフト券</h2>
-              <span className="num-tnum text-xs text-ink-faint">
-                {tickets.length}枚
-              </span>
-            </div>
-            <div className="stagger space-y-3">
-              {tickets.map((t) => (
-                <Card
-                  key={t.id}
-                  className={t.status !== "ACTIVE" ? "opacity-60" : undefined}
-                >
-                  <CardBody className="pb-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="num-tnum text-2xl font-black text-ink">
-                        ¥{t.amount.toLocaleString("ja-JP")}
-                        <span className="ml-1.5 align-middle text-xs font-bold text-ink-faint">
-                          {GIFT_TICKET_REASON_LABELS[t.reason]}
-                        </span>
-                      </p>
-                      <Badge tone={t.status === "ACTIVE" ? "success" : "neutral"}>
-                        {GIFT_TICKET_STATUS_LABELS[t.status]}
-                      </Badge>
-                    </div>
-                    {/* 金券らしい切り取り線 */}
-                    <div className="mt-3 border-t border-dashed border-line" />
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-bold text-ink-faint">
-                          店頭提示コード
-                        </p>
-                        <p className="mt-0.5 font-mono text-sm font-bold tracking-wide text-ink">
-                          {t.code}
-                        </p>
-                      </div>
-                      <p className="num-tnum shrink-0 text-xs text-ink-faint">
-                        有効期限 {t.expiresAt ? formatDate(t.expiresAt) : "なし"}
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
-          </section>
+          <>
+            <TicketSection
+              title="利用可能"
+              tickets={tickets.filter((t) => t.status === "ACTIVE")}
+              empty="利用できるギフト券はありません。"
+            />
+            {tickets.some((t) => t.status !== "ACTIVE") && (
+              <TicketSection
+                title="使用済み・期限切れ"
+                tickets={tickets.filter((t) => t.status !== "ACTIVE")}
+                muted
+              />
+            )}
+          </>
         )}
       </div>
     </div>
+  );
+}
+
+type Ticket = Awaited<ReturnType<typeof prisma.giftTicket.findMany>>[number];
+
+function TicketSection({
+  title,
+  tickets,
+  muted = false,
+  empty,
+}: {
+  title: string;
+  tickets: Ticket[];
+  muted?: boolean;
+  empty?: string;
+}) {
+  return (
+    <section>
+      <div className="mb-2 flex items-center justify-between px-1">
+        <h2 className="text-sm font-bold text-ink-soft">{title}</h2>
+        <span className="num-tnum text-xs text-ink-faint">{tickets.length}枚</span>
+      </div>
+      {tickets.length === 0 ? (
+        <p className="rounded-[var(--radius-card)] border border-dashed border-line px-4 py-6 text-center text-xs text-ink-faint">
+          {empty}
+        </p>
+      ) : (
+        <div className="stagger space-y-3">
+          {tickets.map((t) => (
+            <Card key={t.id}>
+              {/* stagger のアニメーションが opacity を上書きするため、減光は内側で行う */}
+              <CardBody className={muted ? "pb-3 opacity-55 grayscale" : "pb-3"}>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="num-tnum text-2xl font-black text-ink">
+                    {t.amount.toLocaleString("ja-JP")}
+                    <span className="text-base">円</span>
+                    <span className="ml-2 align-middle text-xs font-bold text-ink-faint">
+                      {GIFT_TICKET_REASON_LABELS[t.reason]}
+                    </span>
+                  </p>
+                  <Badge tone={t.status === "ACTIVE" ? "success" : "neutral"}>
+                    {GIFT_TICKET_STATUS_LABELS[t.status]}
+                  </Badge>
+                </div>
+                {/* 金券らしい切り取り線 */}
+                <div className="relative mt-3 border-t border-dashed border-line">
+                  <span className="absolute -left-6 -top-2 h-4 w-4 rounded-full border border-line/80 bg-canvas" />
+                  <span className="absolute -right-6 -top-2 h-4 w-4 rounded-full border border-line/80 bg-canvas" />
+                </div>
+                <div className="mt-3 flex items-end justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold text-ink-faint">店頭提示コード</p>
+                    <p className="mt-0.5 font-mono text-[15px] font-bold tracking-wider text-ink">
+                      {t.code}
+                    </p>
+                  </div>
+                  <p className="num-tnum shrink-0 text-xs text-ink-faint">
+                    {t.status === "USED" && t.usedAt
+                      ? `${formatDate(t.usedAt)} 使用`
+                      : t.expiresAt
+                        ? `有効期限 ${formatDate(t.expiresAt)}`
+                        : "有効期限なし"}
+                  </p>
+                </div>
+              </CardBody>
+            </Card>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

@@ -18,7 +18,7 @@ export default async function ContactPage({
   if (sent === "1") {
     return (
       <div className="flex flex-1 flex-col pb-10">
-        <AppHeader title="お問い合わせ" backHref="/mypage" />
+        <AppHeader title="お問い合わせ" backHref="/menu" />
         <div className="px-4 py-4">
           <Card>
             <EmptyState
@@ -39,7 +39,7 @@ export default async function ContactPage({
 
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="お問い合わせ" backHref="/mypage" />
+      <AppHeader title="お問い合わせ" backHref="/menu" />
 
       <div className="px-4 py-4">
         <Card>

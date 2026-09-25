@@ -20,7 +20,7 @@ export const Textarea = forwardRef<
   return (
     <textarea
       ref={ref}
-      className={cn(fieldClass, "h-auto min-h-24 py-2.5 leading-relaxed", className)}
+      className={cn(fieldClass, "h-auto min-h-24 resize-none py-2.5 leading-relaxed", className)}
       {...props}
     />
   );

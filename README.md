@@ -82,11 +82,11 @@ npm run dev            # http://localhost:3000
 
 | 種別 | メール | パスワード |
 | --- | --- | --- |
-| 会員（男性） | `male0@satukoi.local` 〜 `male5@satukoi.local` | `password` |
-| 会員（女性） | `female0@satukoi.local` 〜 `female5@satukoi.local` | `password` |
+| 会員（男性） | `kenta@example.com`（デモ会員）ほか `daisuke` / `sho` / `ryo` / `takuya` / `shu` `@example.com` | `password` |
+| 会員（女性） | `misaki` / `aoi` / `yui` / `nanami` / `mao` / `ayaka` `@example.com` | `password` |
 | 運営（管理画面） | `admin@satukoi.local` | `password` |
 
-> `male0` はサロン（結婚相談所）会員。会員ログインは `/login`、運営は `/admin/login`。
+> `daisuke@example.com` はサロン（結婚相談所）会員。会員ログインは `/login`、運営は `/admin/login`。
 
 ### npm スクリプト
 

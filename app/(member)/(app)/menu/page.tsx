@@ -14,6 +14,10 @@ import {
   IconShield,
   IconBuilding,
   IconSparkle,
+  IconTicket,
+  IconSend,
+  IconCoffee,
+  IconChevronRight,
 } from "@/components/member/icons";
 
 function SectionHeader({ label }: { label: string }) {
@@ -47,9 +51,7 @@ function MenuRow({
           <span className="mt-0.5 block text-xs text-ink-faint">{subtitle}</span>
         )}
       </span>
-      <span className="text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5">
-        ›
-      </span>
+      <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5" />
     </Link>
   );
 }
@@ -67,6 +69,22 @@ export default async function MenuPage() {
         <MenuRow href="/mypage/edit" icon={<IconUser className={ink} />} label="プロフィール設定" />
         <MenuRow href="/payments" icon={<IconCard className={ink} />} label="決済履歴" />
         <MenuRow href="/settings/notifications" icon={<IconBell className={ink} />} label="通知設定" />
+      </div>
+
+      <SectionHeader label="デート" />
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
+        <MenuRow
+          href="/applications"
+          icon={<IconSend className={ink} />}
+          label="お申込み"
+          subtitle="受け取った申込・送った申込"
+        />
+        <MenuRow
+          href="/partners"
+          icon={<IconCoffee className={ink} />}
+          label="提携パートナー"
+          subtitle="デートで使う提携カフェ・特典"
+        />
       </div>
 
       <SectionHeader label="相談" />
@@ -89,7 +107,7 @@ export default async function MenuPage() {
         />
         <MenuRow
           href="/tickets"
-          icon={<IconCard className={ink} />}
+          icon={<IconTicket className={ink} />}
           label="ギフト券"
           subtitle="提携店で使える金券"
         />

@@ -21,7 +21,7 @@ export default async function AdvisorPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <AppHeader title="AIアドバイザー" backHref="/menu" />
+      <AppHeader title="AIアドバイザー" backHref="/users" />
       <AdvisorChat
         nickname={me.nickname}
         stats={{ matchCount, sentCount, receivedCount }}

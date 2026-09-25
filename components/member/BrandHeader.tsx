@@ -11,7 +11,7 @@ export function BrandHeader({
   bell?: boolean;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-surface/95 px-4 backdrop-blur-lg">
+    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-surface px-4">
       <div className="flex items-center gap-2">
         <BrandMark className="h-8 w-8" />
         <span className="text-[18px] font-black tracking-tight text-ink">

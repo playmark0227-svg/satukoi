@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { AD_TYPE_LABELS, AD_POSITION_LABELS } from "@/lib/constants";
 import { formatDateTime } from "@/lib/format";
 import { createAd, toggleAd } from "./actions";
+import { AdImage } from "@/components/member/AdImage";
 
 
 const TYPE_VALUES = Object.keys(
@@ -146,12 +147,7 @@ export default async function AdminAdsPage() {
 
                   {/* バナープレビュー */}
                   <div className="mt-3 overflow-hidden rounded-xl border border-line bg-canvas">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={ad.imageUrl}
-                      alt={ad.title}
-                      className="block h-auto w-full"
-                    />
+                    <AdImage url={ad.imageUrl} title={ad.title} />
                   </div>
 
                   <dl className="mt-2 space-y-1 text-xs text-ink-soft">

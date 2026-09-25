@@ -12,7 +12,7 @@ const tones: Record<Tone, string> = {
   neutral: "bg-surface-alt text-ink-soft",
   primary: "bg-primary-soft text-primary-strong",
   success: "bg-success-soft text-success",
-  warning: "bg-warning-soft text-warning",
+  warning: "bg-warning-soft text-warning-strong",
   danger: "bg-danger-soft text-danger",
   info: "bg-info-soft text-info",
 };

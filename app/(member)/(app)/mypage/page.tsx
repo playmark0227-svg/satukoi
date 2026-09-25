@@ -6,7 +6,6 @@ import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
 import { Avatar } from "@/components/ui/Avatar";
 import { ButtonLink } from "@/components/ui/Button";
-import { CountUp } from "@/components/ui/CountUp";
 import {
   IconPencil,
   IconHeart,
@@ -14,12 +13,13 @@ import {
   IconChat,
   IconCrown,
   IconBuilding,
+  IconChevronRight,
 } from "@/components/member/icons";
 
 function Stat({ n, label, color }: { n: number; label: string; color: string }) {
   return (
     <div className="flex flex-col items-center">
-      <CountUp value={n} className={`text-display num-tnum text-3xl font-medium ${color}`} />
+      <span className={`text-display num-tnum text-3xl font-medium ${color}`}>{n}</span>
       <span className="mt-1 text-xs text-ink-soft">{label}</span>
     </div>
   );
@@ -47,9 +47,7 @@ function Row({
         {icon}
       </span>
       <span className="flex-1 text-sm font-medium text-ink">{label}</span>
-      <span className="text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5">
-        ›
-      </span>
+      <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5" />
     </Link>
   );
 }
@@ -106,7 +104,7 @@ export default async function MyPage() {
                 {me.nickname}
               </p>
               <p className="num-tnum mt-1 text-sm text-ink-soft">
-                {calcAge(me.birthDate)}歳 / {RESIDENCE_AREA_LABELS[me.residenceArea]}
+                {calcAge(me.birthDate)}歳・{RESIDENCE_AREA_LABELS[me.residenceArea]}
               </p>
             </div>
           </div>

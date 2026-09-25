@@ -77,9 +77,12 @@ export default async function AdminStoresPage() {
                     </form>
                   </div>
 
-                  <details className="mt-3 border-t border-line pt-3">
-                    <summary className="cursor-pointer text-sm font-bold text-primary">
+                  <details className="group mt-3 border-t border-line pt-3">
+                    <summary className="inline-flex cursor-pointer items-center gap-1 text-sm font-bold text-primary-strong">
                       この店舗を編集
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 transition-transform duration-200 group-open:rotate-90" aria-hidden>
+                        <path d="M9 5l7 7-7 7" />
+                      </svg>
                     </summary>
                     <form action={updateStore} className="mt-3 space-y-3">
                       <input type="hidden" name="id" value={store.id} />

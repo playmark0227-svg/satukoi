@@ -47,9 +47,9 @@ const DOC_TYPES = ["ID_DOCUMENT", "SINGLE_CERT", "INCOME_CERT"] as const;
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 px-4 py-2.5">
-      <span className="shrink-0 text-sm text-ink-soft">{label}</span>
-      <span className="text-right text-sm font-medium text-ink">{value}</span>
+    <div className="grid grid-cols-[9rem_1fr] items-start gap-4 px-4 py-2.5">
+      <span className="text-sm text-ink-soft">{label}</span>
+      <span className="text-sm font-medium leading-relaxed text-ink">{value}</span>
     </div>
   );
 }

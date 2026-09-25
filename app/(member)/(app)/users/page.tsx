@@ -14,6 +14,7 @@ import {
   IconSparkle,
   BadgeVerified,
   BadgeCrown,
+  IconChevronRight,
 } from "@/components/member/icons";
 import type { Prisma, ResidenceArea } from "@prisma/client";
 
@@ -118,7 +119,7 @@ export default async function UsersPage({
           <span className="flex-1 text-[13.5px] font-bold text-ink">
             AIアドバイザーに相談する
           </span>
-          <span className="text-ink-faint">›</span>
+          <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint" />
         </Link>
 
         {/* セクション見出し */}

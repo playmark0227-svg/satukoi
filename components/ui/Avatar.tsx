@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { useImageFailed } from "./useImageFailed";
 
 /**
  * 顔写真サムネイル。url が無い／読み込み失敗時はニックネーム頭文字のプレースホルダ。
+ * 頭文字を常に下層に敷き、写真はその上に重ねる（失敗しても崩れた表示を出さない）。
+ * 名前は必ず隣に表示されるため、写真自体は装飾扱い（alt=""）。
  */
 export function Avatar({
   url,
@@ -17,28 +19,27 @@ export function Avatar({
   className?: string;
   rounded?: "full" | "xl";
 }) {
-  const [error, setError] = useState(false);
+  const { failed, ref, onError } = useImageFailed();
   const radius = rounded === "full" ? "rounded-full" : "rounded-2xl";
-  const showImg = url && !error;
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden bg-surface-alt flex items-center justify-center text-ink-faint font-bold",
+        "relative shrink-0 overflow-hidden bg-surface-alt flex items-center justify-center text-ink-faint font-bold",
         radius,
         className
       )}
     >
-      {showImg ? (
+      <span aria-hidden>{name?.[0] ?? "?"}</span>
+      {url && !failed && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
+          ref={ref}
           src={url}
-          alt={name ?? ""}
-          onError={() => setError(true)}
-          className="h-full w-full object-cover"
+          alt=""
+          onError={onError}
+          className="absolute inset-0 h-full w-full object-cover"
         />
-      ) : (
-        <span>{name?.[0] ?? "?"}</span>
       )}
     </div>
   );
