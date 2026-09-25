@@ -2,7 +2,9 @@ import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fromNow, formatDate } from "@/lib/format";
 import { AppHeader } from "@/components/member/AppHeader";
-import { BrandMark } from "@/components/member/BrandMark";
+import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import Link from "next/link";
 import {
@@ -27,16 +29,6 @@ const TYPE_ICON: Record<NotificationType, (p: { className?: string }) => React.R
 };
 import { markAllRead } from "./actions";
 
-/** 通知日時を「今日／今週／今月／それ以前」に分類（日本時間の日付で判定） */
-function periodLabel(d: Date) {
-  const day = (t: number) => Math.floor((t + 9 * 3_600_000) / 86_400_000);
-  const diff = day(Date.now()) - day(d.getTime());
-  if (diff <= 0) return "今日";
-  if (diff < 7) return "今週";
-  if (diff < 30) return "今月";
-  return "それ以前";
-}
-
 export default async function NotificationsPage() {
   const me = await requireMember();
 
@@ -57,13 +49,6 @@ export default async function NotificationsPage() {
 
   const hasUnread = notifications.some((n) => n.readAt === null);
 
-  // Instagram のアクティビティのように期間でまとめる
-  const groups = new Map<string, typeof notifications>();
-  for (const n of notifications) {
-    const key = periodLabel(n.createdAt);
-    groups.set(key, [...(groups.get(key) ?? []), n]);
-  }
-
   return (
     <div className="flex flex-1 flex-col pb-10">
       <AppHeader
@@ -72,26 +57,29 @@ export default async function NotificationsPage() {
         right={
           hasUnread ? (
             <form action={markAllRead}>
-              <button type="submit" className="text-[13px] font-semibold text-primary active:opacity-60">
+              <Button type="submit" variant="ghost" size="sm" className="px-2 text-xs">
                 すべて既読
-              </button>
+              </Button>
             </form>
           ) : undefined
         }
       />
 
-      {notifications.length === 0 ? (
-        <EmptyState
-          icon={<IconBell className="h-6 w-6 text-ink" />}
-          title="お知らせはありません"
-          description="新しい通知が届くとここに表示されます。"
-        />
-      ) : (
-        [...groups.entries()].map(([label, items]) => (
-          <section key={label} className="border-b border-line-soft pb-2 pt-3">
-            <h2 className="px-4 pb-1 text-base font-bold text-ink">{label}</h2>
-            <ul className="stagger">
-              {items.map((n) => {
+      <div className="space-y-5 px-4 py-4">
+        {/* 通知一覧（タップで該当画面へ） */}
+        <section>
+          <SectionTitle>通知</SectionTitle>
+          {notifications.length === 0 ? (
+            <Card>
+              <EmptyState
+                icon={<IconBell className="h-6 w-6 text-ink-faint" />}
+                title="お知らせはありません"
+                description="新しい通知が届くとここに表示されます。"
+              />
+            </Card>
+          ) : (
+            <ul className="stagger divide-y divide-line overflow-hidden rounded-[var(--radius-card)] border border-line/80 bg-surface shadow-[var(--shadow-card)]">
+              {notifications.map((n) => {
                 const unread = n.readAt === null;
                 const href =
                   n.type === "APPLICATION_RECEIVED"
@@ -102,64 +90,79 @@ export default async function NotificationsPage() {
                 const Icon = TYPE_ICON[n.type];
                 const body = (
                   <>
-                    <span className={unread ? "story-ring shrink-0" : "story-ring-seen shrink-0"}>
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface text-ink">
-                        <Icon className="h-5 w-5" />
+                    <span
+                      className={
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-full " +
+                        (unread ? "bg-primary-soft text-primary-strong" : "bg-surface-alt text-ink-faint")
+                      }
+                    >
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-start justify-between gap-2">
+                        <span className={"text-sm text-ink " + (unread ? "font-bold" : "font-medium")}>
+                          {n.title}
+                        </span>
+                        <span className="num-tnum mt-0.5 flex shrink-0 items-center gap-1.5 text-[11px] text-ink-faint">
+                          {fromNow(n.createdAt)}
+                          {unread && (
+                            <span className="h-2 w-2 rounded-full bg-primary" aria-label="未読" />
+                          )}
+                        </span>
+                      </span>
+                      <span className="mt-0.5 block text-[13px] leading-relaxed text-ink-soft">
+                        {n.body}
                       </span>
                     </span>
-                    <span className="min-w-0 flex-1 text-sm leading-snug text-ink">
-                      <span className="font-semibold">{n.title}</span>
-                      <span className="text-ink"> {n.body}</span>
-                      <span className="num-tnum whitespace-nowrap text-ink-soft"> {fromNow(n.createdAt)}</span>
-                    </span>
-                    {href && unread && (
-                      <span className="shrink-0 rounded-lg bg-primary px-3.5 py-1.5 text-[13px] font-semibold text-white">
-                        確認
-                      </span>
-                    )}
                   </>
                 );
                 return (
                   <li key={n.id}>
                     {href ? (
-                      <Link href={href} className="flex items-center gap-3 px-4 py-2.5 active:bg-surface-alt">
+                      <Link
+                        href={href}
+                        className="flex gap-3 px-4 py-3.5 transition-colors hover:bg-canvas active:bg-surface-alt"
+                      >
                         {body}
                       </Link>
                     ) : (
-                      <div className="flex items-center gap-3 px-4 py-2.5">{body}</div>
+                      <div className="flex gap-3 px-4 py-3.5">{body}</div>
                     )}
                   </li>
                 );
               })}
             </ul>
-          </section>
-        ))
-      )}
-
-      {/* 運営からのお知らせ */}
-      {announcements.length > 0 && (
-        <section className="pt-3">
-          <h2 className="px-4 pb-1 text-base font-bold text-ink">運営からのお知らせ</h2>
-          <ul>
-            {announcements.map((a) => (
-              <li key={a.id} className="flex items-start gap-3 px-4 py-2.5">
-                <span className="story-ring-seen shrink-0 self-start">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface">
-                    <BrandMark className="h-6 w-6" />
-                  </span>
-                </span>
-                <span className="min-w-0 flex-1 text-sm leading-snug text-ink">
-                  <span className="font-semibold">{a.title}</span>
-                  <span className="whitespace-pre-wrap"> {a.body}</span>
-                  {a.publishedAt && (
-                    <span className="num-tnum whitespace-nowrap text-ink-soft"> {formatDate(a.publishedAt)}</span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
+          )}
         </section>
-      )}
+
+        {/* 運営からのお知らせ */}
+        {announcements.length > 0 && (
+          <section>
+            <SectionTitle>運営からのお知らせ</SectionTitle>
+            <div className="stagger space-y-2">
+              {announcements.map((a) => (
+                <Card key={a.id}>
+                  <CardBody className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge tone="info">お知らせ</Badge>
+                      {a.publishedAt && (
+                        <span className="num-tnum shrink-0 text-[11px] text-ink-faint">
+                          {formatDate(a.publishedAt)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm font-bold text-ink">{a.title}</p>
+                    <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-soft">
+                      {a.body}
+                    </p>
+                  </CardBody>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
+

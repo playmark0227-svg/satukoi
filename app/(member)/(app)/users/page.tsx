@@ -1,20 +1,18 @@
-import Link from "next/link";
 import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { calcAge } from "@/lib/format";
 import { compatScore } from "@/lib/compat";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { BrandHeader } from "@/components/member/BrandHeader";
-import { Avatar } from "@/components/ui/Avatar";
-import { UserFeed, type FeedUser } from "@/components/member/browse/UserFeed";
+import { BrandMark } from "@/components/member/BrandMark";
+import { UserGrid, type GridUser } from "@/components/member/browse/UserGrid";
 
-/** この日数以内に登録した会員を「新着」としてストーリーの輪で強調 */
+/** この日数以内に登録した会員に「NEW」を付ける */
 const NEW_DAYS = 14;
 const isNewMember = (createdAt: Date) => createdAt.getTime() >= Date.now() - NEW_DAYS * 86_400_000;
 
 /**
- * ホーム（Instagram 風）：上に新着のお相手（ストーリー）、下にAI相性順のフィード。
- * 異性のみ・有効会員・自分以外・ブロック関係（双方）を除外。
+ * さがす（ホーム）：異性のみ・有効会員・自分以外・ブロック関係（双方）を除外して一覧表示。
  * searchParams（ageMin / ageMax / area）は絞り込みの初期値として使う。
  */
 export default async function UsersPage({
@@ -59,24 +57,20 @@ export default async function UsersPage({
         phase: { in: ["SCHEDULING", "CONFIRMED"] },
         OR: [{ applicantId: me.id }, { receiverId: me.id }],
       },
-      select: { id: true, applicantId: true, receiverId: true },
+      select: { applicantId: true, receiverId: true },
     }),
   ]);
 
-  const relation = new Map<string, FeedUser["relation"]>();
-  for (const a of myPending) {
-    relation.set(a.receiverId, { label: "申込済み", cta: "お返事待ち", href: `/users/${a.receiverId}` });
-  }
-  for (const a of theirPending) {
-    relation.set(a.applicantId, { label: "申込が届いています", cta: "お申込みを確認する", href: "/applications" });
-  }
+  // 自分との関係（カードの写真上に表示）
+  const relation = new Map<string, string>();
+  for (const a of myPending) relation.set(a.receiverId, "申込済み");
+  for (const a of theirPending) relation.set(a.applicantId, "申込が届いています");
   for (const m of activeMatches) {
-    const other = m.applicantId === me.id ? m.receiverId : m.applicantId;
-    relation.set(other, { label: "マッチ中", cta: "日程調整を見る", href: `/matches/${m.id}` });
+    relation.set(m.applicantId === me.id ? m.receiverId : m.applicantId, "マッチ中");
   }
 
   // AIが相性の良い順に表示（デモでは決定的な擬似スコア。lib/compat.ts 参照）
-  const users: FeedUser[] = rows
+  const users: GridUser[] = rows
     .map((u) => ({
       id: u.id,
       nickname: u.nickname,
@@ -88,68 +82,29 @@ export default async function UsersPage({
       verified: u.incomeCertVerified,
       salon: u.accountType === "SALON",
       isNew: isNewMember(u.createdAt),
-      occupation: u.occupation,
-      hobbies: u.hobbies,
-      intro: u.selfIntroduction,
       relation: relation.get(u.id) ?? null,
     }))
     .sort((a, b) => b.compat - a.compat);
-
-  // ストーリー：新しく登録した順
-  const stories = [...rows].slice(0, 10);
 
   return (
     <div className="flex flex-1 flex-col">
       <BrandHeader unread={unread} bell />
 
-      {/* ストーリー（新着のお相手） */}
-      <section aria-label="新着のお相手" className="pb-3 pt-1">
-        <div className="flex gap-3.5 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Link
-            href="/mypage/edit"
-            className="flex w-[68px] shrink-0 flex-col items-center gap-1 active:opacity-70"
-          >
-            <span className="relative">
-              <span className="story-ring-seen">
-                <Avatar url={me.photos[0]?.url} name={me.nickname} className="h-[58px] w-[58px] text-lg" />
-              </span>
-              <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white ring-2 ring-surface">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="h-3 w-3" aria-hidden>
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-              </span>
-            </span>
-            <span className="w-full truncate text-center text-[11px] text-ink-soft">あなた</span>
-          </Link>
-          {stories.map((u) => {
-            const isNew = isNewMember(u.createdAt);
-            return (
-              <Link
-                key={u.id}
-                href={`/users/${u.id}`}
-                className="flex w-[68px] shrink-0 flex-col items-center gap-1 active:opacity-70"
-              >
-                <span className={isNew ? "story-ring" : "story-ring-seen"}>
-                  <Avatar
-                    url={u.photos[0]?.url}
-                    name={u.nickname}
-                    className="h-[58px] w-[58px] text-lg"
-                  />
-                </span>
-                <span className="w-full truncate text-center text-[11px] text-ink">
-                  {u.nickname}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      <UserFeed
+      <UserGrid
         users={users}
-        initialAgeMin={sp.ageMin ?? ""}
-        initialAgeMax={sp.ageMax ?? ""}
-        initialArea={sp.area ?? ""}
+        initial={{ ageMin: sp.ageMin ?? "", ageMax: sp.ageMax ?? "", area: sp.area ?? "" }}
+        intro={
+          // サービス案内（控えめなお知らせカード）
+          <div className="animate-fade-up flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-3.5">
+            <BrandMark className="h-10 w-10 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-[13.5px] font-semibold text-ink">チャットなしで、カフェで会える</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-ink-soft">
+                気になる方にデートを申し込むだけ。全員本人確認済みです。
+              </p>
+            </div>
+          </div>
+        }
       />
     </div>
   );

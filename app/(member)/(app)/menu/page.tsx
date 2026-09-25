@@ -13,7 +13,6 @@ import {
   IconDoc,
   IconShield,
   IconBuilding,
-  IconSparkle,
   IconTicket,
   IconSend,
   IconCoffee,
@@ -22,7 +21,7 @@ import {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <p className="border-t-[6px] border-[#fafafa] px-4 pb-1 pt-4 text-[13px] font-semibold text-ink-soft">{label}</p>
+    <p className="px-4 pb-2 pt-6 text-xs font-bold text-ink-faint">{label}</p>
   );
 }
 
@@ -40,35 +39,39 @@ function MenuRow({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3.5 px-4 py-3 transition-colors active:bg-surface-alt"
+      className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-surface-alt/50"
     >
-      <span className="shrink-0 text-ink">{icon}</span>
-      <span className="flex-1">
-        <span className="block text-[15px] text-ink">{label}</span>
-        {subtitle && <span className="block text-xs text-ink-soft">{subtitle}</span>}
+      <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">
+        {icon}
       </span>
-      <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint" />
+      <span className="flex-1">
+        <span className="block text-[15px] font-medium text-ink">{label}</span>
+        {subtitle && (
+          <span className="mt-0.5 block text-xs text-ink-faint">{subtitle}</span>
+        )}
+      </span>
+      <IconChevronRight className="h-4 w-4 shrink-0 text-ink-faint transition-transform duration-200 group-hover:translate-x-0.5" />
     </Link>
   );
 }
 
 export default async function MenuPage() {
   await requireMember();
-  const ink = "h-6 w-6";
+  const ink = "h-[22px] w-[22px] text-ink-soft";
 
   return (
     <div className="flex flex-1 flex-col pb-8">
-      <BrandHeader title="メニュー" />
+      <BrandHeader />
 
       <SectionHeader label="アカウント" />
-      <div className="stagger">
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
         <MenuRow href="/mypage/edit" icon={<IconUser className={ink} />} label="プロフィール設定" />
         <MenuRow href="/payments" icon={<IconCard className={ink} />} label="決済履歴" />
         <MenuRow href="/settings/notifications" icon={<IconBell className={ink} />} label="通知設定" />
       </div>
 
       <SectionHeader label="デート" />
-      <div className="stagger">
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
         <MenuRow
           href="/applications"
           icon={<IconSend className={ink} />}
@@ -84,7 +87,7 @@ export default async function MenuPage() {
       </div>
 
       <SectionHeader label="紹介・特典" />
-      <div className="stagger">
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
         <MenuRow
           href="/referral"
           icon={<IconGift className={ink} />}
@@ -100,7 +103,7 @@ export default async function MenuPage() {
       </div>
 
       <SectionHeader label="サポート" />
-      <div className="stagger">
+      <div className="stagger divide-y divide-line border-y border-line bg-surface">
         <MenuRow href="/info/faq" icon={<IconQuestion className={ink} />} label="よくある質問" />
         <MenuRow href="/contact" icon={<IconChat className={ink} />} label="お問い合わせ" />
         <MenuRow href="/info/terms" icon={<IconDoc className={ink} />} label="利用規約" />

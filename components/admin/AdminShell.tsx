@@ -62,7 +62,7 @@ export function AdminShell({
     it.exact ? pathname === it.href : pathname === it.href || pathname.startsWith(it.href + "/");
 
   return (
-    <div className="flex min-h-dvh bg-[#fafafa]">
+    <div className="flex min-h-dvh bg-canvas">
       <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col border-r border-line bg-surface px-3 pb-4 pt-6 md:flex">
         <Link href="/admin" className="mb-6 flex items-center gap-2.5 px-3">
           <BrandMark className="h-8 w-8" />

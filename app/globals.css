@@ -26,7 +26,7 @@
   --color-ink: #0c0c0d;
   --color-ink-soft: #737373;
   --color-ink-faint: #a8a8a8;
-  --color-canvas: #ffffff;
+  --color-canvas: #fafafa; /* 画面の地（薄いグレー）。カード・ヘッダーは surface（白） */
   --color-surface: #ffffff;
   --color-surface-alt: #efefef;
   --color-line: #dbdbdb;

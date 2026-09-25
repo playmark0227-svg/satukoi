@@ -18,7 +18,7 @@ export default async function AdminLoginPage({
   const { error } = await searchParams;
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#fafafa] px-4 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="animate-fade-up text-center">
           <BrandMark className="mx-auto h-16 w-16" />

@@ -7,19 +7,24 @@ import { Avatar } from "@/components/ui/Avatar";
 import { IconHome, IconHeart, IconMenu } from "./icons";
 
 // match：そのタブ配下として扱う画面（下層画面でも親タブを点灯させる）
-const MATCH = {
-  home: ["/users", "/notifications"],
-  matches: ["/matches", "/applications", "/survey", "/partners"],
-  mypage: ["/mypage"],
-  menu: ["/menu", "/payments", "/settings", "/referral", "/tickets", "/info", "/contact"],
-};
+const items = [
+  { key: "home", href: "/users", label: "ホーム", match: ["/users", "/notifications"] },
+  { key: "matches", href: "/matches", label: "マッチ", match: ["/matches", "/applications", "/survey", "/partners"] },
+  { key: "mypage", href: "/mypage", label: "マイページ", match: ["/mypage"] },
+  {
+    key: "menu",
+    href: "/menu",
+    label: "メニュー",
+    match: ["/menu", "/payments", "/settings", "/referral", "/tickets", "/info", "/contact"],
+  },
+] as const;
 
 /** 画面下に専用のアクションバーを持つ画面ではタブバーを出さない */
 const HIDE_ON = [/^\/users\/[^/]+\/?$/];
 
 /**
- * Instagram 風のアイコンだけの下タブ。選択中は塗りつぶし（黒）、
- * マイページは自分のプロフィール写真で表す。
+ * 下タブ（アイコン＋ラベル）。見た目は Instagram 風：
+ * 選択中は黒の塗りアイコン、未選択は線のアイコン。マイページは自分の写真。
  */
 export function BottomNav({
   avatarUrl,
@@ -28,44 +33,45 @@ export function BottomNav({
 }: {
   avatarUrl?: string | null;
   nickname: string;
-  /** マッチタブに出す未対応件数（届いた申込・日程候補など） */
+  /** マッチタブに赤い点を出す（お返事待ちの申込が届いている） */
   badge?: number;
 }) {
   const pathname = usePathname();
   if (HIDE_ON.some((re) => re.test(pathname))) return null;
-  const on = (key: keyof typeof MATCH) =>
-    MATCH[key].some((m) => pathname === m || pathname.startsWith(m + "/"));
-
-  const tab = "relative flex h-[52px] items-center justify-center text-ink transition-opacity active:opacity-60";
 
   return (
-    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line-soft bg-surface pb-[env(safe-area-inset-bottom)]">
-      <Link href="/users" aria-label="ホーム" aria-current={on("home") ? "page" : undefined} className={tab}>
-        <IconHome className="h-[26px] w-[26px]" filled={on("home")} />
-      </Link>
-      <Link href="/matches" aria-label="マッチ" aria-current={on("matches") ? "page" : undefined} className={tab}>
-        <IconHeart className="h-[26px] w-[26px]" filled={on("matches")} />
-        {badge > 0 && (
-          <span className="absolute left-1/2 top-2.5 ml-2 h-2 w-2 rounded-full bg-like ring-2 ring-surface" />
-        )}
-      </Link>
-      <Link href="/mypage" aria-label="マイページ" aria-current={on("mypage") ? "page" : undefined} className={tab}>
-        <span
-          className={cn(
-            "rounded-full p-[1.5px]",
-            on("mypage") ? "bg-ink" : "bg-transparent"
-          )}
-        >
-          <Avatar
-            url={avatarUrl}
-            name={nickname}
-            className="h-[26px] w-[26px] border border-surface text-[11px]"
-          />
-        </span>
-      </Link>
-      <Link href="/menu" aria-label="メニュー" aria-current={on("menu") ? "page" : undefined} className={tab}>
-        <IconMenu className={cn("h-[26px] w-[26px]", on("menu") && "stroke-[2.6]")} />
-      </Link>
+    <nav className="sticky bottom-0 z-20 grid grid-cols-4 border-t border-line bg-surface px-2 pb-[env(safe-area-inset-bottom)]">
+      {items.map((it) => {
+        const active = it.match.some((m) => pathname === m || pathname.startsWith(m + "/"));
+        return (
+          <Link
+            key={it.href}
+            href={it.href}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "relative flex flex-col items-center gap-1 pb-2 pt-2 text-[10px] text-ink transition-opacity active:opacity-60",
+              active ? "font-bold" : "font-medium text-ink-soft"
+            )}
+          >
+            {it.key === "home" && <IconHome className="h-6 w-6" filled={active} />}
+            {it.key === "matches" && <IconHeart className="h-6 w-6" filled={active} />}
+            {it.key === "mypage" && (
+              <span className={cn("rounded-full p-[1.5px]", active ? "bg-ink" : "bg-transparent")}>
+                <Avatar
+                  url={avatarUrl}
+                  name={nickname}
+                  className="h-[23px] w-[23px] border border-surface text-[10px]"
+                />
+              </span>
+            )}
+            {it.key === "menu" && <IconMenu className={cn("h-6 w-6", active && "stroke-[2.6]")} />}
+            {it.label}
+            {it.key === "matches" && badge > 0 && (
+              <span className="absolute left-1/2 top-1.5 ml-2.5 h-2 w-2 rounded-full bg-like ring-2 ring-surface" />
+            )}
+          </Link>
+        );
+      })}
     </nav>
   );
 }
