@@ -5,9 +5,10 @@ import { Badge } from "@/components/ui/Badge";
 import { formatDateTime } from "@/lib/format";
 
 
+/** 日本時間での「今月1日 0:00」（サーバーのタイムゾーンに依存しない） */
 function startOfThisMonth() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1);
+  const jst = new Date(Date.now() + 9 * 3_600_000);
+  return new Date(Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), 1) - 9 * 3_600_000);
 }
 
 function MetricCard({

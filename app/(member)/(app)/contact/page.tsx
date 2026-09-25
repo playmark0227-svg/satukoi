@@ -22,7 +22,6 @@ export default async function ContactPage({
         <div className="px-4 py-4">
           <Card>
             <EmptyState
-              icon="✓"
               title="お問い合わせを受け付けました"
               description="内容を確認のうえ、ご登録のメールアドレス宛にご連絡いたします。"
               action={

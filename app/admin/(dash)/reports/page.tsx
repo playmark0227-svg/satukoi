@@ -68,7 +68,6 @@ export default async function AdminReportsPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="🚩"
                 title="通報はありません"
                 description="会員からの通報が届くとここに表示されます。"
               />
@@ -169,7 +168,6 @@ export default async function AdminReportsPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="✉"
                 title="お問い合わせはありません"
                 description="会員からのお問い合わせが届くとここに表示されます。"
               />

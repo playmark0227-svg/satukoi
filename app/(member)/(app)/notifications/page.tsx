@@ -1,7 +1,6 @@
 import { requireMember } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { fromNow, formatDate } from "@/lib/format";
-import { NOTIFICATION_TYPE_LABELS } from "@/lib/constants";
 import { AppHeader } from "@/components/member/AppHeader";
 import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -100,18 +99,15 @@ export default async function NotificationsPage() {
                       <Icon className="h-5 w-5" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex items-center justify-between gap-2">
-                        <span className="truncate text-[11px] font-bold text-ink-faint">
-                          {NOTIFICATION_TYPE_LABELS[n.type]}
-                        </span>
-                        <span className="num-tnum shrink-0 text-[11px] text-ink-faint">
-                          {fromNow(n.createdAt)}
-                        </span>
-                      </span>
-                      <span className="mt-0.5 flex items-center gap-1.5">
-                        {unread && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                      <span className="flex items-start justify-between gap-2">
                         <span className={"text-sm text-ink " + (unread ? "font-bold" : "font-medium")}>
                           {n.title}
+                        </span>
+                        <span className="num-tnum mt-0.5 flex shrink-0 items-center gap-1.5 text-[11px] text-ink-faint">
+                          {fromNow(n.createdAt)}
+                          {unread && (
+                            <span className="h-2 w-2 rounded-full bg-primary" aria-label="未読" />
+                          )}
                         </span>
                       </span>
                       <span className="mt-0.5 block text-[13px] leading-relaxed text-ink-soft">

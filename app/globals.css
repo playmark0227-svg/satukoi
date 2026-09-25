@@ -65,6 +65,11 @@ body {
   overflow-wrap: break-word;
 }
 
+/* 規約などの長文は文節改行だと右端がガタつくため、通常の和文組み（禁則は維持） */
+.text-longform {
+  word-break: normal;
+}
+
 /* 見出しは行長をそろえ、本文は最終行の1文字だけの行を避ける */
 h1, h2, h3, h4 { text-wrap: balance; }
 p, li, dd { text-wrap: pretty; }

@@ -32,7 +32,6 @@ export default async function AdminStoresPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="🏠"
                 title="店舗がまだ登録されていません"
                 description="下のフォームから店舗を追加してください。"
               />

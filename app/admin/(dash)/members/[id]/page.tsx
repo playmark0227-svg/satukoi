@@ -484,7 +484,6 @@ export default async function AdminMemberDetailPage({
           <div className="mt-4">
             {member.adminMemos.length === 0 ? (
               <EmptyState
-                icon="📝"
                 title="メモはまだありません"
                 description="この会員に関する対応を記録できます。"
               />

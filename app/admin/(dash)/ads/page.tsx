@@ -107,7 +107,6 @@ export default async function AdminAdsPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="🖼"
                 title="広告がありません"
                 description="上のフォームから広告を追加してください。"
               />

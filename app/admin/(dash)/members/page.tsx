@@ -104,7 +104,6 @@ export default async function AdminMembersPage({
         <Card>
           <CardBody>
             <EmptyState
-              icon="🔍"
               title="該当する会員がいません"
               description="検索条件を変更してお試しください。"
             />

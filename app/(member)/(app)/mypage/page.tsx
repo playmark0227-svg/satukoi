@@ -191,7 +191,10 @@ export default async function MyPage() {
               <p className="num-tnum mt-1 text-[13px] leading-relaxed text-ink-soft">
                 月9,900円〜でデート代無料・全国10万人以上とマッチング・専属カウンセラー
               </p>
-              <p className="mt-2 text-[13px] font-bold text-primary">詳細を見る →</p>
+              <p className="mt-2 inline-flex items-center gap-0.5 text-[13px] font-bold text-primary-strong">
+                詳細を見る
+                <IconChevronRight className="h-3.5 w-3.5" />
+              </p>
             </div>
           </div>
         </Link>
@@ -213,7 +216,10 @@ export default async function MyPage() {
               <p className="num-tnum mt-1 text-[13px] leading-relaxed text-ink-soft">
                 提携不動産でのお部屋探しで、お祝い金をキャッシュバック。新生活まで伴走します。
               </p>
-              <p className="mt-2 text-[13px] font-bold text-primary">詳細を見る →</p>
+              <p className="mt-2 inline-flex items-center gap-0.5 text-[13px] font-bold text-primary-strong">
+                詳細を見る
+                <IconChevronRight className="h-3.5 w-3.5" />
+              </p>
             </div>
           </div>
         </Link>

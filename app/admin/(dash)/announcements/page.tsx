@@ -81,7 +81,6 @@ export default async function AdminAnnouncementsPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="📣"
                 title="お知らせがありません"
                 description="上のフォームから作成してください。"
               />

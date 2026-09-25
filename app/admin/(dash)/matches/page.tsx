@@ -147,7 +147,6 @@ export default async function AdminMatchesPage({
         <Card>
           <CardBody>
             <EmptyState
-              icon="📋"
               title="該当するマッチがありません"
               description="絞り込み条件を変更してください。"
             />

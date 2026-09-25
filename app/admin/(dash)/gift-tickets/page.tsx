@@ -46,7 +46,6 @@ export default async function AdminGiftTicketsPage() {
           <Card>
             <CardBody>
               <EmptyState
-                icon="🎫"
                 title="ギフト券はまだ発行されていません"
                 description="下のフォームから会員に発行できます。"
               />

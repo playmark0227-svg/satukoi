@@ -81,7 +81,6 @@ export default async function AdminCancellationsPage() {
         <Card>
           <CardBody>
             <EmptyState
-              icon="🗒"
               title="キャンセル履歴はありません"
               description="デートのキャンセルが発生するとここに表示されます。"
             />

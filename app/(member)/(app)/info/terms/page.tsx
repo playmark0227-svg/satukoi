@@ -41,7 +41,7 @@ export default function TermsPage() {
       <div className="space-y-4 px-4 py-4">
         <p className="text-xs text-ink-faint">最終更新日：2026年6月25日</p>
         <Card>
-          <CardBody className="space-y-5">
+          <CardBody className="text-longform space-y-5">
             {SECTIONS.map((s) => (
               <section key={s.title}>
                 <h2 className="mb-1 text-sm font-bold text-ink">{s.title}</h2>

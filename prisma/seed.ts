@@ -98,6 +98,8 @@ const ROMAJI: Record<string, string> = {
   みさき: "misaki", あおい: "aoi", ゆい: "yui", ななみ: "nanami", まお: "mao", あやか: "ayaka",
   まちお: "machio",
 };
+// 登録日の固定（デモの申込・マッチより前に登録している必要がある会員）
+const JOINED_DAYS_AGO: Record<string, number> = { けんた: 40, まお: 35 };
 const OCCUPATIONS = ["会社員", "公務員", "看護師", "美容師", "ITエンジニア", "教員"];
 const HOBBIES = ["カフェ巡り", "映画鑑賞", "ドライブ", "ランニング", "料理", "スノーボード"];
 
@@ -110,7 +112,8 @@ async function createMember(args: {
   joinedDaysAgo?: number;
 }) {
   const { i, sex, name } = args;
-  const joined = args.joinedDaysAgo ?? 26 + ((i * 7 + (sex === "FEMALE" ? 4 : 0)) % 38);
+  const joined =
+    args.joinedDaysAgo ?? JOINED_DAYS_AGO[name[1]] ?? 4 + ((i * 11 + (sex === "FEMALE" ? 5 : 0)) % 45);
   const createdAt = jstAt(-joined, 10 + (i % 11), (i % 4) * 15);
   const checkedAt = jstAt(-joined + 1, 15, 30);
   return prisma.member.create({

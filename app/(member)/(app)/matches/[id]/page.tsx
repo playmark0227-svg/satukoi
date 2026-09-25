@@ -274,10 +274,10 @@ function SchedulingView({
                 ))}
               </ul>
               {/* 確定操作の直前に必ず短い注意文と料金を表示 */}
-              <div className="space-y-1 rounded-xl bg-warning-soft px-3 py-2.5 text-xs leading-relaxed text-warning-strong">
-                <p className="font-bold">{CANCELLATION_NOTICE_SHORT}</p>
-                <p>{feeNote}</p>
-              </div>
+              <p className="rounded-xl bg-warning-soft px-3 py-2.5 text-xs font-bold leading-relaxed text-warning-strong">
+                {CANCELLATION_NOTICE_SHORT}
+              </p>
+              <p className="px-1 text-xs leading-relaxed text-ink-soft">{feeNote}</p>
             </CardBody>
           </Card>
         </section>
