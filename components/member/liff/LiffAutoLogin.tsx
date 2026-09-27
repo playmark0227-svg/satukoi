@@ -27,10 +27,15 @@ export function LiffAutoLogin({ hasSession }: { hasSession: boolean }) {
       }
       const idToken = liff.getIDToken();
       if (!idToken) return;
+      // 公式アカウントの友だち状態（LIFF と公式アカウントがリンクされていない場合は取得できない）
+      const friend = await liff
+        .getFriendship()
+        .then((f) => f.friendFlag)
+        .catch(() => undefined);
       const res = await fetch("/api/auth/line", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken, friend }),
       });
       if (!res.ok || cancelled) return;
       try {

@@ -12,6 +12,7 @@ on:
     branches:
       - main
       - claude/relaxed-hypatia-rfik5o
+      - claude/fervent-allen-4barb7
   workflow_dispatch:
 
 permissions:

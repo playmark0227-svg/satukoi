@@ -18,6 +18,7 @@ import {
 import type { AnnouncementTarget, NotificationType } from "@prisma/client";
 
 const TYPE_ICON: Record<NotificationType, (p: { className?: string }) => React.ReactNode> = {
+  LIKE_RECEIVED: IconHeart,
   APPLICATION_RECEIVED: IconSend,
   MATCHED: IconHeart,
   CANDIDATE_RECEIVED: IconCalendar,
@@ -82,11 +83,12 @@ export default async function NotificationsPage() {
               {notifications.map((n) => {
                 const unread = n.readAt === null;
                 const href =
-                  n.type === "APPLICATION_RECEIVED"
+                  n.path ??
+                  (n.type === "APPLICATION_RECEIVED"
                     ? "/applications"
                     : n.matchId
                       ? `/matches/${n.matchId}`
-                      : null;
+                      : null);
                 const Icon = TYPE_ICON[n.type];
                 const body = (
                   <>
@@ -120,7 +122,7 @@ export default async function NotificationsPage() {
                   <li key={n.id}>
                     {href ? (
                       <Link
-                        href={href}
+                        href={href} transitionTypes={["nav-forward"]}
                         className="flex gap-3 px-4 py-3.5 transition-colors hover:bg-canvas active:bg-surface-alt"
                       >
                         {body}

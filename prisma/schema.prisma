@@ -140,59 +140,66 @@ model Member {
   cardRegistered   Boolean @default(false)
 
   // LINE連携（LINEログイン・LINE通知）
-  lineUserId    String? @unique // LINE ユーザーID（LIFF／LINEログインで紐付け）
-  lineConnected Boolean @default(false)
-  notifyViaLine Boolean @default(true)
+  lineUserId     String?            @unique // LINE ユーザーID（LIFF／LINEログインで紐付け）
+  lineConnected  Boolean            @default(false)
+  notifyViaLine  Boolean            @default(true)
+  /// LINE公式アカウントの友だち状態（Webhook の follow/unfollow・LIFF の getFriendship で更新。null=未確認）
+  lineFollowing  Boolean?
+  /// 会員が LINE で受け取らないことにした通知イベント（空＝すべて受け取る）
+  lineMutedTypes NotificationType[] @default([])
 
   // ── プロフィール（②プロフィール登録：すべて必須） ──
   // ※ 登録後に自己編集不可：name / birthDate / sex / residenceArea /
   //   incomeBracket / hasMarriageHistory / hasChildren
   //   （変更は運営申請。アプリ層で編集ガード）
-  fullName          String // 名前（会員間では非公開）
-  nickname          String
-  birthDate         DateTime // 年齢は生年月日から自動算出
-  sex               Sex
-  residenceArea     ResidenceArea
-  eligibilityType   EligibilityType @default(RESIDENT)
-  occupation        String // 職業
-  incomeBracket     IncomeBracket
-  incomeCertVerified Boolean        @default(false) // 所得証明提出・確認済みなら年収公開
-  holidayType       HolidayType
-  fixedHolidays     Weekday[] // holidayType=OTHER_FIXED の場合の曜日
+  fullName           String // 名前（会員間では非公開）
+  nickname           String
+  birthDate          DateTime // 年齢は生年月日から自動算出
+  sex                Sex
+  residenceArea      ResidenceArea
+  eligibilityType    EligibilityType @default(RESIDENT)
+  occupation         String // 職業
+  incomeBracket      IncomeBracket
+  incomeCertVerified Boolean         @default(false) // 所得証明提出・確認済みなら年収公開
+  holidayType        HolidayType
+  fixedHolidays      Weekday[] // holidayType=OTHER_FIXED の場合の曜日
   hasMarriageHistory Boolean // 婚姻歴（有無）
-  hasChildren       Boolean // 子供（有無）
-  childrenWish      ChildrenWish // 将来子供は？
-  heightCm          Int // 身長
-  bodyType          BodyType
-  smoking           SmokingHabit
-  drinking          DrinkingHabit
-  qualifications    String? // 資格
-  hobbies           String? // 趣味
-  selfIntroduction  String? // 自己紹介
+  hasChildren        Boolean // 子供（有無）
+  childrenWish       ChildrenWish // 将来子供は？
+  heightCm           Int // 身長
+  bodyType           BodyType
+  smoking            SmokingHabit
+  drinking           DrinkingHabit
+  qualifications     String? // 資格
+  hobbies            String? // 趣味
+  selfIntroduction   String? // 自己紹介
 
   // 紹介制度
-  referralBonusRemaining Int @default(0) // 紹介特典（デート代無料）残数
+  referralBonusRemaining Int          @default(0) // 紹介特典（デート代無料）残数
   giftTickets            GiftTicket[] // 提携店ギフト券（紹介報酬など）
 
   // 更新料の自動決済管理（登録から1年後に自動決済）
   nextRenewalAt DateTime?
 
   // ── リレーション ──
-  photos        Photo[]
-  documents     Document[]
-  resetTokens   PasswordResetToken[]
-  ownReferralCode ReferralCode?      @relation("memberReferralCode")
+  photos          Photo[]
+  documents       Document[]
+  resetTokens     PasswordResetToken[]
+  ownReferralCode ReferralCode?        @relation("memberReferralCode")
 
-  blocksMade     Block[] @relation("blocker")
-  blocksReceived Block[] @relation("blocked")
-  reportsMade     Report[] @relation("reporter")
-  reportsReceived Report[] @relation("reported")
+  blocksMade      Block[]   @relation("blocker")
+  blocksReceived  Block[]   @relation("blocked")
+  reportsMade     Report[]  @relation("reporter")
+  reportsReceived Report[]  @relation("reported")
   inquiries       Inquiry[]
 
-  applicationsSent     DateApplication[] @relation("applicant")
-  applicationsReceived DateApplication[] @relation("receiver")
-  matchesAsApplicant   Match[]           @relation("matchApplicant")
-  matchesAsReceiver    Match[]           @relation("matchReceiver")
+  likesSent     Like[] @relation("likeFrom")
+  likesReceived Like[] @relation("likeTo")
+
+  applicationsSent     DateApplication[]   @relation("applicant")
+  applicationsReceived DateApplication[]   @relation("receiver")
+  matchesAsApplicant   Match[]             @relation("matchApplicant")
+  matchesAsReceiver    Match[]             @relation("matchReceiver")
   proposalsMade        ScheduleProposal[]
   candidateSelections  ScheduleCandidate[]
 
@@ -386,10 +393,10 @@ model Match {
   application   DateApplication? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
   applicationId String?          @unique
 
-  matchedAt   DateTime  @default(now()) // マッチ成立日（30日/7日の起算点）
+  matchedAt    DateTime  @default(now()) // マッチ成立日（30日/7日の起算点）
   // 最後のアクション日時（自動キャンセル判定：48時間ルール等）
-  lastActionAt DateTime @default(now())
-  closedAt    DateTime?
+  lastActionAt DateTime  @default(now())
+  closedAt     DateTime?
 
   proposals       ScheduleProposal[]
   dateEvent       DateEvent?
@@ -566,13 +573,13 @@ enum CancellationCategory {
 }
 
 model Cancellation {
-  id       String               @id @default(cuid())
-  match    Match                @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  matchId  String
-  by       Member               @relation(fields: [byMemberId], references: [id], onDelete: Cascade)
+  id         String               @id @default(cuid())
+  match      Match                @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  matchId    String
+  by         Member               @relation(fields: [byMemberId], references: [id], onDelete: Cascade)
   byMemberId String
-  category CancellationCategory
-  reason   String
+  category   CancellationCategory
+  reason     String
 
   // 自動制御される結果（運営最終判断で上書き可）
   refundIssuedToCounterpart    Boolean @default(true) // 相手側へ全額返金
@@ -638,21 +645,21 @@ enum ReferralStatus {
 
 /// 紹介の成立記録
 model Referral {
-  id           String         @id @default(cuid())
-  code         ReferralCode   @relation(fields: [codeId], references: [id], onDelete: Cascade)
-  codeId       String
+  id                   String         @id @default(cuid())
+  code                 ReferralCode   @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  codeId               String
   // 紹介者（会員紹介の場合）
-  referrer     Member?        @relation("referrer", fields: [referrerId], references: [id], onDelete: SetNull)
-  referrerId   String?
+  referrer             Member?        @relation("referrer", fields: [referrerId], references: [id], onDelete: SetNull)
+  referrerId           String?
   // 被紹介者（新規会員）
-  referred     Member         @relation("referred", fields: [referredId], references: [id], onDelete: Cascade)
-  referredId   String         @unique
-  status       ReferralStatus @default(PENDING)
-  establishedAt DateTime?
+  referred             Member         @relation("referred", fields: [referredId], references: [id], onDelete: Cascade)
+  referredId           String         @unique
+  status               ReferralStatus @default(PENDING)
+  establishedAt        DateTime?
   // 特典付与済フラグ（デート代無料1回分）
-  referrerBonusGranted Boolean @default(false)
-  referredBonusGranted Boolean @default(false)
-  createdAt    DateTime       @default(now())
+  referrerBonusGranted Boolean        @default(false)
+  referredBonusGranted Boolean        @default(false)
+  createdAt            DateTime       @default(now())
 
   @@index([codeId])
   @@index([status])
@@ -708,6 +715,7 @@ model SurveyResponse {
 // ─────────────────────────────────────────────
 
 enum NotificationType {
+  LIKE_RECEIVED // いいね受信
   APPLICATION_RECEIVED // 申受
   MATCHED // マッチング
   CANDIDATE_RECEIVED // デート日程候補受信
@@ -719,20 +727,24 @@ enum NotificationType {
 }
 
 model Notification {
-  id          String           @id @default(cuid())
-  member      Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  memberId    String
-  type        NotificationType
-  title       String
-  body        String
-  match       Match?           @relation(fields: [matchId], references: [id], onDelete: SetNull)
-  matchId     String?
-  readAt      DateTime?
-  emailSentAt DateTime? // メール送信済時刻（メール／アプリ内の両方通知）
-  createdAt   DateTime         @default(now())
+  id             String           @id @default(cuid())
+  member         Member           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId       String
+  type           NotificationType
+  title          String
+  body           String
+  match          Match?           @relation(fields: [matchId], references: [id], onDelete: SetNull)
+  matchId        String?
+  readAt         DateTime?
+  emailSentAt    DateTime? // メール送信済時刻（メール／アプリ内の両方通知）
+  path           String? // 通知から開く画面（例: /users/xxx）
+  lineSentAt     DateTime? // LINE 送信済時刻（月間配信数の集計にも使用）
+  lineSkipReason String? // LINE を送らなかった理由（イベントOFF・上限到達・未連携など）
+  createdAt      DateTime         @default(now())
 
   @@index([memberId, readAt])
   @@index([createdAt])
+  @@index([lineSentAt])
 }
 
 // ─────────────────────────────────────────────
@@ -831,4 +843,42 @@ model AuditLog {
 
   @@index([targetType, targetId])
   @@index([createdAt])
+}
+
+// ─────────────────────────────────────────────
+//  いいね（デート申込みの前の軽いアプローチ）
+// ─────────────────────────────────────────────
+
+model Like {
+  id        String   @id @default(cuid())
+  from      Member   @relation("likeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  fromId    String
+  to        Member   @relation("likeTo", fields: [toId], references: [id], onDelete: Cascade)
+  toId      String
+  createdAt DateTime @default(now())
+
+  @@unique([fromId, toId])
+  @@index([toId, createdAt])
+}
+
+// ─────────────────────────────────────────────
+//  通知の配信ルール（運営管理画面「LINE通知設定」で変更）
+//  行が無いイベントは lib/notification-rules.ts の既定値を使う。
+// ─────────────────────────────────────────────
+
+model NotificationRule {
+  type         NotificationType @id
+  lineEnabled  Boolean          @default(true) // LINE で送るか
+  emailEnabled Boolean          @default(true) // メールで送るか（アプリ内通知は常に作成）
+  priority     Int              @default(0) // 1 = 優先（月間上限の「優先枠」を使える）
+  updatedAt    DateTime         @updatedAt
+}
+
+/// LINE 配信の全体設定（1行のみ。id = "default"）
+model LineDeliverySetting {
+  id              String   @id @default("default")
+  enabled         Boolean  @default(true) // LINE 配信の全体スイッチ
+  monthlyLimit    Int? // 月間の配信上限（通数）。null = 上限なし
+  priorityReserve Int      @default(0) // 上限のうち優先イベント用に残しておく通数
+  updatedAt       DateTime @updatedAt
 }

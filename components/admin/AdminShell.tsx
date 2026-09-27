@@ -12,6 +12,7 @@ import {
   IconBell,
   IconCoffee,
   IconTicket,
+  IconChat,
 } from "@/components/member/icons";
 
 type P = { className?: string };
@@ -43,6 +44,7 @@ const nav = [
   { href: "/admin/cancellations", label: "キャンセル管理", short: "キャンセル", Icon: IconCalendar },
   { href: "/admin/reports", label: "通報・お問い合わせ", short: "通報", Icon: IconShield },
   { href: "/admin/announcements", label: "お知らせ", short: "お知らせ", Icon: IconBell },
+  { href: "/admin/line", label: "LINE通知設定", short: "LINE通知", Icon: IconChat },
   { href: "/admin/ads", label: "広告", short: "広告", Icon: IconImage },
   { href: "/admin/stores", label: "店舗", short: "店舗", Icon: IconCoffee },
   { href: "/admin/gift-tickets", label: "ギフト券", short: "ギフト券", Icon: IconTicket },

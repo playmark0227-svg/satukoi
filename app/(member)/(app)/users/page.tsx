@@ -38,7 +38,7 @@ export default async function UsersPage({
     excludeIds.add(b.blockedId);
   }
 
-  const [rows, myPending, theirPending, activeMatches] = await Promise.all([
+  const [rows, myPending, theirPending, activeMatches, myLikes, theirLikes] = await Promise.all([
     prisma.member.findMany({
       where: { sex: oppositeSex, status: "ACTIVE", id: { notIn: Array.from(excludeIds) } },
       include: { photos: { orderBy: { order: "asc" }, take: 1 } },
@@ -59,15 +59,20 @@ export default async function UsersPage({
       },
       select: { applicantId: true, receiverId: true },
     }),
+    prisma.like.findMany({ where: { fromId: me.id }, select: { toId: true } }),
+    prisma.like.findMany({ where: { toId: me.id }, select: { fromId: true } }),
   ]);
 
   // 自分との関係（カードの写真上に表示）
   const relation = new Map<string, string>();
+  for (const l of theirLikes) relation.set(l.fromId, "いいね！が届いています");
   for (const a of myPending) relation.set(a.receiverId, "申込済み");
   for (const a of theirPending) relation.set(a.applicantId, "申込が届いています");
   for (const m of activeMatches) {
     relation.set(m.applicantId === me.id ? m.receiverId : m.applicantId, "マッチ中");
   }
+
+  const likedIds = new Set(myLikes.map((l) => l.toId));
 
   // AIが相性の良い順に表示（デモでは決定的な擬似スコア。lib/compat.ts 参照）
   const users: GridUser[] = rows
@@ -83,6 +88,7 @@ export default async function UsersPage({
       salon: u.accountType === "SALON",
       isNew: isNewMember(u.createdAt),
       relation: relation.get(u.id) ?? null,
+      iLiked: likedIds.has(u.id),
     }))
     .sort((a, b) => b.compat - a.compat);
 

@@ -36,7 +36,12 @@
   `app/api/auth/line/route.ts` で LINE の検証 API に照会 → 会員セッション発行）。未登録なら LINE 連携で新規登録、
   メールでログイン中なら LINE を紐付け（`Member.lineUserId`）。紹介コードは LINE のシェア画面で送信。
   メール＋パスワードのログインも併用可能。設定手順は下記「LIFF の設定」。
-- **LINE 通知 UI** … 通知先の切替（`Member.notifyViaLine`）。本実装では Messaging API に接続。
+- **いいね** … プロフィールのハートでお相手に「いいね」（`Like`。取り消し不可・通知は1回）。お互いにいいねで「お互いにいいね！」表示。
+- **LINE 通知（Messaging API）** … 公式アカウントから「いいね」「デートの申込み」「マッチング成立」「日程候補・日程確定・当日連絡・キャンセル」などをプッシュ配信（`lib/notifications.ts` → `lib/line.ts`）。
+  運営管理画面「LINE通知設定」（`/admin/line`）でイベント別の ON/OFF・月間上限・優先枠を設定でき、会員も通知設定画面で主要イベントを個別に OFF にできる。
+  送らなかった理由は `Notification.lineSkipReason` に記録（上限到達・未連携など）。Webhook（`/api/line/webhook`）で友だち追加/ブロックを反映し、メッセージには自動で案内を返信。
+  トークン未設定のあいだは送信せずログのみ。
+- **画面遷移アニメーション** … View Transitions（`experimental.viewTransition`）で、進む＝右から・戻る＝左からのスライド、タブ切替はフェード、一覧の写真→プロフィール写真の変形。タップ時の沈み込み・いいねのハート演出・下タブのアイコンの弾み。`prefers-reduced-motion` では無効。
 - **デザイン** … Instagram のような雰囲気（白ベース・罫線・ブルーの操作色・ストーリーの輪）。詳細は `docs/DESIGN.md`。
 - **成功報酬型課金の訴求** … 登録料 11,000 円＋「デートの日程が確定したときだけ」5,500 円の都度課金（`PRICING.DATE_FEE`）。月額課金なしを前面に訴求。
 - **AI 相性スコア推薦（デモ）** … プロフィール項目にもとづく相性スコア付きのおすすめ表示。本実装では成婚データ駆動の推薦モデルへ。
@@ -104,6 +109,7 @@ npm run dev            # http://localhost:3000
 | `npm run db:seed` | サンプルデータ投入 |
 | `npm run db:studio` | Prisma Studio |
 | `npm run demo:build` | GitHub Pages 用の静的エクスポート（`out/`） |
+| `npm run admin:create -- <email> <password> [名前]` | 運営アカウントの作成・パスワード再設定（本番の初回用） |
 
 ---
 
@@ -190,10 +196,16 @@ prisma/
 未設定のあいだは通常の Web アプリとして動作します（GitHub Pages のデモもこの状態で、「LINEでログイン」は
 ホームへ進むだけのデモ動作）。
 
+## 本番サーバーへのデプロイ（運営管理画面を動かす）
+
+GitHub Pages は見本（読み取り専用）です。運営管理画面を含めて実際に操作できる環境は、
+`Dockerfile` でサーバーにデプロイします。手順・環境変数は **[docs/DEPLOY.md](docs/DEPLOY.md)** を参照
+（Cloud Run 推奨。GitHub から出す場合は `.github/workflows/deploy-server.yml`）。
+
 ## スタブ（未実装・本番で差し替え）
 
 - **Stripe 決済**：`lib/stripe.ts` は実 API を呼ばずダミー結果を返す。実キー設定で実決済に。
-- **メール通知**：`lib/notifications.ts` はアプリ内通知のみ DB 保存し、メールは `console` 出力。
+- **メール通知**：`lib/notifications.ts` はアプリ内通知を DB 保存し、メールは `console` 出力（LINE は Messaging API のトークン設定で実配信）。
 - **画像/書類アップロード**：URL は `pending-upload` のプレースホルダ。実ストレージ連携は別途。
 - **自動キャンセル/更新決済/アンケート送信**：判定関数は実装済。定期実行（cron）は別途。
 

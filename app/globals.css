@@ -177,11 +177,128 @@ summary::-webkit-details-marker { display: none; }
 /* FAQ など details の中身をふわっと */
 details[open] .details-body { animation: fade-up 0.3s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 
+/* ── タップの手ごたえ（押すと少し沈み、離すとバネで戻る） ── */
+.press {
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.15s ease,
+    color 0.15s ease,
+    opacity 0.15s ease;
+}
+.press:active { transform: scale(0.96); transition-duration: 0.08s; }
+.press-soft { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.press-soft:active { transform: scale(0.98); transition-duration: 0.1s; }
+
+/* ── 下タブ：選んだアイコンがぽよんと弾む／通知の点が現れる ── */
+@keyframes tab-pop {
+  0% { transform: scale(0.82); }
+  55% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.animate-tab-pop { animation: tab-pop 0.36s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.animate-badge-pop { animation: badge-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both; }
+
+/* ── いいね：ハートが弾み、周りに粒が広がる ── */
+@keyframes heart-pop {
+  0% { transform: scale(0.6); }
+  40% { transform: scale(1.3); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.animate-heart-pop { animation: heart-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.heart-burst i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 9999px;
+  background: var(--color-like);
+  animation: heart-burst 0.55s ease-out both;
+}
+.heart-burst i:nth-child(even) { background: var(--color-brand-orange); width: 4px; height: 4px; }
+@keyframes heart-burst {
+  0% { transform: rotate(var(--a)) translateY(0) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--a)) translateY(-26px) scale(0.2); opacity: 0; }
+}
+
+/* ════════════════════════════════════════════
+   画面遷移（View Transitions。app/(member)/(app)/template.tsx）
+   進む＝右から、戻る＝左から、タブ切替＝その場で。ヘッダーと下タブは動かさない。
+   ════════════════════════════════════════════ */
+/* View Transition 中は、ページのフェードイン（非対応ブラウザ用）を重ねない */
+:root:active-view-transition .animate-page { animation: none; }
+
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; }
+
+@keyframes vt-fade-in { from { opacity: 0; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@keyframes vt-slide-from { from { translate: var(--vt-offset) 0; } }
+@keyframes vt-slide-to { to { translate: var(--vt-offset) 0; } }
+@keyframes vt-rise { from { translate: 0 8px; } }
+
+::view-transition-old(.nav-forward) {
+  --vt-offset: -30%;
+  animation: 0.16s ease-in both vt-fade-out, 0.34s cubic-bezier(0.32, 0.72, 0, 1) both vt-slide-to;
+}
+::view-transition-new(.nav-forward) {
+  --vt-offset: 100%;
+  animation: 0.34s cubic-bezier(0.32, 0.72, 0, 1) both vt-slide-from;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
+}
+::view-transition-old(.nav-back) {
+  --vt-offset: 100%;
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both vt-slide-to;
+  z-index: 1;
+}
+::view-transition-new(.nav-back) {
+  --vt-offset: -30%;
+  animation: 0.3s cubic-bezier(0.32, 0.72, 0, 1) both vt-slide-from;
+}
+::view-transition-old(.nav-tab),
+::view-transition-old(.nav-fade) { animation: 0.12s ease-out both vt-fade-out; }
+::view-transition-new(.nav-tab),
+::view-transition-new(.nav-fade) {
+  animation: 0.22s ease-out 0.06s both vt-fade-in, 0.28s cubic-bezier(0.22, 0.8, 0.2, 1) 0.06s both vt-rise;
+}
+
+/* スライドするページはページの枠内で切り抜く（PC のデバイス枠からはみ出さない） */
+::view-transition-group(.nav-forward),
+::view-transition-group(.nav-back) { overflow: clip; }
+
+/* 一覧の写真 → プロフィール写真の変形 */
+::view-transition-group(.morph) { animation-duration: 0.38s; animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1); }
+::view-transition-image-pair(.morph) { isolation: isolate; }
+
+/* ヘッダー・下タブは固定（中身だけが動いて見えるように） */
+::view-transition-group(app-header),
+::view-transition-group(bottom-nav) { animation: none; z-index: 100; }
+::view-transition-old(app-header),
+::view-transition-old(bottom-nav) { display: none; }
+::view-transition-new(app-header),
+::view-transition-new(bottom-nav) { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in, .animate-scale-in, .animate-page,
+  .animate-tab-pop, .animate-badge-pop, .animate-heart-pop, .heart-burst,
   .stagger > *,
   details[open] .details-body {
     animation: none !important;
+  }
+  .heart-burst { display: none; }
+  .press:active, .press-soft:active { transform: none; }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }
 

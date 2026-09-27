@@ -12,19 +12,23 @@ export function AppHeader({
   right?: React.ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-20 grid h-12 grid-cols-[4.5rem_1fr_4.5rem] items-center border-b border-line-soft bg-surface px-1.5">
+    <header
+      style={{ viewTransitionName: "app-header" }}
+      className="sticky top-0 z-20 grid h-12 grid-cols-[4.5rem_1fr_4.5rem] items-center border-b border-line-soft bg-surface px-1.5"
+    >
       <div className="flex items-center">
         {backHref && (
           <Link
             href={backHref}
+            transitionTypes={["nav-back"]}
             aria-label="戻る"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition-opacity active:opacity-60"
+            className="press flex h-10 w-10 items-center justify-center rounded-full text-ink"
           >
             <IconChevronLeft className="h-6 w-6" />
           </Link>
         )}
       </div>
-      <h1 className="truncate text-center text-base font-bold text-ink">{title}</h1>
+      <h1 key={title} className="animate-fade-in truncate text-center text-base font-bold text-ink">{title}</h1>
       <div className="flex items-center justify-end pr-1">{right}</div>
     </header>
   );

@@ -131,7 +131,7 @@ function MatchList({ items, pendingReceived }: { items: MatchItem[]; pendingRece
     <div className="space-y-3 px-4 py-4">
       {pendingReceived > 0 && (
         <Link
-          href="/applications"
+          href="/applications" transitionTypes={["nav-forward"]}
           className="animate-fade-up flex items-center gap-3 rounded-[var(--radius-card)] border border-primary/25 bg-primary-tint px-4 py-3 transition-colors active:bg-primary-soft"
         >
           <span className="num-tnum flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
@@ -160,7 +160,7 @@ function MatchList({ items, pendingReceived }: { items: MatchItem[]; pendingRece
           {items.map((it) => (
             <li key={it.id}>
               <Link
-                href={`/matches/${it.id}`}
+                href={`/matches/${it.id} transitionTypes={["nav-forward"]}`}
                 className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-canvas active:bg-surface-alt"
               >
                 {/* 要対応（日程候補が届いた・予定が近い）はグラデーションの輪で目立たせる */}
@@ -208,7 +208,7 @@ function PartnerCard({
 }) {
   return (
     <Link
-      href={href}
+      href={href} transitionTypes={["nav-forward"]}
       className="flex items-start gap-3 rounded-[var(--radius-card)] border border-line/80 bg-surface p-4 shadow-[var(--shadow-card)] transition-colors hover:bg-canvas active:scale-[0.99]"
     >
       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-alt text-ink-soft">

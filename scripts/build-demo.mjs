@@ -5,7 +5,7 @@
 //  ビルド直前に「ソースを一時的に」次のとおり変換してからエクスポートし、
 //  完了後に必ず元へ戻す（実アプリのソースは不変）。
 //   1) app/**/actions.ts から "use server" を除去（=ただのモジュール化）
-//   2) JSX の action={fn} / createMember={fn} を {undefined} に置換
+//   2) JSX の action={fn} / formAction={fn} / createMember={fn} を {undefined} に置換
 //      （サーバー→クライアントへ関数を渡さない・フォームを無害化）
 //   3) route handler(POST 等) は静的エクスポート不可のため一時削除
 //   4) page は force-static（searchParams/cookies を空値化して静的生成可能に）
@@ -51,7 +51,7 @@ for (const f of files) {
     removedRoutes++;
   } else if (f.endsWith(".tsx")) {
     const src = readFileSync(f, "utf8");
-    let next = src.replace(/action=\{\w+\}/g, "action={undefined}");
+    let next = src.replace(/\b(action|formAction)=\{\w+\}/g, "$1={undefined}");
     next = next.replace(/createMember=\{\w+\}/g, "createMember={undefined}");
     if (f.endsWith(`${"page"}.tsx`) && !/export const dynamic\b/.test(next)) {
       next += '\nexport const dynamic = "force-static";\n';

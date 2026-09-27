@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ViewTransition } from "react";
 import { notFound, redirect } from "next/navigation";
 import { requireMember } from "@/lib/auth";
 import { IS_DEMO, getDemoMember } from "@/lib/demo";
@@ -24,11 +24,12 @@ import { UserPhoto } from "@/components/member/UserPhoto";
 import { Avatar } from "@/components/ui/Avatar";
 import { Card, CardBody, SectionTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { BadgeVerified, BadgeCrown, IconChevronRight } from "@/components/member/icons";
+import { BadgeVerified, BadgeCrown, IconChevronRight, IconHeart } from "@/components/member/icons";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Textarea, Select } from "@/components/ui/Input";
-import { applyToUser, blockUser, reportUser } from "./actions";
+import { LikeButton } from "@/components/member/LikeButton";
+import { applyToUser, blockUser, likeUser, reportUser } from "./actions";
 
 /** 1行の項目表示（ラベル：値） */
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -88,7 +89,7 @@ export default async function UserDetailPage({
     { applicantId: me.id, receiverId: user.id },
     { applicantId: user.id, receiverId: me.id },
   ];
-  const [activeMatch, myPending, theirPending] = await Promise.all([
+  const [activeMatch, myPending, theirPending, myLike, theirLike] = await Promise.all([
     prisma.match.findFirst({
       where: { phase: { in: ["SCHEDULING", "CONFIRMED"] }, OR: pair },
       select: { id: true, phase: true },
@@ -99,6 +100,14 @@ export default async function UserDetailPage({
     }),
     prisma.dateApplication.findFirst({
       where: { applicantId: user.id, receiverId: me.id, status: "PENDING" },
+      select: { id: true },
+    }),
+    prisma.like.findUnique({
+      where: { fromId_toId: { fromId: me.id, toId: user.id } },
+      select: { id: true },
+    }),
+    prisma.like.findUnique({
+      where: { fromId_toId: { fromId: user.id, toId: me.id } },
       select: { id: true },
     }),
   ]);
@@ -118,9 +127,11 @@ export default async function UserDetailPage({
       <div className="stagger space-y-4 px-4 pb-6 pt-4">
         {/* 写真＋名前（写真の下に白背景で情報。オーバーレイ文字は使わない） */}
         <Card className="overflow-hidden">
-          <div className="aspect-[4/5] w-full overflow-hidden">
-            <UserPhoto url={user.photos[0]?.url} name={user.nickname} size="lg" />
-          </div>
+          <ViewTransition name={`photo-${user.id}`} share="morph">
+            <div className="aspect-[4/5] w-full overflow-hidden">
+              <UserPhoto url={user.photos[0]?.url} name={user.nickname} size="lg" />
+            </div>
+          </ViewTransition>
           <CardBody className="space-y-1">
             <div className="flex items-center gap-1.5">
               <h2 className="truncate text-lg font-bold text-ink">
@@ -136,6 +147,12 @@ export default async function UserDetailPage({
               {calcAge(user.birthDate)}歳・{RESIDENCE_AREA_LABELS[user.residenceArea]}
               {ELIGIBILITY_LABELS[user.eligibilityType]}・{user.occupation}
             </p>
+            {theirLike && (
+              <p className="animate-scale-in inline-flex items-center gap-1 rounded-full bg-danger-soft px-2.5 py-1 text-xs font-bold text-like">
+                <IconHeart filled className="h-3.5 w-3.5" />
+                {myLike ? "お互いにいいね！しています" : "あなたにいいね！しています"}
+              </p>
+            )}
           </CardBody>
         </Card>
 
@@ -310,7 +327,7 @@ export default async function UserDetailPage({
             <IconChevronRight className="h-4 w-4" />
           </ButtonLink>
         ) : myPending ? (
-          <div className="flex h-13 w-full items-center justify-center rounded-full bg-surface-alt text-[15px] font-bold text-ink-soft">
+          <div className="flex h-11 w-full items-center justify-center rounded-lg bg-surface-alt text-[15px] font-bold text-ink-soft">
             お申込み済み・お返事をお待ちください
           </div>
         ) : (
@@ -319,6 +336,7 @@ export default async function UserDetailPage({
               <p className="text-[10px] font-bold text-ink-faint">AI相性</p>
               <p className="num-tnum text-lg font-black leading-tight text-primary-strong">{compat}%</p>
             </div>
+            <LikeButton targetId={user.id} initialLiked={!!myLike} action={likeUser} />
             <ButtonLink href="#apply" size="lg" className="flex-1">
               デートを申し込む
             </ButtonLink>

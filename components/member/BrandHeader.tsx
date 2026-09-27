@@ -17,7 +17,10 @@ export function BrandHeader({
   title?: string;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between bg-surface px-4">
+    <header
+      style={{ viewTransitionName: "app-header" }}
+      className="sticky top-0 z-20 flex h-14 items-center justify-between bg-surface px-4"
+    >
       {title ? (
         <h1 className="text-[22px] font-bold tracking-tight text-ink">{title}</h1>
       ) : (
@@ -30,12 +33,13 @@ export function BrandHeader({
       {bell && (
         <Link
           href="/notifications"
+          transitionTypes={["nav-forward"]}
           aria-label={unread > 0 ? `お知らせ（未読${unread}件）` : "お知らせ"}
-          className="relative -mr-2 flex h-10 w-10 items-center justify-center rounded-full text-ink transition-opacity active:opacity-60"
+          className="press relative -mr-2 flex h-10 w-10 items-center justify-center rounded-full text-ink"
         >
           <IconBell className="h-[26px] w-[26px]" />
           {unread > 0 && (
-            <span className="num-tnum absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-like px-1 text-[11px] font-bold text-white ring-2 ring-surface">
+            <span className="animate-badge-pop num-tnum absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-like px-1 text-[11px] font-bold text-white ring-2 ring-surface">
               {unread}
             </span>
           )}

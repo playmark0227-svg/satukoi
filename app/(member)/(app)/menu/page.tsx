@@ -38,7 +38,7 @@ function MenuRow({
 }) {
   return (
     <Link
-      href={href}
+      href={href} transitionTypes={["nav-forward"]}
       className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-surface-alt/50"
     >
       <span className="shrink-0 transition-transform duration-200 group-hover:scale-110">

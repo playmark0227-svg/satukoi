@@ -5,7 +5,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg transition-colors duration-150 active:opacity-70 disabled:opacity-40 disabled:pointer-events-none whitespace-nowrap";
+  "press inline-flex items-center justify-center gap-1.5 font-semibold rounded-lg disabled:opacity-40 disabled:pointer-events-none whitespace-nowrap";
 
 // Instagram と同じ考え方：主操作はブルー、それ以外はグレーの面ボタン
 const variants: Record<Variant, string> = {
@@ -49,14 +49,16 @@ export function ButtonLink({
   className,
   children,
   href,
+  transitionTypes,
   ...rest
-}: CommonProps & { href: string } & Omit<
+}: CommonProps & { href: string; transitionTypes?: string[] } & Omit<
     React.AnchorHTMLAttributes<HTMLAnchorElement>,
     "href"
   >) {
   return (
     <Link
       href={href}
+      transitionTypes={transitionTypes}
       className={cn(base, variants[variant], sizes[size], className)}
       {...rest}
     >

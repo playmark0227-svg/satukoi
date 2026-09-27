@@ -38,7 +38,7 @@ function Row({
 }) {
   return (
     <Link
-      href={href}
+      href={href} transitionTypes={["nav-forward"]}
       className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-alt/50"
     >
       <span
@@ -134,7 +134,7 @@ export default async function MyPage() {
             );
           })()}
 
-          <ButtonLink href="/mypage/edit" size="lg" className="mt-3">
+          <ButtonLink href="/mypage/edit" transitionTypes={["nav-forward"]} size="lg" className="mt-3">
             <IconPencil className="h-5 w-5" />
             プロフィールを編集
           </ButtonLink>

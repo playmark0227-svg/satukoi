@@ -4,8 +4,14 @@ import type { NextConfig } from "next";
 // （リポジトリ名 satukoi のプロジェクトページ: /satukoi 配下で配信）
 const isDemoExport = process.env.DEMO_EXPORT === "1";
 
+// 画面遷移アニメーション（React の <ViewTransition>）を有効化。デモ・本番とも共通。
+const common: NextConfig = {
+  experimental: { viewTransition: true },
+};
+
 const nextConfig: NextConfig = isDemoExport
   ? {
+      ...common,
       output: "export",
       basePath: "/satukoi",
       images: { unoptimized: true },
@@ -14,6 +20,6 @@ const nextConfig: NextConfig = isDemoExport
       // それに伴う型不整合でデプロイを止めない。本番ビルドは別途検証済み。
       typescript: { ignoreBuildErrors: true },
     }
-  : {};
+  : common;
 
 export default nextConfig;

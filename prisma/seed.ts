@@ -40,6 +40,9 @@ async function clean() {
   await prisma.auditLog.deleteMany();
   await prisma.adminMemo.deleteMany();
   await prisma.notification.deleteMany();
+  await prisma.like.deleteMany();
+  await prisma.notificationRule.deleteMany();
+  await prisma.lineDeliverySetting.deleteMany();
   await prisma.surveyResponse.deleteMany();
   await prisma.warning.deleteMany();
   await prisma.cancellation.deleteMany();
@@ -127,6 +130,8 @@ async function createMember(args: {
       cardRegistered: true,
       stripeCustomerId: `cus_stub_${sex}${i}`,
       lineConnected: i % 2 === 1, // デモ会員（けんた=男性i=1）はLINE連携済み
+      lineUserId: i % 2 === 1 ? `U_demo_${sex.toLowerCase()}_${i}` : null,
+      lineFollowing: i % 2 === 1 ? true : null,
       notifyViaLine: true,
       fullName: name[0],
       nickname: name[1],
@@ -507,6 +512,35 @@ async function main() {
     });
   }
 
+  // ── いいね（デモ会員けんた宛に数件・けんたからも1件） ──
+  const likedBy: [number, Date][] = [
+    [0, jstAt(0, 8, 40)],
+    [4, jstAt(-1, 21, 5)],
+    [5, jstAt(-3, 12, 30)],
+  ];
+  for (const [fi, at] of likedBy) {
+    const f = females[fi];
+    if (!f) continue;
+    await prisma.like.create({ data: { fromId: f.id, toId: males[1].id, createdAt: at } });
+    await prisma.notification.create({
+      data: {
+        memberId: males[1].id,
+        type: "LIKE_RECEIVED",
+        title: "いいねが届きました",
+        body: `${f.nickname}さんからいいねが届きました。プロフィールを見てみましょう。`,
+        path: `/users/${f.id}`,
+        lineSentAt: at,
+        createdAt: at,
+      },
+    });
+  }
+  await prisma.like.create({ data: { fromId: males[1].id, toId: females[1].id, createdAt: jstAt(-2, 20, 0) } });
+
+  // LINE 配信の全体設定（例：ライトプラン相当の月5,000通、うち500通は優先イベント用に確保）
+  await prisma.lineDeliverySetting.create({
+    data: { id: "default", enabled: true, monthlyLimit: 5000, priorityReserve: 500 },
+  });
+
   // 通報・お問い合わせ
   await prisma.report.create({
     data: {
@@ -576,6 +610,7 @@ async function main() {
     members: await prisma.member.count(),
     matches: await prisma.match.count(),
     stores: await prisma.store.count(),
+    likes: await prisma.like.count(),
   };
   console.log("Seed 完了:", counts);
 }

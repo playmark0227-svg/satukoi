@@ -49,6 +49,58 @@ export async function applyToUser(formData: FormData) {
   redirect("/applications?tab=sent");
 }
 
+/**
+ * いいね：Like を作成し、相手に LIKE_RECEIVED を通知（LINE 通知の対象）。
+ * いいねは取り消せない一方向のアプローチ（何度押しても通知は1回だけ）。
+ */
+export async function likeUser(targetId: string): Promise<{ ok: boolean }> {
+  const me = await requireMember();
+  if (targetId === me.id) return { ok: false };
+
+  const target = await prisma.member.findUnique({
+    where: { id: targetId },
+    select: { id: true, sex: true, status: true },
+  });
+  if (!target || target.status !== "ACTIVE" || target.sex === me.sex) return { ok: false };
+
+  const blocked = await prisma.block.findFirst({
+    where: {
+      OR: [
+        { blockerId: me.id, blockedId: targetId },
+        { blockerId: targetId, blockedId: me.id },
+      ],
+    },
+    select: { id: true },
+  });
+  if (blocked) return { ok: false };
+
+  const existing = await prisma.like.findUnique({
+    where: { fromId_toId: { fromId: me.id, toId: targetId } },
+    select: { id: true },
+  });
+  if (existing) return { ok: true };
+
+  await prisma.like.create({ data: { fromId: me.id, toId: targetId } });
+
+  const mutual = await prisma.like.findUnique({
+    where: { fromId_toId: { fromId: targetId, toId: me.id } },
+    select: { id: true },
+  });
+  await notify({
+    memberId: targetId,
+    type: "LIKE_RECEIVED",
+    title: mutual ? "お互いにいいね！になりました" : "いいねが届きました",
+    body: mutual
+      ? `${me.nickname}さんもあなたにいいね！しています。デートを申し込んでみましょう。`
+      : `${me.nickname}さんからいいねが届きました。プロフィールを見てみましょう。`,
+    path: `/users/${me.id}`,
+  });
+
+  revalidatePath(`/users/${targetId}`);
+  revalidatePath("/users");
+  return { ok: true };
+}
+
 /** ブロック：双方に今後非表示。Block を upsert。 */
 export async function blockUser(formData: FormData) {
   const me = await requireMember();

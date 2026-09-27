@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, ViewTransition } from "react";
 import { RESIDENCE_AREA_LABELS } from "@/lib/constants";
 import { Field } from "@/components/ui/Field";
 import { Input, Select } from "@/components/ui/Input";
@@ -23,12 +23,14 @@ export type GridUser = {
   isNew: boolean;
   /** 自分との関係（申込済み・マッチ中など）。なければ null */
   relation: string | null;
+  /** 自分がいいね！済み */
+  iLiked: boolean;
 };
 
 type Filter = { ageMin: string; ageMax: string; area: string };
 
-/** 自分から申し込んだ／マッチ中 → ハートを塗る（届いた申込は塗らない） */
-const liked = (u: GridUser) => u.relation === "申込済み" || u.relation === "マッチ中";
+/** 自分からいいね！／申し込んだ／マッチ中 → ハートを塗る（届いたものは塗らない） */
+const liked = (u: GridUser) => u.iLiked || u.relation === "申込済み" || u.relation === "マッチ中";
 
 /**
  * ホームの絞り込み＋お相手グリッド。
@@ -177,9 +179,19 @@ export function UserGrid({
         ) : (
           <div className="stagger grid grid-cols-2 gap-x-3 gap-y-5">
             {list.map((u) => (
-              <Link key={u.id} href={`/users/${u.id}`} className="group block transition-opacity active:opacity-70">
+              <Link
+                key={u.id}
+                href={`/users/${u.id}`}
+                transitionTypes={["nav-forward"]}
+                className="press-soft group block"
+              >
                 <div className="relative aspect-square overflow-hidden rounded-lg bg-surface-alt">
-                  <UserPhoto url={u.photoUrl} name={u.nickname} />
+                  {/* 一覧の写真 → プロフィールの大きな写真へ変形しながら移動 */}
+                  <ViewTransition name={`photo-${u.id}`} share="morph">
+                    <div className="h-full w-full">
+                      <UserPhoto url={u.photoUrl} name={u.nickname} />
+                    </div>
+                  </ViewTransition>
                   <span className="absolute left-2 top-2 flex items-center gap-1">
                     {u.isNew && (
                       <span className="rounded-md bg-[image:var(--gradient-brand)] px-1.5 py-0.5 text-[10px] font-bold text-white">

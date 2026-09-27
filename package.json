@@ -13,7 +13,8 @@
     "db:reset": "prisma migrate reset",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "demo:build": "node scripts/build-demo.mjs"
+    "demo:build": "node scripts/build-demo.mjs",
+    "admin:create": "tsx scripts/create-admin.ts"
   },
   "dependencies": {
     "@line/liff": "^2.31.0",

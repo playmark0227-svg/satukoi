@@ -201,6 +201,7 @@ export const CANCELLATION_CATEGORY_LABELS = {
 } as const;
 
 export const NOTIFICATION_TYPE_LABELS = {
+  LIKE_RECEIVED: "いいね",
   APPLICATION_RECEIVED: "申受",
   MATCHED: "マッチング",
   CANDIDATE_RECEIVED: "デート日程候補受信",
