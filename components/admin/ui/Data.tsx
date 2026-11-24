@@ -106,7 +106,7 @@ export function Table({
   return (
     <div
       className={cn(
-        "overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface",
+        "relative overflow-x-auto rounded-[var(--radius-card)] border border-line bg-surface",
         !alwaysVisible && "hidden lg:block",
         className
       )}

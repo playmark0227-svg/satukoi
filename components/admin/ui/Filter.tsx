@@ -222,7 +222,7 @@ const chipBase =
 const chipActive = "border-ink bg-ink text-white";
 const chipIdle = "border-line bg-surface text-ink hover:bg-canvas";
 
-/** 1つだけ選ぶチップ（すべて／有効／書類確認中…） */
+/** 1つだけ選ぶチップ（すべて／有効／書類確認中…）。スマホでも横スクロールにせず折り返して全部見せる */
 export function FilterChips({
   name,
   options,
@@ -243,7 +243,7 @@ export function FilterChips({
     <div
       role="radiogroup"
       aria-label={label}
-      className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-0.5 [scrollbar-width:none] lg:mx-0 lg:flex-wrap lg:px-0 [&::-webkit-scrollbar]:hidden"
+      className="flex flex-wrap gap-2"
     >
       {items.map((o) => {
         const active = current === o.value;

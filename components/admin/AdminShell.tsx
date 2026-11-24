@@ -161,7 +161,7 @@ export function AdminShell({
             <Link href="/admin" className="flex min-w-0 items-center gap-2">
               <BrandMark className="h-7 w-7 shrink-0" />
               <span className="text-[17px] font-black tracking-tight text-ink">サツコイ！</span>
-              <span className="text-xs font-semibold text-ink-soft">運営管理</span>
+              <span className="text-xs font-semibold text-ink-soft max-[359px]:hidden">運営管理</span>
             </Link>
             <span className="ml-auto max-w-[8em] truncate text-[13px] text-ink-soft">{adminName}</span>
             <LogoutButton className="-mr-2" />

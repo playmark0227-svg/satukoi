@@ -12,7 +12,7 @@ export function BackLink({ href, children }: { href: string; children: React.Rea
   return (
     <Link
       href={href}
-      className="mb-2 inline-flex items-center gap-0.5 text-[13px] font-semibold text-primary-text hover:underline"
+      className="mb-1 inline-flex min-h-8 items-center gap-0.5 pr-2 text-[13px] font-semibold text-primary-text hover:underline"
     >
       <IconChevronLeft className="h-4 w-4" />
       {children}
@@ -187,7 +187,10 @@ export function DetailLayout({ main, aside }: { main: React.ReactNode; aside: Re
   return (
     <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
       <div className="order-2 min-w-0 space-y-6 xl:order-1">{main}</div>
-      <aside className="order-1 space-y-4 xl:sticky xl:top-6 xl:order-2">{aside}</aside>
+      {/* 画面より高いときは右欄の中だけスクロール（操作ボタンが画面外に取り残されないように） */}
+      <aside className="order-1 space-y-4 xl:sticky xl:top-6 xl:order-2 xl:-m-1 xl:max-h-[calc(100dvh-3rem)] xl:overflow-y-auto xl:overscroll-contain xl:p-1">
+        {aside}
+      </aside>
     </div>
   );
 }

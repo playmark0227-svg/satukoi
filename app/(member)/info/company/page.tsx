@@ -1,6 +1,6 @@
 import { SERVICE_NAME, SERVICE_CATCHPHRASE } from "@/lib/constants";
-import { AppHeader } from "@/components/member/AppHeader";
 import { Card, CardBody } from "@/components/ui/Card";
+import { InfoHeader } from "../InfoHeader";
 
 const ROWS: { label: string; value: string }[] = [
   { label: "サービス名", value: SERVICE_NAME },
@@ -14,7 +14,7 @@ const ROWS: { label: string; value: string }[] = [
 export default function CompanyPage() {
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="運営会社" backHref="/menu" />
+      <InfoHeader title="運営会社" />
 
       <div className="space-y-4 px-4 py-4">
         <Card>
@@ -37,7 +37,7 @@ export default function CompanyPage() {
           </CardBody>
         </Card>
 
-        <p className="px-1 text-xs leading-relaxed text-ink-faint">
+        <p className="px-1 text-xs leading-relaxed text-ink-soft">
           ※ 本ページの記載内容はサンプルです。正式な会社情報・特定商取引法に基づく表記は別途掲載します。
         </p>
       </div>

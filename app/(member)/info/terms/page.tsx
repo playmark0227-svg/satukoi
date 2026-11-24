@@ -1,6 +1,6 @@
 import { SERVICE_NAME } from "@/lib/constants";
-import { AppHeader } from "@/components/member/AppHeader";
 import { Card, CardBody } from "@/components/ui/Card";
+import { InfoHeader } from "../InfoHeader";
 
 const SECTIONS = [
   {
@@ -36,10 +36,10 @@ const SECTIONS = [
 export default function TermsPage() {
   return (
     <div className="flex flex-1 flex-col pb-10">
-      <AppHeader title="利用規約" backHref="/menu" />
+      <InfoHeader title="利用規約" />
 
       <div className="space-y-4 px-4 py-4">
-        <p className="text-xs text-ink-faint">最終更新日：2026年6月25日</p>
+        <p className="text-xs text-ink-soft">最終更新日：2026年6月25日</p>
         <Card>
           <CardBody className="text-longform space-y-5">
             {SECTIONS.map((s) => (
@@ -48,7 +48,7 @@ export default function TermsPage() {
                 <p className="text-sm leading-relaxed text-ink-soft">{s.body}</p>
               </section>
             ))}
-            <p className="border-t border-line pt-4 text-xs leading-relaxed text-ink-faint">
+            <p className="border-t border-line pt-4 text-xs leading-relaxed text-ink-soft">
               ※ 本文はサンプルです。正式な利用規約は別途定めるものとします。
             </p>
           </CardBody>

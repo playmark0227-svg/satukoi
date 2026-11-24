@@ -7,6 +7,9 @@ import { SERVICE_NAME } from "@/lib/constants";
 import { BrandMark } from "@/components/member/BrandMark";
 import { adminLogin } from "./actions";
 
+/** ログイン後のサイドバー・ヘッダー（AdminShell）と同じ表記にする（「（仮）」を付けない） */
+const ADMIN_BRAND = SERVICE_NAME.replace(/（仮）$/, "");
+
 export default async function AdminLoginPage({
   searchParams,
 }: {
@@ -21,29 +24,23 @@ export default async function AdminLoginPage({
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="animate-fade-up text-center">
-          <BrandMark className="mx-auto h-16 w-16" />
-          <h1 className="mt-4 text-2xl font-black tracking-tight text-ink">
-            {SERVICE_NAME}
-          </h1>
-          <p className="mt-2 text-sm font-bold text-ink-soft">運営管理画面</p>
+          <BrandMark className="mx-auto h-14 w-14" />
+          <h1 className="mt-3 text-2xl font-black tracking-tight text-ink">{ADMIN_BRAND}</h1>
+          <p className="mt-1 text-sm font-semibold text-ink-soft">運営管理画面</p>
         </div>
 
-        <div className="mt-6 rounded-lg border border-line bg-surface px-8 py-7">
-          <p className="text-center text-sm font-bold text-ink">
-            運営ログイン
-          </p>
-
+        <div className="mt-6 rounded-[var(--radius-card)] border border-line bg-surface px-5 py-6 sm:px-7">
           {error && (
             <p
               role="alert"
-              className="mt-4 rounded-xl bg-danger-soft px-4 py-3 text-center text-sm font-bold text-danger"
+              className="mb-4 rounded-lg border border-danger/30 bg-danger-soft px-3.5 py-2.5 text-sm font-semibold text-danger-strong"
             >
               メールアドレスまたはパスワードが正しくありません。
             </p>
           )}
 
-          <form action={adminLogin} className="mt-5 space-y-4">
-            <Field label="メールアドレス" required>
+          <form action={adminLogin} className="space-y-4">
+            <Field label="メールアドレス">
               <Input
                 type="email"
                 name="email"
@@ -54,12 +51,11 @@ export default async function AdminLoginPage({
               />
             </Field>
 
-            <Field label="パスワード" required>
+            <Field label="パスワード">
               <Input
                 type="password"
                 name="password"
                 autoComplete="current-password"
-                placeholder="パスワード"
                 required
               />
             </Field>
@@ -72,7 +68,7 @@ export default async function AdminLoginPage({
           </form>
         </div>
 
-        <p className="mt-6 text-center text-xs text-ink-faint">
+        <p className="mt-5 text-center text-[13px] text-ink-soft">
           関係者以外のログインはご遠慮ください。
         </p>
       </div>

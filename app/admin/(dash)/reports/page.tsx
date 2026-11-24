@@ -1,44 +1,42 @@
-import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { Card, CardBody } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/cn";
+import type { ReportStatus } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
-import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { MemberStatusBadge } from "@/components/ui/StatusBadge";
+import { IconChevronRight } from "@/components/member/icons";
+import { PageHeader, Section, Panel, EmptyInline } from "@/components/admin/ui/Layout";
 import {
-  REPORT_TYPE_LABELS,
-  REPORT_STATUS_LABELS,
-  INQUIRY_STATUS_LABELS,
-} from "@/lib/constants";
-import { formatDateTime } from "@/lib/format";
-import {
-  resolveReport,
-  suspendReported,
-  addReportMemo,
-  resolveInquiry,
-} from "./actions";
+  Tag,
+  CountPill,
+  ReportStatusPill,
+  InquiryStatusPill,
+  MemberStatusPill,
+} from "@/components/admin/ui/Pills";
+import { MemberName, Timestamp } from "@/components/admin/ui/Data";
+import { FilterScope, FilterChips, FilterRow, FilterEmpty } from "@/components/admin/ui/Filter";
+import { navLabel } from "@/lib/admin/nav";
+import { REPORT_TYPE_LABELS, REPORT_STATUS_LABELS, INQUIRY_STATUS_LABELS } from "@/lib/constants";
+import { resolveReport, suspendReported, addReportMemo, resolveInquiry } from "./actions";
 
+// 通報・お問い合わせは同じ3段階（未対応・対応中・対応完了）
+const STATUS_ORDER: ReportStatus[] = ["OPEN", "IN_PROGRESS", "RESOLVED"];
 
-const REPORT_STATUS_TONE = {
-  OPEN: "danger",
-  IN_PROGRESS: "warning",
-  RESOLVED: "success",
-} as const;
+/** 要対応の行の左に出す黄色の線（一覧の rowClass と同じ表現） */
+const ATTENTION_LINE = "shadow-[inset_3px_0_0_var(--color-warning)]";
 
-const INQUIRY_STATUS_TONE = {
-  OPEN: "danger",
-  IN_PROGRESS: "warning",
-  RESOLVED: "success",
-} as const;
+function countByStatus(items: { status: ReportStatus }[]) {
+  return Object.fromEntries(STATUS_ORDER.map((s) => [s, items.filter((i) => i.status === s).length])) as Record<
+    ReportStatus,
+    number
+  >;
+}
 
 export default async function AdminReportsPage() {
   const [reports, inquiries] = await Promise.all([
     prisma.report.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       include: {
-        reporter: { select: { id: true, nickname: true } },
+        reporter: { select: { id: true, nickname: true, fullName: true } },
         reported: {
           select: { id: true, nickname: true, fullName: true, status: true },
         },
@@ -47,182 +45,335 @@ export default async function AdminReportsPage() {
     prisma.inquiry.findMany({
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       include: {
-        member: { select: { id: true, nickname: true } },
+        member: { select: { id: true, nickname: true, fullName: true } },
       },
     }),
   ]);
 
+  const reportCounts = countByStatus(reports);
+  const inquiryCounts = countByStatus(inquiries);
+  const openReports = reportCounts.OPEN + reportCounts.IN_PROGRESS;
+  const openInquiries = inquiryCounts.OPEN + inquiryCounts.IN_PROGRESS;
+
   return (
     <div>
-      <h1 className="mb-1 text-xl font-bold text-ink">通報・お問い合わせ</h1>
-      <p className="mb-6 text-sm text-ink-soft">
-        会員からの通報と、お問い合わせを確認し対応します。
-      </p>
+      <PageHeader
+        title={navLabel("reports")}
+        description="会員からの通報とお問い合わせを確認し、対応します。"
+        actions={
+          // PC では両セクションが1画面に収まるので、スマホ・タブレットだけ下のセクションへのリンクを出す
+          <div className="lg:hidden">
+            <JumpLink href="#inquiries" label="お問い合わせへ" open={openInquiries} />
+          </div>
+        }
+      />
 
-      {/* ── 通報一覧 ── */}
-      <section className="mb-8">
-        <h2 className="mb-2 px-1 text-sm font-bold text-ink-soft">
-          通報一覧（{reports.length} 件）
-        </h2>
+      {/* ── 通報 ── */}
+      <Section id="reports" title="通報" count={reports.length} action={<OpenCount n={openReports} />}>
         {reports.length === 0 ? (
-          <Card>
-            <CardBody>
-              <EmptyState
-                title="通報はありません"
-                description="会員からの通報が届くとここに表示されます。"
-              />
-            </CardBody>
-          </Card>
+          <Panel>
+            <EmptyInline tone="clear">通報はありません</EmptyInline>
+          </Panel>
         ) : (
-          <div className="space-y-3">
-            {reports.map((r) => (
-              <Card key={r.id}>
-                <CardBody>
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <Badge tone={REPORT_STATUS_TONE[r.status]}>
-                      {REPORT_STATUS_LABELS[r.status]}
-                    </Badge>
-                    <Badge tone="neutral">{REPORT_TYPE_LABELS[r.type]}</Badge>
-                    <MemberStatusBadge status={r.reported.status} />
-                  </div>
+          <FilterScope params={["report"]}>
+            <div className={cn("mb-3", WRAP_CHIPS)}>
+              <FilterChips
+                name="report"
+                label="通報の対応状況"
+                allCount={reports.length}
+                options={STATUS_ORDER.map((s) => ({
+                  value: s,
+                  label: REPORT_STATUS_LABELS[s],
+                  count: reportCounts[s],
+                }))}
+              />
+            </div>
+            <ul className="flex flex-col gap-3">
+              {reports.map((r) => {
+                const resolved = r.status === "RESOLVED";
+                return (
+                  <FilterRow
+                    key={r.id}
+                    id={r.id}
+                    as="li"
+                    search={[
+                      r.reported.nickname,
+                      r.reported.fullName,
+                      r.reporter.nickname,
+                      r.reporter.fullName,
+                      REPORT_TYPE_LABELS[r.type],
+                      r.content,
+                    ].join(" ")}
+                    facets={{ report: r.status }}
+                  >
+                    <Panel className={cn(resolved ? "bg-canvas" : ATTENTION_LINE)}>
+                      {/* 未対応・対応中は右の列（スマホは下）に操作。対応完了は操作を下に畳む */}
+                      <div className={cn(!resolved && "md:grid md:grid-cols-[minmax(0,1fr)_20rem]")}>
+                        {/* 内容 */}
+                        <div className="min-w-0 space-y-3 p-4">
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                            <ReportStatusPill status={r.status} size="md" />
+                            <Tag>{REPORT_TYPE_LABELS[r.type]}</Tag>
+                            <Dates
+                              className="xl:ml-auto"
+                              items={[
+                                ["通報", r.createdAt],
+                                ["対応", r.handledAt],
+                              ]}
+                            />
+                          </div>
 
-                  <p className="text-sm text-ink">
-                    <Link
-                      href={`/admin/members/${r.reporter.id}`}
-                      className="font-bold text-primary hover:underline"
-                    >
-                      {r.reporter.nickname}さん
-                    </Link>
-                    <span className="text-ink-faint">（通報者）→ </span>
-                    <Link
-                      href={`/admin/members/${r.reported.id}`}
-                      className="font-bold text-primary hover:underline"
-                    >
-                      {r.reported.nickname}さん
-                    </Link>
-                    <span className="text-xs text-ink-faint">
-                      （{r.reported.fullName}・対象会員）
-                    </span>
-                  </p>
+                          <div className="space-y-1.5 text-sm">
+                            {/* 折り返したときは名前の列にそろえる（ぶら下げインデント） */}
+                            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 pl-[3.75rem]">
+                              <MemberName member={r.reported} role="対象会員" className={cn(ROLE_COL, "-ml-[3.75rem]")} />
+                              <span className="inline-flex items-center gap-1 text-xs text-ink-soft">
+                                会員の状態
+                                <MemberStatusPill status={r.reported.status} />
+                              </span>
+                            </p>
+                            <p>
+                              <MemberName member={r.reporter} role="通報者" className={ROLE_COL} />
+                            </p>
+                          </div>
 
-                  <p className="mt-2 whitespace-pre-wrap rounded-lg bg-canvas px-3 py-2 text-sm text-ink-soft">
-                    {r.content}
-                  </p>
-                  <p className="mt-1 text-xs text-ink-faint">
-                    通報日時 {formatDateTime(r.createdAt)}
-                    {r.handledAt && ` ／ 対応 ${formatDateTime(r.handledAt)}`}
-                  </p>
+                          <div>
+                            <p className="text-[13px] text-ink-soft">通報内容</p>
+                            <p
+                              className={cn(
+                                "mt-0.5 text-sm leading-relaxed whitespace-pre-wrap",
+                                resolved ? "text-ink-soft" : "text-ink"
+                              )}
+                            >
+                              {r.content}
+                            </p>
+                          </div>
+                        </div>
 
-                  <div className="mt-3 space-y-2 border-t border-line pt-3">
-                    <form action={addReportMemo} className="space-y-2">
-                      <input
-                        type="hidden"
-                        name="memberId"
-                        value={r.reported.id}
-                      />
-                      <Field label="運営メモ（対象会員に記録）">
-                        <Input
-                          name="body"
-                          placeholder="例：写真の確認を依頼、本人確認済み など"
-                        />
-                      </Field>
-                      <Button type="submit" size="sm" variant="secondary">
-                        メモを追加
-                      </Button>
-                    </form>
-
-                    <div className="flex flex-wrap gap-2">
-                      <form action={suspendReported}>
-                        <input
-                          type="hidden"
-                          name="memberId"
-                          value={r.reported.id}
-                        />
-                        <Button type="submit" size="sm" variant="outline">
-                          対象会員を停止
-                        </Button>
-                      </form>
-                      {r.status !== "RESOLVED" && (
-                        <form action={resolveReport}>
-                          <input type="hidden" name="reportId" value={r.id} />
-                          <Button type="submit" size="sm">
-                            対応完了にする
-                          </Button>
-                        </form>
-                      )}
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
-          </div>
+                        {resolved ? (
+                          <details className="group border-t border-line">
+                            <summary className="flex cursor-pointer list-none items-center gap-1 px-4 py-2.5 text-[13px] font-semibold text-primary-text select-none hover:bg-surface [&::-webkit-details-marker]:hidden">
+                              <IconChevronRight className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90" />
+                              メモ・操作（運営メモ・対象会員の利用停止）
+                            </summary>
+                            <div className="max-w-xl px-4 pt-1 pb-4">
+                              <ReportOps reportId={r.id} memberId={r.reported.id} resolved />
+                            </div>
+                          </details>
+                        ) : (
+                          <div className="border-t border-line p-4 md:border-t-0 md:border-l">
+                            <ReportOps reportId={r.id} memberId={r.reported.id} resolved={false} />
+                          </div>
+                        )}
+                      </div>
+                    </Panel>
+                  </FilterRow>
+                );
+              })}
+            </ul>
+            <FilterEmpty>条件に合う通報はありません</FilterEmpty>
+          </FilterScope>
         )}
-      </section>
+      </Section>
 
-      {/* ── お問い合わせ一覧 ── */}
-      <section>
-        <h2 className="mb-2 px-1 text-sm font-bold text-ink-soft">
-          お問い合わせ一覧（{inquiries.length} 件）
-        </h2>
+      {/* ── お問い合わせ ── */}
+      <Section id="inquiries" title="お問い合わせ" count={inquiries.length} action={<OpenCount n={openInquiries} />}>
         {inquiries.length === 0 ? (
-          <Card>
-            <CardBody>
-              <EmptyState
-                title="お問い合わせはありません"
-                description="会員からのお問い合わせが届くとここに表示されます。"
-              />
-            </CardBody>
-          </Card>
+          <Panel>
+            <EmptyInline tone="clear">お問い合わせはありません</EmptyInline>
+          </Panel>
         ) : (
-          <div className="space-y-3">
-            {inquiries.map((q) => (
-              <Card key={q.id}>
-                <CardBody>
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <Badge tone={INQUIRY_STATUS_TONE[q.status]}>
-                      {INQUIRY_STATUS_LABELS[q.status]}
-                    </Badge>
-                  </div>
+          <FilterScope params={["inquiry"]}>
+            <div className={cn("mb-3", WRAP_CHIPS)}>
+              <FilterChips
+                name="inquiry"
+                label="お問い合わせの対応状況"
+                allCount={inquiries.length}
+                options={STATUS_ORDER.map((s) => ({
+                  value: s,
+                  label: INQUIRY_STATUS_LABELS[s],
+                  count: inquiryCounts[s],
+                }))}
+              />
+            </div>
+            <ul className="flex flex-col gap-3">
+              {inquiries.map((q) => {
+                const resolved = q.status === "RESOLVED";
+                return (
+                  <FilterRow
+                    key={q.id}
+                    id={q.id}
+                    as="li"
+                    search={[q.member?.nickname, q.member?.fullName, q.email, q.subject, q.body]
+                      .filter(Boolean)
+                      .join(" ")}
+                    facets={{ inquiry: q.status }}
+                  >
+                    <Panel className={cn(resolved ? "bg-canvas" : ATTENTION_LINE)}>
+                      <div className="min-w-0 space-y-3 p-4">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                          <InquiryStatusPill status={q.status} size="md" />
+                          <Dates
+                            className="sm:ml-auto"
+                            items={[
+                              ["受付", q.createdAt],
+                              ["対応", q.handledAt],
+                            ]}
+                          />
+                        </div>
 
-                  <p className="text-sm font-bold text-ink">{q.subject}</p>
-                  <p className="mt-1 text-xs text-ink-faint">
-                    {q.member ? (
-                      <Link
-                        href={`/admin/members/${q.member.id}`}
-                        className="text-primary hover:underline"
-                      >
-                        {q.member.nickname}さん
-                      </Link>
-                    ) : (
-                      "会員以外"
-                    )}
-                    {q.email && ` ／ ${q.email}`}
-                  </p>
+                        <div>
+                          <h3 className={cn("text-[15px] font-bold", resolved ? "text-ink-soft" : "text-ink")}>
+                            {q.subject}
+                          </h3>
+                          <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                            {q.member ? (
+                              <MemberName member={q.member} role="送信者" />
+                            ) : (
+                              <span className="inline-flex items-center gap-1">
+                                <span className="text-xs font-medium text-ink-soft">送信者</span>
+                                <Tag>会員以外</Tag>
+                              </span>
+                            )}
+                            {q.email && (
+                              <a
+                                href={`mailto:${q.email}`}
+                                className="min-w-0 font-medium break-all text-primary-text hover:underline"
+                              >
+                                {q.email}
+                              </a>
+                            )}
+                          </p>
+                        </div>
 
-                  <p className="mt-2 whitespace-pre-wrap rounded-lg bg-canvas px-3 py-2 text-sm text-ink-soft">
-                    {q.body}
-                  </p>
-                  <p className="mt-1 text-xs text-ink-faint">
-                    受付 {formatDateTime(q.createdAt)}
-                    {q.handledAt && ` ／ 対応 ${formatDateTime(q.handledAt)}`}
-                  </p>
+                        <div>
+                          <p className="text-[13px] text-ink-soft">お問い合わせ内容</p>
+                          <p
+                            className={cn(
+                              "mt-0.5 text-sm leading-relaxed whitespace-pre-wrap",
+                              resolved ? "text-ink-soft" : "text-ink"
+                            )}
+                          >
+                            {q.body}
+                          </p>
+                        </div>
+                      </div>
 
-                  {q.status !== "RESOLVED" && (
-                    <div className="mt-3 border-t border-line pt-3">
-                      <form action={resolveInquiry}>
-                        <input type="hidden" name="inquiryId" value={q.id} />
-                        <Button type="submit" size="sm">
-                          対応完了にする
-                        </Button>
-                      </form>
-                    </div>
-                  )}
-                </CardBody>
-              </Card>
-            ))}
-          </div>
+                      {!resolved && (
+                        <div className="border-t border-line px-4 py-3">
+                          <form action={resolveInquiry}>
+                            <input type="hidden" name="inquiryId" value={q.id} />
+                            <Button type="submit" size="md">
+                              対応完了にする
+                            </Button>
+                          </form>
+                        </div>
+                      )}
+                    </Panel>
+                  </FilterRow>
+                );
+              })}
+            </ul>
+            <FilterEmpty>条件に合うお問い合わせはありません</FilterEmpty>
+          </FilterScope>
         )}
-      </section>
+      </Section>
+    </div>
+  );
+}
+
+/** 状態のチップをスマホでも横スクロールにせず折り返す（端で切れて見えなくなるのを防ぐ） */
+const WRAP_CHIPS = "[&_[role=radiogroup]]:mx-0 [&_[role=radiogroup]]:flex-wrap [&_[role=radiogroup]]:px-0";
+
+/** 役割ラベル（対象会員・通報者）の幅を揃えて名前の頭を縦にそろえる */
+const ROLE_COL = "[&>span:first-child]:w-14 [&>span:first-child]:shrink-0";
+
+/** 見出し右の「要対応 n」 */
+function OpenCount({ n }: { n: number }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-ink-soft">
+      要対応
+      <CountPill n={n} />
+    </span>
+  );
+}
+
+/** ページ内の下のセクションへ移る文字リンク（要対応の件数つき） */
+function JumpLink({ href, label, open }: { href: string; label: string; open: number }) {
+  return (
+    <a
+      href={href}
+      className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary-text hover:underline"
+    >
+      <svg
+        viewBox="0 0 20 20"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-4 w-4"
+        aria-hidden
+      >
+        <path d="M10 4v12M5 11l5 5 5-5" />
+      </svg>
+      {label}
+      <span className="ml-1 inline-flex items-center gap-1 font-normal text-ink-soft">
+        要対応
+        <CountPill n={open} />
+      </span>
+    </a>
+  );
+}
+
+/** 受付・対応の日時を並べる（対応日時がなければ省略） */
+function Dates({ items, className }: { items: [string, Date | null][]; className?: string }) {
+  return (
+    <span className={cn("flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] text-ink-soft", className)}>
+      {items
+        .filter((it): it is [string, Date] => it[1] != null)
+        .map(([label, date]) => (
+          <span key={label}>
+            {label} <Timestamp date={date} className="text-ink" />
+          </span>
+        ))}
+    </span>
+  );
+}
+
+/** 通報への操作：対応完了（主）・運営メモ・対象会員の停止 */
+function ReportOps({ reportId, memberId, resolved }: { reportId: string; memberId: string; resolved: boolean }) {
+  const memoId = `memo-${reportId}`;
+  return (
+    <div className="space-y-4">
+      {!resolved && (
+        <form action={resolveReport}>
+          <input type="hidden" name="reportId" value={reportId} />
+          <Button type="submit" size="md">
+            対応完了にする
+          </Button>
+        </form>
+      )}
+
+      <form action={addReportMemo}>
+        <input type="hidden" name="memberId" value={memberId} />
+        <label htmlFor={memoId} className="mb-1 block text-[13px] font-semibold text-ink">
+          運営メモ<span className="font-normal text-ink-soft">（対象会員に記録）</span>
+        </label>
+        <div className="flex gap-2">
+          <Input id={memoId} name="body" className="h-10 min-w-0 flex-1" placeholder="例：写真の確認を依頼" />
+          <Button type="submit" size="md" variant="secondary">
+            追加
+          </Button>
+        </div>
+      </form>
+
+      <form action={suspendReported} className="border-t border-line-soft pt-3">
+        <input type="hidden" name="memberId" value={memberId} />
+        <Button type="submit" size="md" variant="outline">
+          対象会員を利用停止
+        </Button>
+      </form>
     </div>
   );
 }
