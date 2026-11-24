@@ -35,7 +35,9 @@ export function CardBody({
   className?: string;
   children: React.ReactNode;
 }) {
-  return <div className={cn("p-4", className)}>{children}</div>;
+  // cn は単純な結合なので、p-0 などの指定時は既定の p-4 を付けない（付けると p-4 が勝ってしまう）
+  const customPadding = /(^|\s)p-\S+/.test(className ?? "");
+  return <div className={cn(!customPadding && "p-4", className)}>{children}</div>;
 }
 
 export function SectionTitle({
