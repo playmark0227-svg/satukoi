@@ -46,3 +46,15 @@ export function formatSlot(start: Date | string, end: Date | string): string {
 export function fromNow(d: Date | string): string {
   return dayjs(d).format("M/D HH:mm");
 }
+
+/** 一覧向けの短い日時（今年なら「11/23（月）20:05」、それ以外は「2025/11/23 20:05」） */
+export function formatShortDateTime(d: Date | string): string {
+  const x = dayjs(d);
+  return x.year() === dayjs().year() ? x.format("M/D（ddd）HH:mm") : x.format("YYYY/M/D HH:mm");
+}
+
+/** 一覧向けの短い日付（今年なら「11/23（月）」、それ以外は「2025/11/23」） */
+export function formatShortDate(d: Date | string): string {
+  const x = dayjs(d);
+  return x.year() === dayjs().year() ? x.format("M/D（ddd）") : x.format("YYYY/M/D");
+}

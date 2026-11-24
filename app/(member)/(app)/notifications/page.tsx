@@ -58,7 +58,7 @@ export default async function NotificationsPage() {
         right={
           hasUnread ? (
             <form action={markAllRead}>
-              <Button type="submit" variant="ghost" size="sm" className="px-2 text-xs">
+              <Button type="submit" variant="ghost" size="sm">
                 すべて既読
               </Button>
             </form>

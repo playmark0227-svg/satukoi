@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 
-type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline";
+type Variant = "primary" | "secondary" | "ghost" | "danger" | "outline" | "danger-outline";
 type Size = "sm" | "md" | "lg";
 
 const base =
@@ -14,6 +14,8 @@ const variants: Record<Variant, string> = {
   ghost: "bg-transparent text-ink hover:bg-surface-alt",
   danger: "bg-danger text-white hover:brightness-105",
   outline: "border border-line bg-surface text-ink hover:bg-surface-alt",
+  // 取り返しのつかない操作の入口（強制退会・違約金など）。塗りの danger より控えめに
+  "danger-outline": "border border-danger/40 bg-surface text-danger-strong hover:bg-danger-soft",
 };
 
 const sizes: Record<Size, string> = {

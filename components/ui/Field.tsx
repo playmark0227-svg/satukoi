@@ -30,7 +30,7 @@ export function Field({
         )}
       </span>
       {children}
-      {hint && !error && <span className="mt-1 block text-xs text-ink-faint">{hint}</span>}
+      {hint && !error && <span className="mt-1 block text-xs text-ink-soft">{hint}</span>}
       {error && <span className="mt-1 block text-xs text-danger">{error}</span>}
     </label>
   );

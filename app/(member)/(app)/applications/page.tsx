@@ -169,7 +169,7 @@ function List({
       {items.map((item) => (
         <Card key={item.id}>
           <div className="p-4">
-            <Link href={`/users/${item.other.id} transitionTypes={["nav-forward"]}`} className="flex items-start gap-3">
+            <Link href={`/users/${item.other.id}`} transitionTypes={["nav-forward"]} className="flex items-start gap-3">
               <span className={item.status === "PENDING" ? "story-ring" : "story-ring-seen"}>
                 <Avatar
                   url={item.other.photos[0]?.url}

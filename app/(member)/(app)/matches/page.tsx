@@ -160,7 +160,7 @@ function MatchList({ items, pendingReceived }: { items: MatchItem[]; pendingRece
           {items.map((it) => (
             <li key={it.id}>
               <Link
-                href={`/matches/${it.id} transitionTypes={["nav-forward"]}`}
+                href={`/matches/${it.id}`} transitionTypes={["nav-forward"]}
                 className="group flex items-center gap-3.5 px-4 py-3.5 transition-colors hover:bg-canvas active:bg-surface-alt"
               >
                 {/* 要対応（日程候補が届いた・予定が近い）はグラデーションの輪で目立たせる */}

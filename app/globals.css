@@ -11,6 +11,8 @@
   /* 操作色（ボタン・リンク・選択状態） */
   --color-primary: #0095f6;
   --color-primary-strong: #1877f2;
+  /* 文字として使う操作色（白地・淡色地でも読める濃さ。ボタンの塗りは primary のまま） */
+  --color-primary-text: #0060c7;
   --color-primary-soft: #e0f1fe;
   --color-primary-tint: #f0f8ff;
 
@@ -34,11 +36,16 @@
 
   --color-success: #20b15a;
   --color-success-soft: #e7f7ee;
+  --color-success-strong: #15803d; /* 淡い成功色の上に載せる文字色 */
   --color-warning: #f59e0b;
   --color-warning-soft: #fef3e2;
   --color-warning-strong: #b45309; /* 淡い警告背景の上に載せる文字色（コントラスト確保） */
   --color-danger: #ed4956;
   --color-danger-soft: #fdecee;
+  --color-danger-strong: #c0262d; /* 淡い警告色の上に載せる文字色 */
+  /* 調整中など「進行中」を表す色（運営管理画面のステータス用。info＝primary と区別する） */
+  --color-violet: #6d28d9;
+  --color-violet-soft: #f3e8ff;
   --color-info: #0095f6;
   --color-info-soft: #e0f1fe;
 
@@ -118,6 +125,11 @@ body {
 @layer base {
   h1, h2, h3, h4 { text-wrap-style: balance; }
   p, li, dd { text-wrap-style: pretty; }
+  /* キーボード操作時だけ、いまどこにいるかをはっきり示す */
+  :where(a, button, summary, [role="switch"]):focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 /* ── タイポグラフィ・ユーティリティ ── */

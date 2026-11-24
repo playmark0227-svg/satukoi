@@ -114,7 +114,7 @@ export default async function MatchDetailPage({
 
       {/* お相手（タップでプロフィールへ） */}
       <Link
-        href={`/users/${other.id} transitionTypes={["nav-forward"]}`}
+        href={`/users/${other.id}`} transitionTypes={["nav-forward"]}
         className="flex items-center gap-3 border-b border-line bg-surface px-4 py-3 transition-colors active:bg-surface-alt"
       >
         <Avatar url={other.photos[0]?.url} name={other.nickname} className="h-12 w-12 text-lg" />
@@ -167,7 +167,7 @@ export default async function MatchDetailPage({
               </CardBody>
             </Card>
             <Link
-              href={`/survey/${match.id} transitionTypes={["nav-forward"]}`}
+              href={`/survey/${match.id}`} transitionTypes={["nav-forward"]}
               className="flex items-center gap-3 rounded-[var(--radius-card)] border border-line/80 bg-surface px-4 py-3.5 shadow-[var(--shadow-card)] transition-colors active:bg-surface-alt"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-surface-alt text-ink-soft">

@@ -33,7 +33,7 @@ export const Select = forwardRef<
   return (
     <select
       ref={ref}
-      className={cn(fieldClass, "appearance-none bg-no-repeat", className)}
+      className={cn(fieldClass, "appearance-none bg-no-repeat pr-10", className)}
       style={{
         backgroundImage:
           "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%239aa0b4' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>\")",
