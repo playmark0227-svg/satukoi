@@ -100,7 +100,7 @@ export function AdminShell({
   return (
     <div className="flex min-h-dvh bg-canvas">
       {/* ── PC：サイドバー ── */}
-      <aside className="sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col border-r border-line bg-surface px-3 pt-6 pb-4 lg:flex">
+      <aside className="sticky top-0 hidden h-dvh w-[264px] shrink-0 flex-col border-r border-line bg-surface px-3 pt-6 pb-4 lg:flex">
         <Link href="/admin" className="mb-4 flex items-center gap-2.5 px-3">
           <BrandMark className="h-8 w-8" />
           <span className="min-w-0">

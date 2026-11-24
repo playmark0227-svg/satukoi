@@ -485,6 +485,100 @@ async function main() {
     },
   });
 
+  // ── マッチ④：キャンセル（24時間前〜2時間前。違約金5,500円は未収・警告1点） ──
+  const app4 = await prisma.dateApplication.create({
+    data: {
+      applicantId: males[2].id,
+      receiverId: females[2].id,
+      status: "ACCEPTED",
+      createdAt: jstAt(-9, 21, 0),
+      respondedAt: jstAt(-8, 12, 30),
+    },
+  });
+  const match4 = await prisma.match.create({
+    data: {
+      applicantId: males[2].id,
+      receiverId: females[2].id,
+      applicationId: app4.id,
+      phase: "CANCELLED",
+      matchedAt: jstAt(-8, 12, 30),
+      lastActionAt: jstAt(-2, 10, 15),
+    },
+  });
+  await prisma.dateEvent.create({
+    data: {
+      matchId: match4.id,
+      startAt: jstAt(-1, 14, 0),
+      endAt: jstAt(-1, 15, 0),
+      status: "CANCELLED",
+      storeId: stores[2].id,
+      storeConfirmedAt: jstAt(-5, 18, 0),
+      confirmedAt: jstAt(-6, 20, 0),
+    },
+  });
+  const cancel4 = await prisma.cancellation.create({
+    data: {
+      matchId: match4.id,
+      byMemberId: males[2].id,
+      category: "H24_TO_2H",
+      reason: "急な仕事が入ってしまったため。",
+      refundIssuedToCounterpart: true,
+      penaltyAmount: 5500,
+      warningPoints: 1,
+      createdAt: jstAt(-2, 10, 15),
+    },
+  });
+  await prisma.warning.create({
+    data: {
+      memberId: males[2].id,
+      points: 1,
+      reason: "24時間前〜2時間前のキャンセル",
+      cancellationId: cancel4.id,
+      issuedAt: jstAt(-2, 10, 15),
+      expiresAt: jstAt(363, 10, 15),
+    },
+  });
+  await prisma.payment.create({
+    data: {
+      memberId: males[2].id,
+      matchId: match4.id,
+      purpose: "PENALTY_5500",
+      amount: 5500,
+      status: "PENDING",
+      createdAt: jstAt(-2, 10, 15),
+    },
+  });
+
+  // ── マッチ⑤：日程確定・店舗が未確定（運営の対応待ち） ──
+  const app5 = await prisma.dateApplication.create({
+    data: {
+      applicantId: males[4].id,
+      receiverId: females[5].id,
+      status: "ACCEPTED",
+      createdAt: jstAt(-4, 22, 10),
+      respondedAt: jstAt(-3, 9, 40),
+    },
+  });
+  const match5 = await prisma.match.create({
+    data: {
+      applicantId: males[4].id,
+      receiverId: females[5].id,
+      applicationId: app5.id,
+      phase: "CONFIRMED",
+      matchedAt: jstAt(-3, 9, 40),
+      lastActionAt: jstAt(0, 9, 5),
+    },
+  });
+  await prisma.dateEvent.create({
+    data: {
+      matchId: match5.id,
+      startAt: jstAt(4, 19, 0),
+      endAt: jstAt(4, 20, 0),
+      status: "SCHEDULED",
+      confirmedAt: jstAt(0, 9, 5),
+    },
+  });
+
   // ── 受け取ったお申込み（デモ会員けんた宛・お返事待ち） ──
   const received: [number, string | null, Date][] = [
     [2, "プロフィールを拝見しました。休日が合いそうなので、よろしければお会いしたいです。", jstAt(-1, 22, 15)],

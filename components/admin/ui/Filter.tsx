@@ -17,7 +17,7 @@
 //  同じ項目を表（PC）と一覧（スマホ）の両方に出すときは、同じ id を渡す（件数は id 単位で数える）。
 // ════════════════════════════════════════════════════════════════════
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 import { IconSearch } from "@/components/member/icons";
 
@@ -52,6 +52,23 @@ export function normalizeSearch(s: string) {
     .replace(/[ァ-ヶ]/g, (ch) => String.fromCharCode(ch.charCodeAt(0) - 0x60));
 }
 
+// ── URL を「状態の置き場所」として使う（?q=…&status=…）。replaceState では popstate が来ないので自前で通知する
+const urlListeners = new Set<() => void>();
+function subscribeUrl(cb: () => void) {
+  urlListeners.add(cb);
+  window.addEventListener("popstate", cb);
+  return () => {
+    urlListeners.delete(cb);
+    window.removeEventListener("popstate", cb);
+  };
+}
+const getUrlSnapshot = () => window.location.search;
+const getServerUrlSnapshot = () => "";
+function replaceUrl(url: URL) {
+  window.history.replaceState(window.history.state, "", url);
+  urlListeners.forEach((l) => l());
+}
+
 export function FilterScope({
   params = [],
   children,
@@ -60,39 +77,33 @@ export function FilterScope({
   params?: string[];
   children: React.ReactNode;
 }) {
-  const [q, setQState] = useState("");
-  const [facets, setFacets] = useState<Facets>({});
+  // サーバー描画・ハイドレーション時は絞り込みなし（全件表示）→ 直後に URL の条件を反映
+  const search = useSyncExternalStore(subscribeUrl, getUrlSnapshot, getServerUrlSnapshot);
+  const paramsKey = params.join(",");
+  const { q, facets } = useMemo(() => {
+    const sp = new URLSearchParams(search);
+    const f: Facets = {};
+    for (const p of paramsKey ? paramsKey.split(",") : []) {
+      const v = sp.get(p);
+      if (v) f[p] = v;
+    }
+    return { q: sp.get("q") ?? "", facets: f };
+  }, [search, paramsKey]);
+
   const reg = useRef(new Map<string, boolean>());
   const [counts, setCounts] = useState({ visible: 0, total: 0 });
   const pending = useRef(false);
-  const paramsKey = params.join(",");
 
-  // URL の初期値（ダッシュボードからのリンク ?status=… など）
-  useEffect(() => {
-    const sp = new URLSearchParams(window.location.search);
-    const initQ = sp.get("q");
-    if (initQ) setQState(initQ);
-    const init: Facets = {};
+  const update = useCallback((nextQ: string, nextF: Facets) => {
+    const url = new URL(window.location.href);
+    if (nextQ) url.searchParams.set("q", nextQ);
+    else url.searchParams.delete("q");
     for (const p of paramsKey ? paramsKey.split(",") : []) {
-      const v = sp.get(p);
-      if (v) init[p] = v;
+      if (nextF[p]) url.searchParams.set(p, nextF[p]);
+      else url.searchParams.delete(p);
     }
-    if (Object.keys(init).length) setFacets(init);
+    replaceUrl(url);
   }, [paramsKey]);
-
-  const syncUrl = useCallback(
-    (nextQ: string, nextF: Facets) => {
-      const url = new URL(window.location.href);
-      if (nextQ) url.searchParams.set("q", nextQ);
-      else url.searchParams.delete("q");
-      for (const p of paramsKey ? paramsKey.split(",") : []) {
-        if (nextF[p]) url.searchParams.set(p, nextF[p]);
-        else url.searchParams.delete(p);
-      }
-      window.history.replaceState(window.history.state, "", url);
-    },
-    [paramsKey]
-  );
 
   const recount = useCallback(() => {
     if (pending.current) return;
@@ -111,21 +122,13 @@ export function FilterScope({
     () => ({
       q,
       facets,
-      setQ: (next) => {
-        setQState(next);
-        syncUrl(next, facets);
-      },
+      setQ: (next) => update(next, facets),
       setFacet: (name, v) => {
         const next = { ...facets, [name]: v };
         if (!v) delete next[name];
-        setFacets(next);
-        syncUrl(q, next);
+        update(q, next);
       },
-      clear: () => {
-        setQState("");
-        setFacets({});
-        syncUrl("", {});
-      },
+      clear: () => update("", {}),
       report: (id, visible) => {
         reg.current.set(id, visible);
         recount();
@@ -137,7 +140,7 @@ export function FilterScope({
       visible: counts.visible,
       total: counts.total,
     }),
-    [q, facets, counts, syncUrl, recount]
+    [q, facets, counts, update, recount]
   );
 
   return <FilterCtx.Provider value={value}>{children}</FilterCtx.Provider>;
